@@ -1135,44 +1135,19 @@
     const site = document.getElementById('f_site').value || 'Site non sélectionné';
     const type = document.getElementById('f_type').value || 'Kulanz';
     const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+    const orNum = document.querySelector('input[name="or_number"]').value || 'sansOR';
 
     document.getElementById('ph-site').textContent = site;
     document.getElementById('ph-date').textContent = now;
     document.getElementById('ph-type-badge').textContent = 'Demande ' + type;
 
-    const btn = document.querySelector('.btn-print');
-    btn.disabled = true;
-    btn.textContent = 'Génération PDF…';
+    // Nom du fichier suggéré dans la boîte "Enregistrer"
+    document.title = `Demande_${type}_${site.replace(/\s/g,'_')}_OR${orNum}`;
 
-    // Charger html2pdf si pas encore chargé
-    if (!window.html2pdf) {
-      await new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    }
+    window.print();
 
-    const element = document.querySelector('main');
-    const orNum = document.querySelector('input[name="or_number"]').value || 'sans-OR';
-    const filename = `Demande_${type}_${site.replace(/\s/g,'_')}_OR${orNum}_${now.replace(/\s/g,'-')}.pdf`;
-
-    const opt = {
-      margin:       [6, 8, 6, 8],
-      filename:     filename,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: ['avoid-all'] }
-    };
-
-    await html2pdf().set(opt).from(element).save();
-
-    btn.disabled = false;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Enregistrer en PDF`;
-    showToast('✔ PDF enregistré !');
+    // Restaurer le titre original après
+    setTimeout(() => { document.title = 'Formulaire de Demande Garantie – GE Auto'; }, 2000);
   }
 
 
