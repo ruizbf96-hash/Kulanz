@@ -1046,22 +1046,18 @@
   });
 
   // ─── Submit → mailto ─────────────────────────────────────────────
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
     const form = document.getElementById('mainForm');
     const data = new FormData(form);
 
-    const site = data.get('site') || 'Non renseigné';
     if (!data.get('site')) {
       alert('⚠ Veuillez sélectionner un site dans la barre de navigation.');
       return;
     }
 
     const type = data.get('type_demande');
-    let body = `DEMANDE DE PRISE EN CHARGE – ${type.toUpperCase()}\n`;
-    body += `${'═'.repeat(50)}\n\n`;
-    body += `Site : ${site}\n`;
-    body += `Type de demande : ${type}\n\n`;
+    const site = data.get('site');
 
     const labels = {
       chassis: 'N° de châssis', kilometrage: 'Kilométrage (km)',
@@ -1082,26 +1078,56 @@
       commentaires: 'Commentaires'
     };
 
+    let message = `DEMANDE DE PRISE EN CHARGE – ${type.toUpperCase()}\n`;
+    message += `${'═'.repeat(50)}\n\n`;
+    message += `Site : ${site}\nType de demande : ${type}\n\n`;
+
     for (const [key, label] of Object.entries(labels)) {
       const val = data.get(key);
-      if (val && val.trim()) body += `${label} : ${val}\n`;
+      if (val && val.trim()) message += `${label} : ${val}\n`;
     }
 
     const pieces = data.getAll('pieces[]');
     if (pieces.length > 0) {
-      body += `\nPièces jointes déclarées :\n`;
-      pieces.forEach(p => body += `  – ${p}\n`);
+      message += `\nPièces jointes déclarées :\n`;
+      pieces.forEach(p => message += `  – ${p}\n`);
     }
 
-    body += `\n${'─'.repeat(50)}\n`;
-    body += `Envoyé depuis le formulaire GE Auto Garantie`;
+    message += `\n${'─'.repeat(50)}\nEnvoyé depuis le formulaire GE Auto Garantie`;
 
-    const subject = encodeURIComponent(`[${type}] Demande prise en charge – ${site} – OR ${data.get('or_number') || '?'}`);
-    const bodyEnc = encodeURIComponent(body);
+    const btn = document.querySelector('.btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours…';
 
-    window.location.href = `mailto:teamgarantie@geauto.fr?subject=${subject}&body=${bodyEnc}`;
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: '7bf5b927-e39f-4fc1-9f60-642e4741e445',
+          subject: `[${type}] Demande – ${site} – OR ${data.get('or_number') || '?'}`,
+          message: message,
+          from_name: 'Formulaire GE Auto Garantie'
+        })
+      });
 
-    showToast('✔ Ouverture de votre messagerie…');
+      const result = await res.json();
+
+      if (result.success) {
+        showToast('✔ Demande envoyée à teamgarantie@geauto.fr');
+        form.reset();
+        document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('site-display-name').textContent = 'Aucun site sélectionné';
+        document.getElementById('f_site').value = '';
+      } else {
+        throw new Error('Échec envoi');
+      }
+    } catch (err) {
+      showToast('❌ Erreur — vérifiez votre connexion');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande`;
+    }
   }
 
   function printForm() {
