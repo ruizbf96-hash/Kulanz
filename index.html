@@ -676,7 +676,7 @@
 
 <!-- ─── MAIN ───────────────────────────────────────────────────────── -->
 <main>
-  <form id="mainForm" onsubmit="submitForm(event)">
+  <form id="mainForm">
     <input type="hidden" id="f_site" name="site" value="">
     <input type="hidden" id="f_type" name="type_demande" value="Kulanz">
 
@@ -799,7 +799,7 @@
           <div class="field">
             <label>Y a-t-il une TPI ? <span class="req">*</span></label>
             <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="tpi" value="OUI" required> Oui</label>
+              <label class="radio-item"><input type="radio" name="tpi" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="tpi" value="NON"> Non</label>
             </div>
           </div>
@@ -814,7 +814,7 @@
           <div class="field">
             <label>Garantie OPTEVEN visible dans les données véhicule ELSA ? <span class="req">*</span></label>
             <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="opteven" value="OUI" required> Oui</label>
+              <label class="radio-item"><input type="radio" name="opteven" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="opteven" value="NON"> Non</label>
             </div>
           </div>
@@ -822,7 +822,7 @@
           <div class="field">
             <label>Code "tuning" enregistré dans SAGA/2 ou ODIS ? <span class="req">*</span></label>
             <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="tuning" value="OUI" required> Oui <small style="color:var(--red);margin-left:4px;">→ NOK</small></label>
+              <label class="radio-item"><input type="radio" name="tuning" value="OUI"> Oui <small style="color:var(--red);margin-left:4px;">→ NOK</small></label>
               <label class="radio-item"><input type="radio" name="tuning" value="NON"> Non</label>
             </div>
           </div>
@@ -830,7 +830,7 @@
           <div class="field">
             <label>Préconisations constructeur respectées (y compris dernier entretien) ? <span class="req">*</span></label>
             <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="preconisations" value="OUI" required> Oui</label>
+              <label class="radio-item"><input type="radio" name="preconisations" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="preconisations" value="NON"> Non</label>
             </div>
           </div>
@@ -838,7 +838,7 @@
           <div class="field">
             <label>Dernier entretien fait chez le site ou vendu lors de la réparation ? <span class="req">*</span></label>
             <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="dernier_entretien" value="OUI" required> Oui</label>
+              <label class="radio-item"><input type="radio" name="dernier_entretien" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="dernier_entretien" value="NON"> Non <small style="color:var(--red);margin-left:4px;">→ NOK</small></label>
             </div>
           </div>
@@ -846,7 +846,7 @@
           <div class="field">
             <label>Lien entre la cause du dommage et l'entretien ? <span class="req">*</span></label>
             <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="lien_entretien" value="OUI" required> Oui <small style="color:var(--red);margin-left:4px;">→ NOK sauf entretiens OK</small></label>
+              <label class="radio-item"><input type="radio" name="lien_entretien" value="OUI"> Oui <small style="color:var(--red);margin-left:4px;">→ NOK sauf entretiens OK</small></label>
               <label class="radio-item"><input type="radio" name="lien_entretien" value="NON"> Non</label>
             </div>
           </div>
@@ -978,17 +978,17 @@
         En soumettant, le formulaire sera envoyé par e-mail à <strong>teamgarantie@geauto.fr</strong>
       </p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-        <button type="submit" class="btn-submit">
+        <button type="button" onclick="envoyerFormulaire()" class="btn-submit">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/>
           </svg>
           Envoyer la demande
         </button>
-        <button type="button" class="btn-print" onclick="printForm()">
+        <button type="button" onclick="printForm()" class="btn-print">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
           </svg>
-          Imprimer / Enregistrer en PDF
+          Enregistrer en PDF
         </button>
       </div>
     </div>
@@ -1046,13 +1046,22 @@
   });
 
   // ─── Submit → mailto ─────────────────────────────────────────────
-  async function submitForm(e) {
-    e.preventDefault();
+  async function envoyerFormulaire() {
     const form = document.getElementById('mainForm');
     const data = new FormData(form);
 
     if (!data.get('site')) {
       alert('⚠ Veuillez sélectionner un site dans la barre de navigation.');
+      return;
+    }
+
+    // Vérifier champs obligatoires manuellement
+    const chassis = form.querySelector('[name="chassis"]').value.trim();
+    const km = form.querySelector('[name="kilometrage"]').value.trim();
+    const or = form.querySelector('[name="or_number"]').value.trim();
+    const dateOR = form.querySelector('[name="date_or"]').value.trim();
+    if (!chassis || !km || !or || !dateOR) {
+      alert('⚠ Veuillez remplir tous les champs obligatoires (châssis, kilométrage, N° OR, date OR).');
       return;
     }
 
