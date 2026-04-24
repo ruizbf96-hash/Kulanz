@@ -1141,21 +1141,25 @@
   }
 
   function printForm() {
-    const site = document.getElementById('f_site').value || 'Site non sélectionné';
+    const site = document.getElementById('f_site').value;
     const type = document.getElementById('f_type').value || 'Kulanz';
     const orNum = document.querySelector('input[name="or_number"]').value || '';
-    const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
 
+    // Vérifications avant génération
+    if (!site) { alert('⚠ Veuillez sélectionner un site avant d\'enregistrer.'); return; }
+    if (!orNum) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation avant d\'enregistrer.'); return; }
+
+    const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
     const f = document.getElementById('mainForm');
-    const get = name => { const el = f.querySelector(`[name="${name}"]`); return el ? el.value : ''; };
-    const getRadio = name => { const el = f.querySelector(`[name="${name}"]:checked`); return el ? el.value : ''; };
+    const get = n => { const el = f.querySelector(`[name="${n}"]`); return el ? el.value : ''; };
+    const getRadio = n => { const el = f.querySelector(`[name="${n}"]:checked`); return el ? el.value : ''; };
 
     const fields = [
       { label: 'Site', value: site },
       { label: 'Type de demande', value: type },
       { label: 'N° de châssis', value: get('chassis') },
       { label: 'Kilométrage', value: get('kilometrage') ? get('kilometrage') + ' km' : '' },
-      { label: "N° d'Ordre de Réparation", value: get('or_number') },
+      { label: "N° d'Ordre de Réparation", value: orNum },
       { label: "Date de l'OR", value: get('date_or') },
       { label: 'KVPS', value: get('kvps') },
       { label: 'Technicien', value: get('technicien') },
@@ -1185,74 +1189,53 @@
         { label: 'Taux CIG (%)', value: get('cig_taux') },
       );
       const pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(el => el.value);
-      if (pieces.length) fields.push({ label: 'Pièces jointes', value: pieces.join('<br>• ') });
+      if (pieces.length) fields.push({ label: 'Pièces jointes', value: '• ' + pieces.join('\n• ') });
     }
     fields.push({ label: 'Commentaires', value: get('commentaires') });
 
     const rows = fields
-      .filter(f => f.value && f.value.trim())
-      .map((f, i) => `
-        <tr style="background:${i % 2 === 0 ? '#ffffff' : '#f7f6f2'}">
-          <td style="font-size:10.5px;font-weight:600;color:#444;padding:7px 12px;border:1px solid #ddd;width:38%;vertical-align:top;">${f.label}</td>
-          <td style="font-size:10.5px;color:#1a1a2e;padding:7px 12px;border:1px solid #ddd;vertical-align:top;">${f.value}</td>
-        </tr>`).join('');
+      .filter(fi => fi.value && fi.value.trim())
+      .map((fi, i) => `<tr style="background:${i%2===0?'#fff':'#f7f6f2'}">
+        <td style="font-size:11px;font-weight:600;color:#444;padding:6px 10px;border:1px solid #ddd;width:38%;vertical-align:top">${fi.label}</td>
+        <td style="font-size:11px;color:#1a1a2e;padding:6px 10px;border:1px solid #ddd;vertical-align:top;white-space:pre-wrap">${fi.value}</td>
+      </tr>`).join('');
 
-    const filename = `Demande_${type}_${site.replace(/\s+/g,'_')}_OR${orNum}.pdf`;
+    const filename = `Demande_${type}_${site.replace(/\s+/g,'_')}_OR${orNum}`;
 
-    const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${filename}</title>
 <style>
-  @page { size:A4 portrait; margin:12mm 14mm; }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:Arial,sans-serif; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  .hdr { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1a1a2e; padding-bottom:10px; margin-bottom:14px; }
-  .hdr-l h1 { font-size:18px; font-weight:700; color:#1a1a2e; }
-  .badge { display:inline-block; background:#1a1a2e; color:#d4ae52; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:20px; margin-top:5px; }
-  .hdr-r { text-align:right; font-size:10px; color:#555; line-height:1.8; }
-  .hdr-r strong { color:#1a1a2e; font-size:12px; display:block; }
-  .sec { font-size:11px; font-weight:700; color:#fff; background:#1a1a2e; padding:5px 10px; margin-top:12px; letter-spacing:0.5px; }
-  table { width:100%; border-collapse:collapse; }
-  .footer { margin-top:18px; border-top:1px solid #ddd; padding-top:7px; font-size:8.5px; color:#aaa; text-align:center; }
-</style>
-</head>
-<body>
+  @page{size:A4 portrait;margin:12mm 14mm}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1a1a2e;padding-bottom:10px;margin-bottom:14px}
+  .hdr-l h1{font-size:18px;font-weight:700;color:#1a1a2e}
+  .badge{display:inline-block;background:#1a1a2e;color:#d4ae52;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-top:5px}
+  .hdr-r{text-align:right;font-size:10px;color:#555;line-height:1.8}
+  .hdr-r strong{color:#1a1a2e;font-size:12px;display:block}
+  .sec{font-size:11px;font-weight:700;color:#fff;background:#1a1a2e;padding:5px 10px;margin-top:12px;letter-spacing:.5px}
+  table{width:100%;border-collapse:collapse}
+  .footer{margin-top:18px;border-top:1px solid #ddd;padding-top:7px;font-size:8.5px;color:#aaa;text-align:center}
+</style></head><body>
 <div class="hdr">
-  <div class="hdr-l">
-    <h1>GE Auto — Demande Garantie</h1>
-    <div class="badge">Demande ${type}</div>
-  </div>
-  <div class="hdr-r">
-    <strong>${site}</strong>
-    Date : ${now}<br>
-    OR : ${orNum || '—'}<br>
-    teamgarantie@geauto.fr
-  </div>
+  <div class="hdr-l"><h1>GE Auto — Demande Garantie</h1><div class="badge">Demande ${type}</div></div>
+  <div class="hdr-r"><strong>${site}</strong>Date : ${now}<br>OR : ${orNum}<br>teamgarantie@geauto.fr</div>
 </div>
 <div class="sec">Détails de la demande</div>
 <table>${rows}</table>
 <div class="footer">Document généré depuis le formulaire GE Auto Garantie — ${now}</div>
-</body>
-</html>`;
+<script>
+  window.addEventListener('load', function() {
+    window.print();
+    window.addEventListener('afterprint', function() { window.close(); });
+  });
+<\/script>
+</body></html>`;
 
-    // Créer iframe cachée pour imprimer proprement
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:0;';
-    document.body.appendChild(iframe);
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(html);
-    iframe.contentDocument.close();
-
-    iframe.onload = function() {
-      // Forcer le nom du fichier via le titre
-      iframe.contentDocument.title = filename.replace('.pdf','');
-      setTimeout(() => {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        setTimeout(() => document.body.removeChild(iframe), 1000);
-      }, 300);
-    };
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) { alert('⚠ Autorisez les popups pour ce site puis réessayez.'); return; }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
   }
 
 
