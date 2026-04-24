@@ -1131,23 +1131,117 @@
     }
   }
 
-  async function printForm() {
+  function printForm() {
     const site = document.getElementById('f_site').value || 'Site non sélectionné';
     const type = document.getElementById('f_type').value || 'Kulanz';
+    const orNum = document.querySelector('input[name="or_number"]').value || '';
     const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
-    const orNum = document.querySelector('input[name="or_number"]').value || 'sansOR';
 
-    document.getElementById('ph-site').textContent = site;
-    document.getElementById('ph-date').textContent = now;
-    document.getElementById('ph-type-badge').textContent = 'Demande ' + type;
+    // Collecter toutes les valeurs du formulaire
+    const f = document.getElementById('mainForm');
+    const get = name => { const el = f.querySelector(`[name="${name}"]`); return el ? el.value : ''; };
+    const getRadio = name => { const el = f.querySelector(`[name="${name}"]:checked`); return el ? el.value : ''; };
 
-    // Nom du fichier suggéré dans la boîte "Enregistrer"
-    document.title = `Demande_${type}_${site.replace(/\s/g,'_')}_OR${orNum}`;
+    const fields = [
+      { label: 'Site', value: site },
+      { label: 'Type de demande', value: type },
+      { label: 'N° de châssis', value: get('chassis') },
+      { label: 'Kilométrage', value: get('kilometrage') ? get('kilometrage') + ' km' : '' },
+      { label: "N° d'Ordre de Réparation", value: get('or_number') },
+      { label: "Date de l'OR", value: get('date_or') },
+      { label: 'KVPS', value: get('kvps') },
+      { label: 'Technicien', value: get('technicien') },
+      { label: 'Plainte client', value: get('plainte_client') },
+      { label: "Type d'avarie", value: get('type_avarie') },
+      { label: 'Emplacement', value: get('emplacement') },
+      { label: 'Référence pièce', value: get('ref_piece') },
+      { label: 'Désignation pièce', value: get('desig_piece') },
+      { label: 'Code dommage', value: get('code_dommage') },
+      { label: 'Code avarie', value: get('code_avarie') },
+    ];
 
-    window.print();
+    if (type === 'Kulanz') {
+      fields.push(
+        { label: 'TPI présente', value: getRadio('tpi') },
+        { label: 'N° TPI', value: get('num_tpi') },
+        { label: 'Garantie OPTEVEN visible', value: getRadio('opteven') },
+        { label: 'Code tuning détecté', value: getRadio('tuning') },
+        { label: 'Préconisations respectées', value: getRadio('preconisations') },
+        { label: 'Dernier entretien OK', value: getRadio('dernier_entretien') },
+        { label: 'Lien dommage / entretien', value: getRadio('lien_entretien') },
+      );
+    } else {
+      fields.push(
+        { label: 'Demande KULANZ effectuée', value: getRadio('kulanz_done') },
+        { label: 'CIG appliqué', value: getRadio('cig') },
+        { label: 'Taux CIG (%)', value: get('cig_taux') },
+      );
+      const pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(el => el.value);
+      if (pieces.length) fields.push({ label: 'Pièces jointes', value: pieces.join(', ') });
+    }
 
-    // Restaurer le titre original après
-    setTimeout(() => { document.title = 'Formulaire de Demande Garantie – GE Auto'; }, 2000);
+    fields.push({ label: 'Commentaires', value: get('commentaires') });
+
+    // Générer les lignes du tableau
+    const rows = fields
+      .filter(f => f.value && f.value.trim())
+      .map(f => `
+        <tr>
+          <td style="font-size:11px;font-weight:600;color:#555;padding:6px 10px;border:1px solid #ddd;background:#f9f8f5;width:40%;vertical-align:top;">${f.label}</td>
+          <td style="font-size:11px;color:#1a1a2e;padding:6px 10px;border:1px solid #ddd;vertical-align:top;">${f.value}</td>
+        </tr>`).join('');
+
+    const filename = `Demande_${type}_${site.replace(/\s/g,'_')}_OR${orNum}`;
+
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>${filename}</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #fff; color: #1a1a2e; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #1a1a2e; padding-bottom: 10px; margin-bottom: 16px; }
+  .header-left h1 { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+  .header-left .badge { display: inline-block; background: #1a1a2e; color: #d4ae52; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; margin-top: 5px; }
+  .header-right { text-align: right; font-size: 11px; color: #555; line-height: 1.7; }
+  .header-right strong { color: #1a1a2e; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  tr:nth-child(even) td:last-child { background: #fafaf8; }
+  .section-title { font-size: 13px; font-weight: 700; color: #fff; background: #1a1a2e; padding: 6px 10px; margin-top: 14px; margin-bottom: 0; letter-spacing: 0.5px; }
+  .footer { margin-top: 20px; border-top: 1px solid #ddd; padding-top: 8px; font-size: 9px; color: #999; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <h1>GE Auto — Demande Garantie</h1>
+      <div class="badge">Demande ${type}</div>
+    </div>
+    <div class="header-right">
+      <strong>${site}</strong><br>
+      Date : ${now}<br>
+      OR : ${orNum || '—'}<br>
+      teamgarantie@geauto.fr
+    </div>
+  </div>
+
+  <div class="section-title">Détails de la demande</div>
+  <table>${rows}</table>
+
+  <div class="footer">Document généré depuis le formulaire GE Auto Garantie — ${now}</div>
+
+  <script>
+    window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }
+  <\/script>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
+    if (!win) alert('⚠ Autorisez les popups pour ce site dans votre navigateur.');
   }
 
 
