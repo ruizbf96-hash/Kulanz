@@ -1137,7 +1137,6 @@
     const orNum = document.querySelector('input[name="or_number"]').value || '';
     const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
 
-    // Collecter toutes les valeurs du formulaire
     const f = document.getElementById('mainForm');
     const get = name => { const el = f.querySelector(`[name="${name}"]`); return el ? el.value : ''; };
     const getRadio = name => { const el = f.querySelector(`[name="${name}"]:checked`); return el ? el.value : ''; };
@@ -1177,71 +1176,74 @@
         { label: 'Taux CIG (%)', value: get('cig_taux') },
       );
       const pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(el => el.value);
-      if (pieces.length) fields.push({ label: 'Pièces jointes', value: pieces.join(', ') });
+      if (pieces.length) fields.push({ label: 'Pièces jointes', value: pieces.join('<br>• ') });
     }
-
     fields.push({ label: 'Commentaires', value: get('commentaires') });
 
-    // Générer les lignes du tableau
     const rows = fields
       .filter(f => f.value && f.value.trim())
-      .map(f => `
-        <tr>
-          <td style="font-size:11px;font-weight:600;color:#555;padding:6px 10px;border:1px solid #ddd;background:#f9f8f5;width:40%;vertical-align:top;">${f.label}</td>
-          <td style="font-size:11px;color:#1a1a2e;padding:6px 10px;border:1px solid #ddd;vertical-align:top;">${f.value}</td>
+      .map((f, i) => `
+        <tr style="background:${i % 2 === 0 ? '#ffffff' : '#f7f6f2'}">
+          <td style="font-size:10.5px;font-weight:600;color:#444;padding:7px 12px;border:1px solid #ddd;width:38%;vertical-align:top;">${f.label}</td>
+          <td style="font-size:10.5px;color:#1a1a2e;padding:7px 12px;border:1px solid #ddd;vertical-align:top;">${f.value}</td>
         </tr>`).join('');
 
-    const filename = `Demande_${type}_${site.replace(/\s/g,'_')}_OR${orNum}`;
+    const filename = `Demande_${type}_${site.replace(/\s+/g,'_')}_OR${orNum}.pdf`;
 
     const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>${filename}</title>
 <style>
-  @page { size: A4 portrait; margin: 12mm 14mm; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; background: #fff; color: #1a1a2e; }
-  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #1a1a2e; padding-bottom: 10px; margin-bottom: 16px; }
-  .header-left h1 { font-size: 20px; font-weight: 700; color: #1a1a2e; }
-  .header-left .badge { display: inline-block; background: #1a1a2e; color: #d4ae52; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; margin-top: 5px; }
-  .header-right { text-align: right; font-size: 11px; color: #555; line-height: 1.7; }
-  .header-right strong { color: #1a1a2e; font-size: 13px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-  tr:nth-child(even) td:last-child { background: #fafaf8; }
-  .section-title { font-size: 13px; font-weight: 700; color: #fff; background: #1a1a2e; padding: 6px 10px; margin-top: 14px; margin-bottom: 0; letter-spacing: 0.5px; }
-  .footer { margin-top: 20px; border-top: 1px solid #ddd; padding-top: 8px; font-size: 9px; color: #999; text-align: center; }
+  @page { size:A4 portrait; margin:12mm 14mm; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Arial,sans-serif; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .hdr { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1a1a2e; padding-bottom:10px; margin-bottom:14px; }
+  .hdr-l h1 { font-size:18px; font-weight:700; color:#1a1a2e; }
+  .badge { display:inline-block; background:#1a1a2e; color:#d4ae52; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:20px; margin-top:5px; }
+  .hdr-r { text-align:right; font-size:10px; color:#555; line-height:1.8; }
+  .hdr-r strong { color:#1a1a2e; font-size:12px; display:block; }
+  .sec { font-size:11px; font-weight:700; color:#fff; background:#1a1a2e; padding:5px 10px; margin-top:12px; letter-spacing:0.5px; }
+  table { width:100%; border-collapse:collapse; }
+  .footer { margin-top:18px; border-top:1px solid #ddd; padding-top:7px; font-size:8.5px; color:#aaa; text-align:center; }
 </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-left">
-      <h1>GE Auto — Demande Garantie</h1>
-      <div class="badge">Demande ${type}</div>
-    </div>
-    <div class="header-right">
-      <strong>${site}</strong><br>
-      Date : ${now}<br>
-      OR : ${orNum || '—'}<br>
-      teamgarantie@geauto.fr
-    </div>
+<div class="hdr">
+  <div class="hdr-l">
+    <h1>GE Auto — Demande Garantie</h1>
+    <div class="badge">Demande ${type}</div>
   </div>
-
-  <div class="section-title">Détails de la demande</div>
-  <table>${rows}</table>
-
-  <div class="footer">Document généré depuis le formulaire GE Auto Garantie — ${now}</div>
-
-  <script>
-    window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }
-  <\/script>
+  <div class="hdr-r">
+    <strong>${site}</strong>
+    Date : ${now}<br>
+    OR : ${orNum || '—'}<br>
+    teamgarantie@geauto.fr
+  </div>
+</div>
+<div class="sec">Détails de la demande</div>
+<table>${rows}</table>
+<div class="footer">Document généré depuis le formulaire GE Auto Garantie — ${now}</div>
 </body>
 </html>`;
 
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url, '_blank');
-    if (!win) alert('⚠ Autorisez les popups pour ce site dans votre navigateur.');
+    // Créer iframe cachée pour imprimer proprement
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:0;';
+    document.body.appendChild(iframe);
+    iframe.contentDocument.open();
+    iframe.contentDocument.write(html);
+    iframe.contentDocument.close();
+
+    iframe.onload = function() {
+      // Forcer le nom du fichier via le titre
+      iframe.contentDocument.title = filename.replace('.pdf','');
+      setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+      }, 300);
+    };
   }
 
 
