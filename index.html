@@ -1211,8 +1211,11 @@
   .footer{margin-top:18px;border-top:1px solid #ddd;padding-top:7px;font-size:8.5px;color:#aaa;text-align:center}
 </style></head><body>
 <div class="hdr">
-  <div class="hdr-l"><h1>GE Auto — Demande Garantie</h1><div class="badge">Demande ${type}</div></div>
-  <div class="hdr-r"><strong>${site}</strong>Date : ${now}<br>OR : ${orNum}<br>teamgarantie@geauto.fr</div>
+  <div class="hdr-l">
+    <h1>${site} — ${get('kvps') || 'KVPS'} — ${get('code_dommage') || 'Code dommage'}</h1>
+    <div class="badge">Demande ${type}</div>
+  </div>
+  <div class="hdr-r"><strong>OR : ${orNum}</strong>Date : ${now}<br>teamgarantie@geauto.fr</div>
 </div>
 <div class="sec">Détails de la demande</div>
 <table>${rows}</table>
