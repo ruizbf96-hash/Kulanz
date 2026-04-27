@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulaire de Demande Garantie – GE Auto</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --noir: #0d0d0d;
@@ -1012,11 +1011,8 @@
     document.getElementById('site-display-name').textContent = name;
     // Auto-fill KVPS
     const kvps = kvpsMap[name] || '';
-    const kvpsInput = document.getElementById('mainForm').querySelector('input[name="kvps"]');
-    if (kvpsInput) {
-      kvpsInput.value = kvps;
-      kvpsInput.dispatchEvent(new Event('input'));
-    }
+    const kvpsInput = document.querySelector('input[name="kvps"]');
+    if (kvpsInput) kvpsInput.value = kvps;
   }
 
   // ─── Kulanz / CCR toggle ──────────────────────────────────────────
@@ -1044,7 +1040,7 @@
   });
 
   // ─── Submit → mailto ─────────────────────────────────────────────
-  function envoyerFormulaire() {
+  async function envoyerFormulaire() {
     const form = document.getElementById('mainForm');
     const data = new FormData(form);
 
@@ -1106,19 +1102,21 @@
     btn.disabled = true;
     btn.textContent = 'Envoi en cours…';
 
-    fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        access_key: '7bf5b927-e39f-4fc1-9f60-642e4741e445',
-        subject: `[${type}] Demande – ${site} – OR ${data.get('or_number') || '?'}`,
-        message: message,
-        from_name: 'Formulaire GE Auto Garantie',
-        redirect: 'https://ruizbf96-hash.github.io/Kulanz/'
-      })
-    })
-    .then(res => res.json())
-    .then(result => {
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: '7bf5b927-e39f-4fc1-9f60-642e4741e445',
+          subject: `[${type}] Demande – ${site} – OR ${data.get('or_number') || '?'}`,
+          message: message,
+          from_name: 'Formulaire GE Auto Garantie',
+          redirect: 'https://ruizbf96-hash.github.io/Kulanz/'
+        })
+      });
+
+      const result = await res.json();
+
       if (result.success) {
         showToast('✔ Demande envoyée à teamgarantie@geauto.fr');
         form.reset();
@@ -1128,147 +1126,27 @@
       } else {
         throw new Error('Échec envoi');
       }
-    })
-    .catch(() => showToast('❌ Erreur — vérifiez votre connexion'))
-    .finally(() => {
+    } catch (err) {
+      showToast('❌ Erreur — vérifiez votre connexion');
+    } finally {
       btn.disabled = false;
       btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande`;
-    });
+    }
   }
 
-  async function printForm() {
+  function printForm() {
     const site = document.getElementById('f_site').value;
     const type = document.getElementById('f_type').value || 'Kulanz';
     const orNum = document.querySelector('input[name="or_number"]').value || '';
 
+    // Vérifications avant génération
     if (!site) { alert('⚠ Veuillez sélectionner un site avant d\'enregistrer.'); return; }
     if (!orNum) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation avant d\'enregistrer.'); return; }
-
-    const btn = document.querySelector('.btn-print');
-    btn.disabled = true;
-    btn.textContent = 'Génération PDF…';
-
-    try {
-      const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
-      const f = document.getElementById('mainForm');
-      const get = n => { const el = f.querySelector(`[name="${n}"]`); return el ? el.value : ''; };
-      const getRadio = n => { const el = f.querySelector(`[name="${n}"]:checked`); return el ? el.value : ''; };
-
-      const kvps = get('kvps') || '';
-      const codeDom = get('code_dommage') || '';
-      const titleDoc = `[DEMANDE ${type.toUpperCase()}] ${site} — ${kvps} — ${codeDom}`;
-      const filename = `[${type.toUpperCase()}] ${site.replace(/\s+/g,'_')}${kvps?'_'+kvps:''}${codeDom?'_'+codeDom:''}_OR${orNum}.pdf`;
-
-      const fields = [
-        { label: 'Site', value: site },
-        { label: 'Type de demande', value: type },
-        { label: 'N° de châssis', value: get('chassis') },
-        { label: 'Kilométrage', value: get('kilometrage') ? get('kilometrage') + ' km' : '' },
-        { label: "N° d'Ordre de Réparation", value: orNum },
-        { label: "Date de l'OR", value: get('date_or') },
-        { label: 'KVPS', value: kvps },
-        { label: 'Technicien', value: get('technicien') },
-        { label: 'Plainte client', value: get('plainte_client') },
-        { label: "Type d'avarie", value: get('type_avarie') },
-        { label: 'Emplacement', value: get('emplacement') },
-        { label: 'Référence pièce', value: get('ref_piece') },
-        { label: 'Désignation pièce', value: get('desig_piece') },
-        { label: 'Code dommage', value: codeDom },
-        { label: 'Code avarie', value: get('code_avarie') },
-      ];
-
-      if (type === 'Kulanz') {
-        fields.push(
-          { label: 'TPI présente', value: getRadio('tpi') },
-          { label: 'N° TPI', value: get('num_tpi') },
-          { label: 'Garantie OPTEVEN visible', value: getRadio('opteven') },
-          { label: 'Code tuning détecté', value: getRadio('tuning') },
-          { label: 'Préconisations respectées', value: getRadio('preconisations') },
-          { label: 'Dernier entretien OK', value: getRadio('dernier_entretien') },
-          { label: 'Lien dommage / entretien', value: getRadio('lien_entretien') },
-        );
-      } else {
-        fields.push(
-          { label: 'Demande KULANZ effectuée', value: getRadio('kulanz_done') },
-          { label: 'CIG appliqué', value: getRadio('cig') },
-          { label: 'Taux CIG (%)', value: get('cig_taux') },
-        );
-        const pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(el => el.value);
-        if (pieces.length) fields.push({ label: 'Pièces jointes', value: '• ' + pieces.join('\n• ') });
-      }
-      fields.push({ label: 'Commentaires', value: get('commentaires') });
-
-      const doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
-      const W = 210, ml = 14, usableW = W - ml * 2;
-      let y = 14;
-
-      // En-tête
-      doc.setFillColor(26, 26, 46);
-      doc.rect(ml, y, usableW, 16, 'F');
-      doc.setTextColor(212, 174, 82);
-      doc.setFontSize(10); doc.setFont('helvetica', 'bold');
-      const titleLines = doc.splitTextToSize(titleDoc, usableW - 8);
-      doc.text(titleLines, ml + 4, y + 6);
-      doc.setTextColor(180, 180, 180);
-      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-      doc.text(`OR : ${orNum}   |   Date : ${now}   |   teamgarantie@geauto.fr`, ml + 4, y + 13);
-      y += 22;
-
-      // Titre section
-      doc.setFillColor(240, 237, 232);
-      doc.rect(ml, y, usableW, 7, 'F');
-      doc.setTextColor(26, 26, 46);
-      doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-      doc.text('Détails de la demande', ml + 3, y + 5);
-      y += 9;
-
-      // Tableau
-      const colLabel = 65, colVal = usableW - colLabel;
-      fields.filter(fi => fi.value && fi.value.trim()).forEach((fi, i) => {
-        const lines = doc.splitTextToSize(fi.value, colVal - 4);
-        const rowH = Math.max(7, lines.length * 5 + 2);
-        if (y + rowH > 282) { doc.addPage(); y = 14; }
-        doc.setFillColor(i%2===0 ? 255 : 247, i%2===0 ? 255 : 246, i%2===0 ? 255 : 242);
-        doc.rect(ml, y, usableW, rowH, 'F');
-        doc.setDrawColor(221, 221, 221);
-        doc.rect(ml, y, colLabel, rowH, 'S');
-        doc.rect(ml + colLabel, y, colVal, rowH, 'S');
-        doc.setFont('helvetica', 'bold'); doc.setTextColor(80, 80, 80); doc.setFontSize(9);
-        doc.text(fi.label, ml + 3, y + 5);
-        doc.setFont('helvetica', 'normal'); doc.setTextColor(26, 26, 46);
-        doc.text(lines, ml + colLabel + 3, y + 5);
-        y += rowH;
-      });
-
-      // Footer
-      y += 5;
-      doc.setDrawColor(200, 200, 200);
-      doc.line(ml, y, ml + usableW, y);
-      doc.setFontSize(7.5); doc.setTextColor(170, 170, 170); doc.setFont('helvetica', 'normal');
-      doc.text(`Document généré depuis le formulaire GE Auto Garantie — ${now}`, W/2, y + 4, { align: 'center' });
-
-      doc.save(filename);
-      showToast('✔ PDF enregistré : ' + filename);
-
-    } catch(err) {
-      console.error(err);
-      showToast('❌ Erreur génération PDF : ' + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Enregistrer en PDF`;
-    }
-  }
 
     const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
     const f = document.getElementById('mainForm');
     const get = n => { const el = f.querySelector(`[name="${n}"]`); return el ? el.value : ''; };
     const getRadio = n => { const el = f.querySelector(`[name="${n}"]:checked`); return el ? el.value : ''; };
-
-    const kvps = get('kvps') || '';
-    const codeDom = get('code_dommage') || '';
-
-    // Nom du fichier : [KULANZ] Audi_Hœnheim_02155_12345_OR000123
-    const filename = `[${type.toUpperCase()}] ${site.replace(/\s+/g,'_')}${kvps ? '_'+kvps : ''}${codeDom ? '_'+codeDom : ''}_OR${orNum}.html`;
 
     const fields = [
       { label: 'Site', value: site },
@@ -1277,14 +1155,14 @@
       { label: 'Kilométrage', value: get('kilometrage') ? get('kilometrage') + ' km' : '' },
       { label: "N° d'Ordre de Réparation", value: orNum },
       { label: "Date de l'OR", value: get('date_or') },
-      { label: 'KVPS', value: kvps },
+      { label: 'KVPS', value: get('kvps') },
       { label: 'Technicien', value: get('technicien') },
       { label: 'Plainte client', value: get('plainte_client') },
       { label: "Type d'avarie", value: get('type_avarie') },
       { label: 'Emplacement', value: get('emplacement') },
       { label: 'Référence pièce', value: get('ref_piece') },
       { label: 'Désignation pièce', value: get('desig_piece') },
-      { label: 'Code dommage', value: codeDom },
+      { label: 'Code dommage', value: get('code_dommage') },
       { label: 'Code avarie', value: get('code_avarie') },
     ];
 
@@ -1316,16 +1194,16 @@
         <td style="font-size:11px;color:#1a1a2e;padding:6px 10px;border:1px solid #ddd;vertical-align:top;white-space:pre-wrap">${fi.value}</td>
       </tr>`).join('');
 
-    const titleDoc = `[DEMANDE ${type.toUpperCase()}] ${site} — ${kvps} — ${codeDom}`;
+    const filename = `Demande_${type}_${site.replace(/\s+/g,'_')}_OR${orNum}`;
 
-    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${titleDoc}</title>
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${filename}</title>
 <style>
   @page{size:A4 portrait;margin:12mm 14mm}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,sans-serif;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1a1a2e;padding-bottom:10px;margin-bottom:14px}
-  .hdr-l h1{font-size:15px;font-weight:700;color:#1a1a2e;line-height:1.4}
-  .badge{display:inline-block;background:#1a1a2e;color:#d4ae52;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-top:6px}
+  .hdr-l h1{font-size:18px;font-weight:700;color:#1a1a2e}
+  .badge{display:inline-block;background:#1a1a2e;color:#d4ae52;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-top:5px}
   .hdr-r{text-align:right;font-size:10px;color:#555;line-height:1.8}
   .hdr-r strong{color:#1a1a2e;font-size:12px;display:block}
   .sec{font-size:11px;font-weight:700;color:#fff;background:#1a1a2e;padding:5px 10px;margin-top:12px;letter-spacing:.5px}
@@ -1334,7 +1212,7 @@
 </style></head><body>
 <div class="hdr">
   <div class="hdr-l">
-    <h1>${titleDoc}</h1>
+    <h1>${site} — ${get('kvps') || 'KVPS'} — ${get('code_dommage') || 'Code dommage'}</h1>
     <div class="badge">Demande ${type}</div>
   </div>
   <div class="hdr-r"><strong>OR : ${orNum}</strong>Date : ${now}<br>teamgarantie@geauto.fr</div>
@@ -1350,30 +1228,11 @@
 <\/script>
 </body></html>`;
 
-    // File System Access API — ouvre "Enregistrer sous" avec choix du dossier
-    if (window.showSaveFilePicker) {
-      try {
-        const fileHandle = await window.showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ description: 'Fichier HTML (ouvrir puis Imprimer → PDF)', accept: { 'text/html': ['.html'] } }]
-        });
-        const writable = await fileHandle.createWritable();
-        await writable.write(html);
-        await writable.close();
-        showToast('✔ Fichier enregistré ! Ouvrez-le et imprimez en PDF.');
-      } catch(e) {
-        if (e.name !== 'AbortError') showToast('❌ Erreur lors de l\'enregistrement.');
-      }
-    } else {
-      // Fallback : téléchargement direct
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click();
-      setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
-      showToast('✔ Fichier téléchargé : ' + filename);
-    }
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) { alert('⚠ Autorisez les popups pour ce site puis réessayez.'); return; }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
   }
 
 
