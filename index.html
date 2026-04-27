@@ -8,129 +8,130 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
-    --noir: #0d0d0d;
-    --charcoal: #1a1a2e;
-    --silver: #c8c8d4;
-    --cream: #f5f3ee;
-    --gold: #b8973a;
-    --gold-light: #d4ae52;
-    --white: #ffffff;
-    --red: #c0392b;
-    --border: rgba(184,151,58,0.25);
-    --card-bg: rgba(255,255,255,0.98);
-    --shadow: 0 4px 32px rgba(13,13,13,0.10);
-    --radius: 12px;
+    --charcoal:#1a1a2e; --silver:#c8c8d4; --cream:#f5f3ee;
+    --gold:#b8973a; --gold-light:#d4ae52; --white:#ffffff;
+    --red:#c0392b; --green:#27ae60;
+    --card-bg:rgba(255,255,255,0.98);
+    --shadow:0 4px 32px rgba(13,13,13,0.10);
+    --radius:12px;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--charcoal); min-height:100vh; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;}
 
   /* HEADER */
-  header { background:var(--charcoal); position:sticky; top:0; z-index:100; box-shadow:0 2px 24px rgba(0,0,0,0.25); }
-  .header-top { display:flex; align-items:center; justify-content:space-between; padding:18px 40px; border-bottom:1px solid rgba(184,151,58,0.3); }
-  .site-bar { display:flex; align-items:center; padding:0 40px; overflow-x:auto; }
-  .site-bar-label { font-size:10px; color:var(--silver); letter-spacing:2px; text-transform:uppercase; white-space:nowrap; padding:12px 20px 12px 0; border-right:1px solid rgba(184,151,58,0.2); }
-  .site-btn { padding:12px 20px; background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--silver); white-space:nowrap; border-right:1px solid rgba(184,151,58,0.1); transition:all 0.2s; position:relative; }
-  .site-btn::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--gold); transform:scaleX(0); transition:transform 0.2s; }
-  .site-btn:hover { color:var(--gold-light); }
-  .site-btn:hover::after { transform:scaleX(1); }
-  .site-btn.active { color:var(--gold-light); font-weight:500; }
-  .site-btn.active::after { transform:scaleX(1); }
+  header{background:var(--charcoal);position:sticky;top:0;z-index:100;box-shadow:0 2px 24px rgba(0,0,0,0.25);}
+  .header-top{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid rgba(184,151,58,0.3);}
+  .site-bar{display:flex;align-items:center;padding:0 40px;overflow-x:auto;}
+  .site-bar-label{font-size:10px;color:var(--silver);letter-spacing:2px;text-transform:uppercase;white-space:nowrap;padding:12px 20px 12px 0;border-right:1px solid rgba(184,151,58,0.2);}
+  .site-btn{padding:12px 20px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--silver);white-space:nowrap;border-right:1px solid rgba(184,151,58,0.1);transition:all 0.2s;position:relative;}
+  .site-btn::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform 0.2s;}
+  .site-btn:hover{color:var(--gold-light);}
+  .site-btn:hover::after,.site-btn.active::after{transform:scaleX(1);}
+  .site-btn.active{color:var(--gold-light);font-weight:500;}
 
   /* TYPE TOGGLE */
-  .type-toggle-wrap { background:var(--charcoal); padding:0 40px 32px; display:flex; justify-content:center; }
-  .type-toggle { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(184,151,58,0.2); border-radius:50px; padding:5px; gap:4px; }
-  .type-btn { padding:10px 32px; border:none; border-radius:40px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:var(--silver); background:none; transition:all 0.3s; }
-  .type-btn.active { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--charcoal); font-weight:600; box-shadow:0 2px 16px rgba(184,151,58,0.4); }
+  .type-toggle-wrap{background:var(--charcoal);padding:0 40px 24px;display:flex;justify-content:center;}
+  .type-toggle{display:flex;background:rgba(255,255,255,0.05);border:1px solid rgba(184,151,58,0.2);border-radius:50px;padding:5px;gap:4px;}
+  .type-btn{padding:10px 32px;border:none;border-radius:40px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--silver);background:none;transition:all 0.3s;}
+  .type-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);font-weight:600;box-shadow:0 2px 16px rgba(184,151,58,0.4);}
+
+  /* COPIER KULANZ */
+  .copier-bar{background:var(--charcoal);display:flex;justify-content:center;padding:0 40px 20px;}
+  #btn-copier-kulanz{display:none;align-items:center;gap:8px;padding:10px 28px;background:rgba(184,151,58,0.15);border:1.5px solid var(--gold);border-radius:50px;color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+  #btn-copier-kulanz:hover{background:rgba(184,151,58,0.28);}
 
   /* MAIN */
-  main { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+  main{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
 
   /* SECTIONS */
-  .form-section { background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:24px; overflow:hidden; border:1px solid rgba(184,151,58,0.1); animation:fadeUp 0.4s ease both; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-  .section-header { display:flex; align-items:center; gap:14px; padding:20px 28px; background:linear-gradient(90deg,rgba(184,151,58,0.08) 0%,transparent 100%); border-bottom:1px solid rgba(184,151,58,0.12); }
-  .section-number { width:30px; height:30px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:var(--charcoal); flex-shrink:0; }
-  .section-title { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:var(--charcoal); }
-  .section-body { padding:28px; }
+  .form-section{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:24px;overflow:hidden;border:1px solid rgba(184,151,58,0.1);animation:fadeUp 0.4s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .section-header{display:flex;align-items:center;gap:14px;padding:20px 28px;background:linear-gradient(90deg,rgba(184,151,58,0.08) 0%,transparent 100%);border-bottom:1px solid rgba(184,151,58,0.12);}
+  .section-number{width:30px;height:30px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--charcoal);flex-shrink:0;}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--charcoal);}
+  .section-body{padding:28px;}
 
   /* GRID */
-  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
-  .span-2 { grid-column:span 2; }
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .span-2{grid-column:span 2;}
 
   /* FIELDS */
-  .field { display:flex; flex-direction:column; gap:6px; }
-  label { font-size:11px; font-weight:500; letter-spacing:0.8px; text-transform:uppercase; color:#666; }
-  label .opt { font-size:9px; color:var(--gold); font-weight:400; margin-left:4px; }
-  label .req { color:var(--red); margin-left:2px; }
-  input[type="text"],input[type="email"],input[type="date"],input[type="number"],select,textarea {
-    width:100%; padding:11px 14px; border:1.5px solid #e0ddd8; border-radius:8px;
-    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--charcoal);
-    background:#fafaf8; transition:all 0.2s; outline:none;
+  .field{display:flex;flex-direction:column;gap:4px;}
+  label{font-size:11px;font-weight:500;letter-spacing:0.8px;text-transform:uppercase;color:#666;}
+  label .opt{font-size:9px;color:var(--gold);font-weight:400;margin-left:4px;}
+  label .req{color:var(--red);margin-left:2px;}
+  .hint{font-size:10px;color:#aaa;margin-top:2px;}
+  .hint.ok{color:var(--green);}
+  .hint.err{color:var(--red);}
+
+  input[type="text"],input[type="date"],input[type="number"],select,textarea{
+    width:100%;padding:11px 14px;border:1.5px solid #e0ddd8;border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:14px;color:var(--charcoal);
+    background:#fafaf8;transition:all 0.2s;outline:none;
   }
-  input:focus,select:focus,textarea:focus { border-color:var(--gold); background:var(--white); box-shadow:0 0 0 3px rgba(184,151,58,0.12); }
-  input::placeholder,textarea::placeholder { color:#aaa; font-size:13px; }
-  textarea { resize:vertical; min-height:88px; }
-  select { cursor:pointer; appearance:none;
+  input:focus,select:focus,textarea:focus{border-color:var(--gold);background:var(--white);box-shadow:0 0 0 3px rgba(184,151,58,0.12);}
+  input.valid{border-color:var(--green);}
+  input.invalid{border-color:var(--red);}
+  input::placeholder,textarea::placeholder{color:#aaa;font-size:13px;}
+  textarea{resize:vertical;min-height:88px;}
+  select{cursor:pointer;appearance:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8973a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat:no-repeat; background-position:right 14px center; padding-right:36px;
-  }
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
 
   /* RADIO */
-  .radio-group { display:flex; gap:12px; flex-wrap:wrap; margin-top:4px; }
-  .radio-item { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; }
-  .radio-item input[type="radio"] { width:16px; height:16px; accent-color:var(--gold); cursor:pointer; flex-shrink:0; }
+  .radio-group{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
+  .radio-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;}
+  .radio-item input[type="radio"]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
 
   /* CHECKLIST */
-  .checklist { display:flex; flex-direction:column; gap:10px; }
-  .checklist-item { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1.5px solid #e8e5df; border-radius:8px; cursor:pointer; transition:all 0.2s; background:#fafaf8; }
-  .checklist-item:hover { border-color:var(--gold); background:rgba(184,151,58,0.04); }
-  .checklist-item input[type="checkbox"] { width:16px; height:16px; accent-color:var(--gold); flex-shrink:0; margin-top:2px; cursor:pointer; }
-  .checklist-item-text { font-size:13px; line-height:1.5; color:#444; }
+  .checklist{display:flex;flex-direction:column;gap:10px;}
+  .checklist-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid #e8e5df;border-radius:8px;cursor:pointer;transition:all 0.2s;background:#fafaf8;}
+  .checklist-item:hover{border-color:var(--gold);background:rgba(184,151,58,0.04);}
+  .checklist-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
+  .checklist-item-text{font-size:13px;line-height:1.5;color:#444;}
 
-  /* INFO BOX */
-  .info-box { background:rgba(184,151,58,0.07); border:1px solid rgba(184,151,58,0.25); border-radius:8px; padding:14px 18px; font-size:12.5px; color:#5a4a1a; line-height:1.6; margin-bottom:20px; }
-  .info-box strong { color:var(--gold); }
-
-  /* CIG */
-  .cig-box { border:1.5px solid rgba(184,151,58,0.25); border-radius:8px; padding:18px; background:rgba(184,151,58,0.04); }
-  .cig-box .cig-title { font-size:12px; font-weight:500; letter-spacing:0.5px; color:var(--gold); margin-bottom:12px; text-transform:uppercase; }
+  /* INFO / CIG */
+  .info-box{background:rgba(184,151,58,0.07);border:1px solid rgba(184,151,58,0.25);border-radius:8px;padding:14px 18px;font-size:12.5px;color:#5a4a1a;line-height:1.6;margin-bottom:20px;}
+  .info-box strong{color:var(--gold);}
+  .cig-box{border:1.5px solid rgba(184,151,58,0.25);border-radius:8px;padding:18px;background:rgba(184,151,58,0.04);}
+  .cig-box .cig-title{font-size:12px;font-weight:500;letter-spacing:0.5px;color:var(--gold);margin-bottom:12px;text-transform:uppercase;}
 
   /* DIVIDER */
-  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(184,151,58,0.2),transparent); margin:24px 0; }
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(184,151,58,0.2),transparent);margin:24px 0;}
 
   /* HIDDEN */
-  .section-kulanz { display:block; }
-  .section-ccr { display:none; }
+  .section-kulanz{display:block;}
+  .section-ccr{display:none;}
 
   /* SUBMIT */
-  .submit-area { display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:12px; }
-  .submit-hint { font-size:12px; color:#888; text-align:center; }
-  .submit-hint strong { color:var(--gold); }
-  .btn-submit { display:inline-flex; align-items:center; gap:10px; padding:16px 52px; background:linear-gradient(135deg,var(--charcoal),#2c2c50); color:var(--white); border:none; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; letter-spacing:1px; cursor:pointer; transition:all 0.3s; box-shadow:0 4px 20px rgba(13,13,13,0.25); }
-  .btn-submit:hover { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--charcoal); transform:translateY(-2px); box-shadow:0 8px 28px rgba(184,151,58,0.35); }
-  .btn-submit svg { width:18px; height:18px; flex-shrink:0; }
-  .btn-print { display:inline-flex; align-items:center; gap:10px; padding:16px 36px; background:var(--white); color:var(--charcoal); border:2px solid rgba(184,151,58,0.35); border-radius:50px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.3s; }
-  .btn-print:hover { border-color:var(--gold); background:rgba(184,151,58,0.06); color:var(--gold); transform:translateY(-2px); }
-  .btn-print svg { width:17px; height:17px; flex-shrink:0; }
+  .submit-area{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:12px;}
+  .submit-hint{font-size:12px;color:#888;text-align:center;}
+  .submit-hint strong{color:var(--gold);}
+  .btn-submit{display:inline-flex;align-items:center;gap:10px;padding:16px 52px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;letter-spacing:1px;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 20px rgba(13,13,13,0.25);}
+  .btn-submit:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);transform:translateY(-2px);}
+  .btn-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .btn-print{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--white);color:var(--charcoal);border:2px solid rgba(184,151,58,0.35);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.3s;}
+  .btn-print:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
+  .btn-print:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 
   /* TOAST */
-  #toast { position:fixed; bottom:32px; right:32px; background:var(--charcoal); color:var(--white); padding:14px 24px; border-radius:10px; font-size:13px; box-shadow:0 4px 24px rgba(0,0,0,0.25); border-left:4px solid var(--gold); transform:translateY(80px); opacity:0; transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); z-index:999; pointer-events:none; }
-  #toast.show { transform:translateY(0); opacity:1; }
+  #toast{position:fixed;bottom:32px;right:32px;background:var(--charcoal);color:var(--white);padding:14px 24px;border-radius:10px;font-size:13px;box-shadow:0 4px 24px rgba(0,0,0,0.25);border-left:4px solid var(--gold);transform:translateY(80px);opacity:0;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);z-index:999;pointer-events:none;}
+  #toast.show{transform:translateY(0);opacity:1;}
 
-  @media(max-width:680px) {
-    .header-top { padding:14px 20px; }
-    .site-bar { padding:0 10px; }
-    main { padding:24px 14px 60px; }
-    .section-body { padding:20px 18px; }
-    .grid-2,.grid-3 { grid-template-columns:1fr; }
-    .span-2 { grid-column:span 1; }
-    .type-toggle-wrap { padding:0 20px 24px; }
+  @media(max-width:680px){
+    .header-top{padding:14px 20px;}
+    .site-bar{padding:0 10px;}
+    main{padding:24px 14px 60px;}
+    .section-body{padding:20px 18px;}
+    .grid-2{grid-template-columns:1fr;}
+    .span-2{grid-column:span 1;}
+    .type-toggle-wrap,.copier-bar{padding-left:20px;padding-right:20px;}
   }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
   <div class="header-top">
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold-light);letter-spacing:1px;">Demande Kulanz / CCR</div>
@@ -151,6 +152,7 @@
   </div>
 </header>
 
+<!-- TYPE TOGGLE -->
 <div class="type-toggle-wrap">
   <div class="type-toggle">
     <button class="type-btn active" id="btn-kulanz" onclick="switchType('kulanz')">Demande KULANZ</button>
@@ -158,12 +160,21 @@
   </div>
 </div>
 
+<!-- BOUTON COPIER KULANZ -->
+<div class="copier-bar">
+  <button id="btn-copier-kulanz" onclick="copierDepuisKulanz()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    Copier les données depuis Kulanz
+  </button>
+</div>
+
+<!-- MAIN -->
 <main>
   <form id="mainForm">
     <input type="hidden" id="f_site" name="site" value="">
     <input type="hidden" id="f_type" name="type_demande" value="Kulanz">
 
-    <!-- VÉHICULE -->
+    <!-- 1. VÉHICULE -->
     <div class="form-section" style="animation-delay:0.05s">
       <div class="section-header">
         <div class="section-number">1</div>
@@ -173,7 +184,8 @@
         <div class="grid-2">
           <div class="field">
             <label>Numéro de châssis <span class="req">*</span></label>
-            <input type="text" name="chassis" placeholder="Ex : WAUZZZ8R3LA000000">
+            <input type="text" name="chassis" id="chassis_input" placeholder="Ex : WAUZZZ8R3LA000000" maxlength="17">
+            <span class="hint" id="chassis_hint">0 / 17 caractères</span>
           </div>
           <div class="field">
             <label>Kilométrage <span class="req">*</span></label>
@@ -181,7 +193,8 @@
           </div>
           <div class="field">
             <label>N° d'Ordre de Réparation <span class="req">*</span></label>
-            <input type="text" name="or_number" placeholder="Ex : 000123">
+            <input type="text" name="or_number" id="or_input" placeholder="Ex : 000123" maxlength="6">
+            <span class="hint" id="or_hint">0 / 6 chiffres</span>
           </div>
           <div class="field">
             <label>Date de l'OR <span class="req">*</span></label>
@@ -199,7 +212,7 @@
       </div>
     </div>
 
-    <!-- PLAINTE -->
+    <!-- 2. DOMMAGE -->
     <div class="form-section" style="animation-delay:0.1s">
       <div class="section-header">
         <div class="section-number">2</div>
@@ -209,7 +222,7 @@
         <div class="grid-2">
           <div class="field span-2">
             <label>Plainte du client <span class="req">*</span></label>
-            <textarea name="plainte_client" placeholder="Décrivez la plainte du client avec précision…"></textarea>
+            <textarea name="plainte_client" placeholder="LE CLIENT SIGNALE …"></textarea>
           </div>
           <div class="field">
             <label>Type d'avarie <span class="req">*</span></label>
@@ -229,8 +242,9 @@
             <select name="emplacement">
               <option value="">— Sélectionner —</option>
               <option>Gauche</option><option>Droit</option><option>Avant</option><option>Arrière</option>
-              <option>Avant gauche</option><option>Avant droit</option><option>Arrière gauche</option>
-              <option>Arrière droit</option><option>Non applicable</option>
+              <option>Avant gauche</option><option>Avant droit</option>
+              <option>Arrière gauche</option><option>Arrière droit</option>
+              <option>Non applicable</option>
             </select>
           </div>
         </div>
@@ -245,18 +259,20 @@
             <input type="text" name="desig_piece" placeholder="Ex : Pompe à eau">
           </div>
           <div class="field">
-            <label>Code dommage <span class="opt">(optionnel)</span></label>
-            <input type="text" name="code_dommage" placeholder="Ex : 12345">
+            <label>Code dommage <span class="req">*</span></label>
+            <input type="text" name="code_dommage" id="code_dom_input" placeholder="Ex : 1234" maxlength="4">
+            <span class="hint" id="code_dom_hint">0 / 4 chiffres</span>
           </div>
           <div class="field">
-            <label>Code avarie <span class="opt">(optionnel)</span></label>
-            <input type="text" name="code_avarie" placeholder="Ex : 12345">
+            <label>Code avarie <span class="req">*</span></label>
+            <input type="text" name="code_avarie" id="code_ava_input" placeholder="Ex : 1234" maxlength="4">
+            <span class="hint" id="code_ava_hint">0 / 4 chiffres</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- KULANZ -->
+    <!-- 3. KULANZ -->
     <div class="form-section section-kulanz" style="animation-delay:0.15s">
       <div class="section-header">
         <div class="section-number">3</div>
@@ -291,7 +307,7 @@
             </div>
           </div>
           <div class="field">
-            <label>Préconisations constructeur respectées (y compris dernier entretien) ?</label>
+            <label>Préconisations constructeur respectées ?</label>
             <div class="radio-group">
               <label class="radio-item"><input type="radio" name="preconisations" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="preconisations" value="NON"> Non</label>
@@ -315,7 +331,7 @@
       </div>
     </div>
 
-    <!-- CCR PRÉREQUIS -->
+    <!-- 3. CCR PRÉREQUIS -->
     <div class="form-section section-ccr" style="animation-delay:0.15s">
       <div class="section-header">
         <div class="section-number">3</div>
@@ -333,7 +349,7 @@
       </div>
     </div>
 
-    <!-- CCR PIÈCES -->
+    <!-- 4. CCR PIÈCES -->
     <div class="form-section section-ccr" style="animation-delay:0.2s">
       <div class="section-header">
         <div class="section-number">4</div>
@@ -356,7 +372,7 @@
       </div>
     </div>
 
-    <!-- CCR CIG -->
+    <!-- 5. CCR CIG -->
     <div class="form-section section-ccr" style="animation-delay:0.25s">
       <div class="section-header">
         <div class="section-number">5</div>
@@ -370,7 +386,7 @@
             <label class="radio-item"><input type="radio" name="cig" value="standard_16"> CIG standard 16 %</label>
             <label class="radio-item" style="align-items:center;gap:10px;">
               <input type="radio" name="cig" value="superieur"> CIG supérieur à 16 % →
-              <input type="number" name="cig_taux" placeholder="…%" min="0" max="100" step="0.5" style="width:90px;padding:6px 10px;font-size:13px;" disabled id="cig_taux_input">
+              <input type="number" name="cig_taux" id="cig_taux_input" placeholder="…%" min="0" max="100" step="0.5" style="width:90px;padding:6px 10px;font-size:13px;" disabled>
             </label>
           </div>
         </div>
@@ -396,11 +412,11 @@
       <p class="submit-hint">En soumettant, le formulaire sera envoyé par e-mail à <strong>teamgarantie@geauto.fr</strong></p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
         <button type="button" onclick="envoyerFormulaire()" class="btn-submit">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
           Envoyer la demande
         </button>
         <button type="button" onclick="genererPDF()" class="btn-print">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Enregistrer en PDF
         </button>
       </div>
@@ -412,15 +428,40 @@
 
 <script>
 // ── KVPS MAP ────────────────────────────────────────────────
-const kvpsMap = {
+var kvpsMap = {
   'Audi Hœnheim':'02155','Audi Obernai':'02486',
   'SEAT Hœnheim':'63930','SKODA Hœnheim':'02376',
   'VW Bischheim':'02154','VW Illkirch':'02153','VW Obernai':'02485'
 };
 
+// Données sauvegardées depuis Kulanz
+var donneesKulanz = {};
+
+// ── HELPERS ─────────────────────────────────────────────────
+function getVal(name) {
+  var el = document.getElementById('mainForm').querySelector('[name="'+name+'"]');
+  return el ? el.value.trim() : '';
+}
+function setVal(name, val) {
+  var el = document.getElementById('mainForm').querySelector('[name="'+name+'"]');
+  if (el && val !== undefined) el.value = val;
+}
+function getRadio(name) {
+  var el = document.getElementById('mainForm').querySelector('[name="'+name+'"]:checked');
+  return el ? el.value : '';
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
+}
+
 // ── SITE ────────────────────────────────────────────────────
 function selectSite(btn, name) {
-  document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.site-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   document.getElementById('f_site').value = name;
   document.getElementById('site-display-name').textContent = name;
@@ -429,22 +470,112 @@ function selectSite(btn, name) {
 
 // ── TYPE TOGGLE ─────────────────────────────────────────────
 function switchType(type) {
-  const isK = type === 'kulanz';
+  var isK = type === 'kulanz';
+  if (!isK) sauvegarderKulanz();
   document.getElementById('btn-kulanz').classList.toggle('active', isK);
   document.getElementById('btn-ccr').classList.toggle('active', !isK);
   document.getElementById('f_type').value = isK ? 'Kulanz' : 'CCR';
-  document.querySelectorAll('.section-kulanz').forEach(el => el.style.display = isK ? 'block' : 'none');
-  document.querySelectorAll('.section-ccr').forEach(el => el.style.display = !isK ? 'block' : 'none');
+  document.querySelectorAll('.section-kulanz').forEach(function(el){ el.style.display = isK ? 'block' : 'none'; });
+  document.querySelectorAll('.section-ccr').forEach(function(el){ el.style.display = !isK ? 'block' : 'none'; });
   document.getElementById('comm-num').textContent = isK ? '4' : '6';
+  document.getElementById('btn-copier-kulanz').style.display = isK ? 'none' : 'flex';
 }
 
-// ── EVENTS ──────────────────────────────────────────────────
+// ── SAUVEGARDE KULANZ ────────────────────────────────────────
+function sauvegarderKulanz() {
+  donneesKulanz = {
+    site: document.getElementById('f_site').value,
+    chassis: getVal('chassis'), kilometrage: getVal('kilometrage'),
+    or_number: getVal('or_number'), date_or: getVal('date_or'),
+    kvps: getVal('kvps'), technicien: getVal('technicien'),
+    plainte_client: getVal('plainte_client'), type_avarie: getVal('type_avarie'),
+    emplacement: getVal('emplacement'), ref_piece: getVal('ref_piece'),
+    desig_piece: getVal('desig_piece'), code_dommage: getVal('code_dommage'),
+    code_avarie: getVal('code_avarie')
+  };
+}
+
+// ── COPIER DEPUIS KULANZ ─────────────────────────────────────
+function copierDepuisKulanz() {
+  if (!donneesKulanz.chassis && !donneesKulanz.or_number) {
+    alert('⚠ Aucune donnée Kulanz trouvée. Remplissez d\'abord le formulaire Kulanz.');
+    return;
+  }
+  var champs = ['chassis','kilometrage','or_number','date_or','kvps','technicien',
+                'plainte_client','type_avarie','emplacement','ref_piece',
+                'desig_piece','code_dommage','code_avarie'];
+  champs.forEach(function(n){ setVal(n, donneesKulanz[n]); });
+
+  // Site
+  if (donneesKulanz.site) {
+    document.getElementById('f_site').value = donneesKulanz.site;
+    document.getElementById('site-display-name').textContent = donneesKulanz.site;
+    document.querySelectorAll('.site-btn').forEach(function(b){
+      b.classList.toggle('active', b.textContent.trim() === donneesKulanz.site);
+    });
+  }
+
+  // Mise à jour compteurs
+  ['chassis','or_number','code_dommage','code_avarie'].forEach(function(n){
+    var el = document.getElementById('mainForm').querySelector('[name="'+n+'"]');
+    if (el) { var ev = new Event('input'); el.dispatchEvent(ev); }
+  });
+
+  showToast('✔ Données Kulanz copiées avec succès !');
+}
+
+// ── VALIDATION EN TEMPS RÉEL ─────────────────────────────────
+document.addEventListener('input', function(e) {
+  var n = e.target.name, v = e.target.value;
+
+  if (n === 'chassis') {
+    v = v.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,17);
+    e.target.value = v;
+    var h = document.getElementById('chassis_hint');
+    h.textContent = v.length+' / 17 caractères';
+    h.className = 'hint'+(v.length===17?' ok':v.length>0?' err':'');
+    e.target.className = v.length===17?'valid':v.length>0?'invalid':'';
+  }
+  if (n === 'or_number') {
+    v = v.replace(/\D/g,'').slice(0,6);
+    e.target.value = v;
+    var h = document.getElementById('or_hint');
+    h.textContent = v.length+' / 6 chiffres';
+    h.className = 'hint'+(v.length===6?' ok':v.length>0?' err':'');
+    e.target.className = v.length===6?'valid':v.length>0?'invalid':'';
+  }
+  if (n === 'code_dommage') {
+    v = v.replace(/\D/g,'').slice(0,4);
+    e.target.value = v;
+    var h = document.getElementById('code_dom_hint');
+    h.textContent = v.length+' / 4 chiffres';
+    h.className = 'hint'+(v.length===4?' ok':v.length>0?' err':'');
+    e.target.className = v.length===4?'valid':v.length>0?'invalid':'';
+  }
+  if (n === 'code_avarie') {
+    v = v.replace(/\D/g,'').slice(0,4);
+    e.target.value = v;
+    var h = document.getElementById('code_ava_hint');
+    h.textContent = v.length+' / 4 chiffres';
+    h.className = 'hint'+(v.length===4?' ok':v.length>0?' err':'');
+    e.target.className = v.length===4?'valid':v.length>0?'invalid':'';
+  }
+  if (n === 'cig') {
+    var inp = document.getElementById('cig_taux_input');
+    inp.disabled = e.target.value !== 'superieur';
+    if (!inp.disabled) inp.focus();
+  }
+  if (n === 'tpi') {
+    document.getElementById('tpi_num_field').style.display = e.target.value === 'OUI' ? 'flex' : 'none';
+  }
+});
+
 document.addEventListener('change', function(e) {
   if (e.target.name === 'tpi') {
     document.getElementById('tpi_num_field').style.display = e.target.value === 'OUI' ? 'flex' : 'none';
   }
   if (e.target.name === 'cig') {
-    const inp = document.getElementById('cig_taux_input');
+    var inp = document.getElementById('cig_taux_input');
     inp.disabled = e.target.value !== 'superieur';
     if (!inp.disabled) inp.focus();
   }
@@ -452,139 +583,144 @@ document.addEventListener('change', function(e) {
 
 // ── COLLECTE DONNÉES ────────────────────────────────────────
 function collecterDonnees() {
-  const f = document.getElementById('mainForm');
-  const site = document.getElementById('f_site').value;
-  const type = document.getElementById('f_type').value || 'Kulanz';
-  const get = n => { const el = f.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
-  const getRadio = n => { const el = f.querySelector(`[name="${n}"]:checked`); return el ? el.value : ''; };
+  var f = document.getElementById('mainForm');
+  var site = document.getElementById('f_site').value;
+  var type = document.getElementById('f_type').value || 'Kulanz';
 
-  const fields = [
-    { label:'Site', value:site },
-    { label:'Type de demande', value:type },
-    { label:'N° de châssis', value:get('chassis') },
-    { label:'Kilométrage', value:get('kilometrage') ? get('kilometrage')+' km' : '' },
-    { label:"N° d'Ordre de Réparation", value:get('or_number') },
-    { label:"Date de l'OR", value:get('date_or') },
-    { label:'KVPS', value:get('kvps') },
-    { label:'Technicien', value:get('technicien') },
-    { label:'Plainte client', value:get('plainte_client') },
-    { label:"Type d'avarie", value:get('type_avarie') },
-    { label:'Emplacement', value:get('emplacement') },
-    { label:'Référence pièce', value:get('ref_piece') },
-    { label:'Désignation pièce', value:get('desig_piece') },
-    { label:'Code dommage', value:get('code_dommage') },
-    { label:'Code avarie', value:get('code_avarie') },
+  var fields = [
+    {label:'Site', value:site},
+    {label:'Type de demande', value:type},
+    {label:'N° de châssis', value:getVal('chassis')},
+    {label:'Kilométrage', value:getVal('kilometrage') ? getVal('kilometrage')+' km' : ''},
+    {label:"N° d'Ordre de Réparation", value:getVal('or_number')},
+    {label:"Date de l'OR", value:getVal('date_or')},
+    {label:'KVPS', value:getVal('kvps')},
+    {label:'Technicien', value:getVal('technicien')},
+    {label:'Plainte client', value:getVal('plainte_client')},
+    {label:"Type d'avarie", value:getVal('type_avarie')},
+    {label:'Emplacement', value:getVal('emplacement')},
+    {label:'Référence pièce', value:getVal('ref_piece')},
+    {label:'Désignation pièce', value:getVal('desig_piece')},
+    {label:'Code dommage', value:getVal('code_dommage')},
+    {label:'Code avarie', value:getVal('code_avarie')},
   ];
 
   if (type === 'Kulanz') {
     fields.push(
-      { label:'TPI présente', value:getRadio('tpi') },
-      { label:'N° TPI', value:get('num_tpi') },
-      { label:'Garantie OPTEVEN visible', value:getRadio('opteven') },
-      { label:'Code tuning détecté', value:getRadio('tuning') },
-      { label:'Préconisations respectées', value:getRadio('preconisations') },
-      { label:'Dernier entretien OK', value:getRadio('dernier_entretien') },
-      { label:'Lien dommage / entretien', value:getRadio('lien_entretien') },
+      {label:'TPI présente', value:getRadio('tpi')},
+      {label:'N° TPI', value:getVal('num_tpi')},
+      {label:'Garantie OPTEVEN visible', value:getRadio('opteven')},
+      {label:'Code tuning détecté', value:getRadio('tuning')},
+      {label:'Préconisations respectées', value:getRadio('preconisations')},
+      {label:'Dernier entretien OK', value:getRadio('dernier_entretien')},
+      {label:'Lien dommage / entretien', value:getRadio('lien_entretien')}
     );
   } else {
     fields.push(
-      { label:'Demande KULANZ effectuée', value:getRadio('kulanz_done') },
-      { label:'CIG appliqué', value:getRadio('cig') },
-      { label:'Taux CIG (%)', value:get('cig_taux') },
+      {label:'Demande KULANZ effectuée', value:getRadio('kulanz_done')},
+      {label:'CIG appliqué', value:getRadio('cig')},
+      {label:'Taux CIG (%)', value:getVal('cig_taux')}
     );
-    const pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(el => el.value);
-    if (pieces.length) fields.push({ label:'Pièces jointes', value:pieces.join('\n') });
+    var pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(function(el){ return el.value; });
+    if (pieces.length) fields.push({label:'Pièces jointes', value:pieces.join('\n')});
   }
-  fields.push({ label:'Commentaires', value:get('commentaires') });
+  fields.push({label:'Commentaires', value:getVal('commentaires')});
 
-  return { site, type, fields, get };
+  return {site:site, type:type, fields:fields};
 }
 
 // ── ENVOYER ─────────────────────────────────────────────────
 function envoyerFormulaire() {
-  const { site, type, fields, get } = collecterDonnees();
+  var d = collecterDonnees();
+  var site = d.site, type = d.type;
 
   if (!site) { alert('⚠ Veuillez sélectionner un site.'); return; }
-  if (!get('chassis')) { alert('⚠ Veuillez remplir le numéro de châssis.'); return; }
-  if (!get('or_number')) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.'); return; }
+  if (!getVal('chassis') || getVal('chassis').length !== 17) { alert('⚠ Le numéro de châssis doit contenir exactement 17 caractères.'); return; }
+  if (!getVal('or_number') || getVal('or_number').length !== 6) { alert('⚠ Le N° d\'Ordre de Réparation doit contenir exactement 6 chiffres.'); return; }
+  if (!getVal('plainte_client')) { alert('⚠ Veuillez remplir la plainte du client.'); return; }
+  if (!getVal('code_dommage') || getVal('code_dommage').length !== 4) { alert('⚠ Le code dommage doit contenir exactement 4 chiffres.'); return; }
+  if (!getVal('code_avarie') || getVal('code_avarie').length !== 4) { alert('⚠ Le code avarie doit contenir exactement 4 chiffres.'); return; }
 
-  const btn = document.querySelector('.btn-submit');
+  var btn = document.querySelector('.btn-submit');
   btn.disabled = true;
   btn.textContent = 'Envoi en cours…';
 
-  let message = `DEMANDE DE PRISE EN CHARGE – ${type.toUpperCase()}\n${'═'.repeat(50)}\n\n`;
-  fields.filter(fi => fi.value).forEach(fi => { message += `${fi.label} : ${fi.value}\n`; });
-  message += `\n${'─'.repeat(50)}\nEnvoyé depuis le formulaire GE Auto Garantie`;
+  var message = 'DEMANDE DE PRISE EN CHARGE – '+type.toUpperCase()+'\n'+'═'.repeat(50)+'\n\n';
+  d.fields.filter(function(fi){ return fi.value; }).forEach(function(fi){ message += fi.label+' : '+fi.value+'\n'; });
+  message += '\n'+'─'.repeat(50)+'\nEnvoyé depuis le formulaire GE Auto Garantie';
 
   fetch('https://api.web3forms.com/submit', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
       access_key:'7bf5b927-e39f-4fc1-9f60-642e4741e445',
-      subject:`[${type}] Demande – ${site} – OR ${get('or_number') || '?'}`,
+      subject:'['+type+'] Demande – '+site+' – OR '+getVal('or_number'),
       message: message,
       from_name:'Formulaire GE Auto Garantie'
     })
   })
-  .then(r => r.json())
-  .then(res => {
+  .then(function(r){ return r.json(); })
+  .then(function(res){
     if (res.success) {
       showToast('✔ Demande envoyée à teamgarantie@geauto.fr');
       document.getElementById('mainForm').reset();
-      document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.site-btn').forEach(function(b){ b.classList.remove('active'); });
       document.getElementById('site-display-name').textContent = 'Aucun site sélectionné';
       document.getElementById('f_site').value = '';
       document.getElementById('f_type').value = 'Kulanz';
+      // Reset hints
+      ['chassis_hint','or_hint','code_dom_hint','code_ava_hint'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){ el.className='hint'; el.textContent=el.textContent.replace(/^\d+/,'0'); }
+      });
     } else {
       showToast('❌ Erreur envoi — réessayez.');
     }
   })
-  .catch(() => showToast('❌ Erreur réseau — vérifiez votre connexion.'))
-  .finally(() => {
+  .catch(function(){ showToast('❌ Erreur réseau — vérifiez votre connexion.'); })
+  .finally(function(){
     btn.disabled = false;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande`;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande';
   });
 }
 
 // ── PDF ──────────────────────────────────────────────────────
 function genererPDF() {
-  const { site, type, fields, get } = collecterDonnees();
+  var d = collecterDonnees();
+  var site = d.site, type = d.type;
 
   if (!site) { alert('⚠ Veuillez sélectionner un site.'); return; }
-  if (!get('or_number')) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.'); return; }
+  if (!getVal('or_number')) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.'); return; }
+  if (!window.jspdf) { alert('⚠ Bibliothèque PDF non chargée, réessayez.'); return; }
 
-  if (!window.jspdf) { alert('⚠ Bibliothèque PDF non chargée, réessayez dans quelques secondes.'); return; }
-
-  const btn = document.querySelector('.btn-print');
+  var btn = document.querySelector('.btn-print');
   btn.disabled = true;
   btn.textContent = 'Génération PDF…';
 
   try {
-    const kvps = get('kvps') || '';
-    const codeDom = get('code_dommage') || '';
-    const orNum = get('or_number');
-    const now = new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
+    var kvps = getVal('kvps');
+    var codeDom = getVal('code_dommage');
+    var orNum = getVal('or_number');
+    var now = new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+    var titleDoc = '[DEMANDE '+type.toUpperCase()+'] '+site+(kvps?' — '+kvps:'')+(codeDom?' — '+codeDom:'');
+    var filename = '['+type.toUpperCase()+'] '+site.replace(/\s+/g,'_')+(kvps?'_'+kvps:'')+(codeDom?'_'+codeDom:'')+'_OR'+orNum+'.pdf';
 
-    const titleDoc = `[DEMANDE ${type.toUpperCase()}] ${site}${kvps?' — '+kvps:''}${codeDom?' — '+codeDom:''}`;
-    const filename = `[${type.toUpperCase()}] ${site.replace(/\s+/g,'_')}${kvps?'_'+kvps:''}${codeDom?'_'+codeDom:''}_OR${orNum}.pdf`;
-
-    const doc = new window.jspdf.jsPDF({ unit:'mm', format:'a4' });
-    const W=210, ml=14, usableW=W-ml*2;
-    let y=14;
+    var doc = new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+    var W=210, ml=14, usableW=W-ml*2, y=14;
 
     // En-tête
     doc.setFillColor(26,26,46);
     doc.rect(ml,y,usableW,18,'F');
     doc.setTextColor(212,174,82);
     doc.setFontSize(10); doc.setFont('helvetica','bold');
-    const tLines = doc.splitTextToSize(titleDoc, usableW-8);
+    var tLines = doc.splitTextToSize(titleDoc, usableW-8);
     doc.text(tLines, ml+4, y+6);
     doc.setTextColor(180,180,180);
     doc.setFontSize(7.5); doc.setFont('helvetica','normal');
-    doc.text(`OR : ${orNum}   |   Date : ${now}   |   teamgarantie@geauto.fr`, ml+4, y+15);
+    doc.text('OR : '+orNum+'   |   Date : '+now+'   |   teamgarantie@geauto.fr', ml+4, y+15);
     y+=24;
 
-    // Titre tableau
+    // Titre section
     doc.setFillColor(240,237,232);
     doc.rect(ml,y,usableW,7,'F');
     doc.setTextColor(26,26,46);
@@ -592,12 +728,12 @@ function genererPDF() {
     doc.text('Détails de la demande', ml+3, y+5);
     y+=9;
 
-    // Lignes
-    const colL=65, colV=usableW-colL;
-    fields.filter(fi => fi.value && fi.value.trim()).forEach((fi,i) => {
-      const lines = doc.splitTextToSize(fi.value, colV-4);
-      const rowH = Math.max(7, lines.length*5+2);
-      if (y+rowH>282) { doc.addPage(); y=14; }
+    // Lignes tableau
+    var colL=65, colV=usableW-colL;
+    d.fields.filter(function(fi){ return fi.value && fi.value.trim(); }).forEach(function(fi,i){
+      var lines = doc.splitTextToSize(fi.value, colV-4);
+      var rowH = Math.max(7, lines.length*5+2);
+      if (y+rowH>282){ doc.addPage(); y=14; }
       if (i%2===0) doc.setFillColor(255,255,255); else doc.setFillColor(247,246,242);
       doc.rect(ml,y,usableW,rowH,'F');
       doc.setDrawColor(221,221,221);
@@ -615,26 +751,18 @@ function genererPDF() {
     doc.setDrawColor(200,200,200);
     doc.line(ml,y,ml+usableW,y);
     doc.setFontSize(7.5); doc.setTextColor(170,170,170); doc.setFont('helvetica','normal');
-    doc.text(`Document généré depuis le formulaire GE Auto Garantie — ${now}`, W/2, y+4, {align:'center'});
+    doc.text('Document généré depuis le formulaire GE Auto Garantie — '+now, W/2, y+4, {align:'center'});
 
     doc.save(filename);
-    showToast('✔ PDF enregistré : ' + filename);
+    showToast('✔ PDF enregistré : '+filename);
 
   } catch(err) {
-    showToast('❌ Erreur : ' + err.message);
+    showToast('❌ Erreur : '+err.message);
     console.error(err);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Enregistrer en PDF`;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Enregistrer en PDF';
   }
-}
-
-// ── TOAST ────────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
 }
 </script>
 </body>
