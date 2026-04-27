@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulaire de Demande Garantie – GE Auto</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --noir: #0d0d0d;
@@ -15,642 +16,141 @@
     --gold-light: #d4ae52;
     --white: #ffffff;
     --red: #c0392b;
-    --green: #27ae60;
     --border: rgba(184,151,58,0.25);
     --card-bg: rgba(255,255,255,0.98);
     --shadow: 0 4px 32px rgba(13,13,13,0.10);
     --radius: 12px;
   }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--charcoal); min-height:100vh; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* HEADER */
+  header { background:var(--charcoal); position:sticky; top:0; z-index:100; box-shadow:0 2px 24px rgba(0,0,0,0.25); }
+  .header-top { display:flex; align-items:center; justify-content:space-between; padding:18px 40px; border-bottom:1px solid rgba(184,151,58,0.3); }
+  .site-bar { display:flex; align-items:center; padding:0 40px; overflow-x:auto; }
+  .site-bar-label { font-size:10px; color:var(--silver); letter-spacing:2px; text-transform:uppercase; white-space:nowrap; padding:12px 20px 12px 0; border-right:1px solid rgba(184,151,58,0.2); }
+  .site-btn { padding:12px 20px; background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--silver); white-space:nowrap; border-right:1px solid rgba(184,151,58,0.1); transition:all 0.2s; position:relative; }
+  .site-btn::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--gold); transform:scaleX(0); transition:transform 0.2s; }
+  .site-btn:hover { color:var(--gold-light); }
+  .site-btn:hover::after { transform:scaleX(1); }
+  .site-btn.active { color:var(--gold-light); font-weight:500; }
+  .site-btn.active::after { transform:scaleX(1); }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--charcoal);
-    min-height: 100vh;
+  /* TYPE TOGGLE */
+  .type-toggle-wrap { background:var(--charcoal); padding:0 40px 32px; display:flex; justify-content:center; }
+  .type-toggle { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(184,151,58,0.2); border-radius:50px; padding:5px; gap:4px; }
+  .type-btn { padding:10px 32px; border:none; border-radius:40px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:var(--silver); background:none; transition:all 0.3s; }
+  .type-btn.active { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--charcoal); font-weight:600; box-shadow:0 2px 16px rgba(184,151,58,0.4); }
+
+  /* MAIN */
+  main { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+
+  /* SECTIONS */
+  .form-section { background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:24px; overflow:hidden; border:1px solid rgba(184,151,58,0.1); animation:fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .section-header { display:flex; align-items:center; gap:14px; padding:20px 28px; background:linear-gradient(90deg,rgba(184,151,58,0.08) 0%,transparent 100%); border-bottom:1px solid rgba(184,151,58,0.12); }
+  .section-number { width:30px; height:30px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:var(--charcoal); flex-shrink:0; }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:var(--charcoal); }
+  .section-body { padding:28px; }
+
+  /* GRID */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; }
+  .span-2 { grid-column:span 2; }
+
+  /* FIELDS */
+  .field { display:flex; flex-direction:column; gap:6px; }
+  label { font-size:11px; font-weight:500; letter-spacing:0.8px; text-transform:uppercase; color:#666; }
+  label .opt { font-size:9px; color:var(--gold); font-weight:400; margin-left:4px; }
+  label .req { color:var(--red); margin-left:2px; }
+  input[type="text"],input[type="email"],input[type="date"],input[type="number"],select,textarea {
+    width:100%; padding:11px 14px; border:1.5px solid #e0ddd8; border-radius:8px;
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--charcoal);
+    background:#fafaf8; transition:all 0.2s; outline:none;
+  }
+  input:focus,select:focus,textarea:focus { border-color:var(--gold); background:var(--white); box-shadow:0 0 0 3px rgba(184,151,58,0.12); }
+  input::placeholder,textarea::placeholder { color:#aaa; font-size:13px; }
+  textarea { resize:vertical; min-height:88px; }
+  select { cursor:pointer; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8973a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; padding-right:36px;
   }
 
-  /* ─── HEADER ─────────────────────────────────────────────── */
-  header {
-    background: var(--charcoal);
-    padding: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 24px rgba(0,0,0,0.25);
-  }
-
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 40px;
-    border-bottom: 1px solid rgba(184,151,58,0.3);
-  }
-
-  .logo-area {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .logo-icon {
-    height: 56px;
-    width: auto;
-    display: block;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 6px;
-    padding: 4px 8px;
-  }
-
-  .logo-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 300;
-    color: var(--silver);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border-left: 1px solid rgba(184,151,58,0.4);
-    padding-left: 16px;
-  }
-
-  .header-subtitle {
-    font-size: 11px;
-    color: var(--silver);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  /* site selector */
-  .site-bar {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    padding: 0 40px;
-    overflow-x: auto;
-  }
-
-  .site-bar-label {
-    font-size: 10px;
-    color: var(--silver);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    padding: 12px 20px 12px 0;
-    border-right: 1px solid rgba(184,151,58,0.2);
-    margin-right: 0;
-  }
-
-  .site-btn {
-    padding: 12px 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--silver);
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    border-right: 1px solid rgba(184,151,58,0.1);
-    transition: all 0.2s;
-    position: relative;
-  }
-
-  .site-btn::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--gold);
-    transform: scaleX(0);
-    transition: transform 0.2s;
-  }
-
-  .site-btn:hover { color: var(--gold-light); }
-  .site-btn:hover::after { transform: scaleX(1); }
-
-  .site-btn.active {
-    color: var(--gold-light);
-    font-weight: 500;
-  }
-  .site-btn.active::after { transform: scaleX(1); }
-
-  /* ─── HERO ────────────────────────────────────────────────── */
-  .hero {
-    background: linear-gradient(135deg, var(--charcoal) 0%, #2c2c50 100%);
-    padding: 52px 40px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 60% 0%, rgba(184,151,58,0.12) 0%, transparent 70%);
-  }
-
-  .hero-tag {
-    display: inline-block;
-    font-size: 10px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    border: 1px solid rgba(184,151,58,0.4);
-    padding: 5px 16px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-  }
-
-  .hero h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 38px; font-weight: 300;
-    color: var(--white);
-    line-height: 1.2;
-    margin-bottom: 10px;
-    position: relative;
-  }
-
-  .hero h1 span { color: var(--gold-light); font-weight: 600; }
-
-  .hero p {
-    font-size: 13px;
-    color: var(--silver);
-    max-width: 520px;
-    margin: 0 auto;
-    line-height: 1.7;
-    position: relative;
-  }
-
-  /* ─── TYPE TOGGLE ─────────────────────────────────────────── */
-  .type-toggle-wrap {
-    background: var(--charcoal);
-    padding: 0 40px 32px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .type-toggle {
-    display: flex;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(184,151,58,0.2);
-    border-radius: 50px;
-    padding: 5px;
-    gap: 4px;
-  }
-
-  .type-btn {
-    padding: 10px 32px;
-    border: none;
-    border-radius: 40px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    color: var(--silver);
-    background: none;
-    transition: all 0.3s;
-  }
-
-  .type-btn.active {
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: var(--charcoal);
-    font-weight: 600;
-    box-shadow: 0 2px 16px rgba(184,151,58,0.4);
-  }
-
-  /* ─── MAIN LAYOUT ─────────────────────────────────────────── */
-  main {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 40px 24px 80px;
-  }
-
-  /* ─── FORM SECTIONS ───────────────────────────────────────── */
-  .form-section {
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 24px;
-    overflow: hidden;
-    border: 1px solid rgba(184,151,58,0.1);
-    animation: fadeUp 0.4s ease both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 20px 28px;
-    background: linear-gradient(90deg, rgba(184,151,58,0.08) 0%, transparent 100%);
-    border-bottom: 1px solid rgba(184,151,58,0.12);
-  }
-
-  .section-number {
-    width: 30px; height: 30px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 600;
-    color: var(--charcoal);
-    flex-shrink: 0;
-  }
-
-  .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 19px; font-weight: 600;
-    color: var(--charcoal);
-    letter-spacing: 0.3px;
-  }
-
-  .section-body {
-    padding: 28px;
-  }
-
-  /* ─── GRID ────────────────────────────────────────────────── */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
-  .span-2 { grid-column: span 2; }
-
-  /* ─── FIELD ───────────────────────────────────────────────── */
-  .field { display: flex; flex-direction: column; gap: 6px; }
-
-  label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: #666;
-  }
-
-  label .opt {
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: var(--gold);
-    font-weight: 400;
-    margin-left: 4px;
-  }
-
-  label .req {
-    color: var(--red);
-    margin-left: 2px;
-  }
-
-  input[type="text"], input[type="email"], input[type="date"], input[type="number"],
-  select, textarea {
-    width: 100%;
-    padding: 11px 14px;
-    border: 1.5px solid #e0ddd8;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--charcoal);
-    background: #fafaf8;
-    transition: all 0.2s;
-    outline: none;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--gold);
-    background: var(--white);
-    box-shadow: 0 0 0 3px rgba(184,151,58,0.12);
-  }
-
-  input::placeholder, textarea::placeholder { color: #aaa; font-size: 13px; }
-
-  textarea { resize: vertical; min-height: 88px; }
-
-  select { cursor: pointer; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8973a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 14px center;
-    padding-right: 36px;
-  }
-
-  /* ─── RADIO / CHECKBOX ────────────────────────────────────── */
-  .radio-group, .check-group {
-    display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px;
-  }
-
-  .radio-item, .check-item {
-    display: flex; align-items: center; gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-  }
-
-  .radio-item input[type="radio"], .check-item input[type="checkbox"] {
-    width: 16px; height: 16px;
-    accent-color: var(--gold);
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  /* ─── CHECKLIST ───────────────────────────────────────────── */
-  .checklist {
-    display: flex; flex-direction: column; gap: 10px;
-  }
-
-  .checklist-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 12px 14px;
-    border: 1.5px solid #e8e5df;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: #fafaf8;
-  }
-
-  .checklist-item:hover { border-color: var(--gold); background: rgba(184,151,58,0.04); }
-
-  .checklist-item input[type="checkbox"] {
-    width: 16px; height: 16px;
-    accent-color: var(--gold);
-    flex-shrink: 0;
-    margin-top: 2px;
-    cursor: pointer;
-  }
-
-  .checklist-item-text {
-    font-size: 13px; line-height: 1.5; color: #444;
-  }
-
-  /* ─── INFO BOX ────────────────────────────────────────────── */
-  .info-box {
-    background: rgba(184,151,58,0.07);
-    border: 1px solid rgba(184,151,58,0.25);
-    border-radius: 8px;
-    padding: 14px 18px;
-    font-size: 12.5px;
-    color: #5a4a1a;
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-
-  .info-box strong { color: var(--gold); }
-
-  /* ─── CIG SECTION ─────────────────────────────────────────── */
-  .cig-box {
-    border: 1.5px solid rgba(184,151,58,0.25);
-    border-radius: 8px;
-    padding: 18px;
-    background: rgba(184,151,58,0.04);
-  }
-  .cig-box .cig-title {
-    font-size: 12px; font-weight: 500; letter-spacing: 0.5px;
-    color: var(--gold); margin-bottom: 12px; text-transform: uppercase;
-  }
-
-  /* ─── DIVIDER ─────────────────────────────────────────────── */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(184,151,58,0.2), transparent);
-    margin: 24px 0;
-  }
-
-  /* ─── HIDDEN SECTIONS ─────────────────────────────────────── */
-  .section-kulanz { display: block; }
-  .section-ccr    { display: none; }
-
-  /* ─── SUBMIT ──────────────────────────────────────────────── */
-  .submit-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    margin-top: 12px;
-  }
-
-  .submit-hint {
-    font-size: 12px;
-    color: #888;
-    text-align: center;
-  }
-
-  .submit-hint strong { color: var(--gold); }
-
-  .btn-submit {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 16px 52px;
-    background: linear-gradient(135deg, var(--charcoal), #2c2c50);
-    color: var(--white);
-    border: none;
-    border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 500;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 20px rgba(13,13,13,0.25);
-  }
-
-  .btn-submit:hover {
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: var(--charcoal);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(184,151,58,0.35);
-  }
-
-  .btn-submit svg { width: 18px; height: 18px; flex-shrink: 0; }
-
-  /* ─── TOAST ───────────────────────────────────────────────── */
-  #toast {
-    position: fixed; bottom: 32px; right: 32px;
-    background: var(--charcoal);
-    color: var(--white);
-    padding: 14px 24px;
-    border-radius: 10px;
-    font-size: 13px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-    border-left: 4px solid var(--gold);
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
-    z-index: 999;
-    pointer-events: none;
-  }
-  #toast.show { transform: translateY(0); opacity: 1; }
-
-  .btn-print {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 16px 36px;
-    background: var(--white);
-    color: var(--charcoal);
-    border: 2px solid rgba(184,151,58,0.35);
-    border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 500;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  }
-  .btn-print:hover {
-    border-color: var(--gold);
-    background: rgba(184,151,58,0.06);
-    color: var(--gold);
-    transform: translateY(-2px);
-  }
-  .btn-print svg { width: 17px; height: 17px; flex-shrink: 0; }
-
-  /* ─── PRINT STYLES ────────────────────────────────────────── */
-  @media print {
-    @page {
-      size: A4 portrait;
-      margin: 6mm 8mm;
-    }
-
-    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-
-    body { background: #fff !important; font-size: 9px; }
-
-    header, .hero, .type-toggle-wrap, .submit-area, #toast { display: none !important; }
-
-    main { max-width: 100%; padding: 0; margin: 0; }
-
-    /* Print header */
-    .print-header {
-      display: flex !important;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1.5px solid #1a1a2e;
-      padding-bottom: 5px;
-      margin-bottom: 6px;
-    }
-    .print-header-logo .ph-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 13px; font-weight: 600; color: #1a1a2e;
-    }
-    .print-header-meta {
-      text-align: right; font-size: 8px; color: #555; line-height: 1.4;
-    }
-    .print-type-badge {
-      display: inline-block !important;
-      background: #1a1a2e; color: #d4ae52;
-      font-size: 7px; font-weight: 600; letter-spacing: 1px;
-      text-transform: uppercase; padding: 2px 7px; border-radius: 20px; margin-top: 2px;
-    }
-
-    /* Sections très compactes */
-    .form-section {
-      box-shadow: none !important;
-      border: 1px solid #ccc !important;
-      border-radius: 4px !important;
-      margin-bottom: 4px !important;
-      page-break-inside: avoid;
-      animation: none !important;
-    }
-
-    .section-header {
-      padding: 4px 10px !important;
-      background: #f0ede8 !important;
-      border-bottom: 1px solid #ddd !important;
-    }
-    .section-number {
-      width: 16px !important; height: 16px !important;
-      font-size: 8px !important; flex-shrink: 0;
-    }
-    .section-title { font-size: 10px !important; }
-
-    .section-body { padding: 5px 10px !important; }
-
-    .grid-2 { gap: 5px !important; }
-    .grid-3 { gap: 4px !important; }
-
-    .field { gap: 2px !important; }
-
-    label { font-size: 7.5px !important; margin-bottom: 0 !important; letter-spacing: 0.3px !important; }
-
-    input[type="text"], input[type="email"], input[type="date"], input[type="number"],
-    select, textarea {
-      padding: 3px 6px !important;
-      font-size: 9px !important;
-      border: 1px solid #ccc !important;
-      background: #fafafa !important;
-      border-radius: 3px !important;
-      min-height: unset !important;
-    }
-
-    textarea { min-height: 28px !important; }
-
-    .divider { margin: 4px 0 !important; }
-
-    .checklist { gap: 2px !important; }
-    .checklist-item {
-      padding: 3px 6px !important;
-      border-radius: 3px !important;
-      border: 1px solid #e0ddd8 !important;
-    }
-    .checklist-item-text { font-size: 8px !important; line-height: 1.3 !important; }
-    .checklist-item-text small { font-size: 7px !important; }
-
-    .info-box {
-      padding: 4px 8px !important;
-      font-size: 8px !important;
-      margin-bottom: 5px !important;
-      border-radius: 4px !important;
-    }
-    .cig-box { padding: 5px 8px !important; }
-    .cig-box .cig-title { font-size: 8px !important; margin-bottom: 4px !important; }
-
-    .radio-group, .check-group { gap: 6px !important; }
-    .radio-item, .check-item { font-size: 8px !important; gap: 4px !important; }
-    .radio-item small { font-size: 7px !important; }
-
-    .section-ccr[style*="block"], .section-kulanz[style*="block"] { display: block !important; }
-  }
-
-  @media (max-width: 680px) {
-    .header-top { padding: 14px 20px; }
-    .site-bar { padding: 0 10px; }
-    .hero { padding: 36px 20px 28px; }
-    .hero h1 { font-size: 28px; }
-    main { padding: 24px 14px 60px; }
-    .section-body { padding: 20px 18px; }
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .span-2 { grid-column: span 1; }
-    .type-btn { padding: 9px 20px; font-size: 12px; }
-    .type-toggle-wrap { padding: 0 20px 24px; }
+  /* RADIO */
+  .radio-group { display:flex; gap:12px; flex-wrap:wrap; margin-top:4px; }
+  .radio-item { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; }
+  .radio-item input[type="radio"] { width:16px; height:16px; accent-color:var(--gold); cursor:pointer; flex-shrink:0; }
+
+  /* CHECKLIST */
+  .checklist { display:flex; flex-direction:column; gap:10px; }
+  .checklist-item { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1.5px solid #e8e5df; border-radius:8px; cursor:pointer; transition:all 0.2s; background:#fafaf8; }
+  .checklist-item:hover { border-color:var(--gold); background:rgba(184,151,58,0.04); }
+  .checklist-item input[type="checkbox"] { width:16px; height:16px; accent-color:var(--gold); flex-shrink:0; margin-top:2px; cursor:pointer; }
+  .checklist-item-text { font-size:13px; line-height:1.5; color:#444; }
+
+  /* INFO BOX */
+  .info-box { background:rgba(184,151,58,0.07); border:1px solid rgba(184,151,58,0.25); border-radius:8px; padding:14px 18px; font-size:12.5px; color:#5a4a1a; line-height:1.6; margin-bottom:20px; }
+  .info-box strong { color:var(--gold); }
+
+  /* CIG */
+  .cig-box { border:1.5px solid rgba(184,151,58,0.25); border-radius:8px; padding:18px; background:rgba(184,151,58,0.04); }
+  .cig-box .cig-title { font-size:12px; font-weight:500; letter-spacing:0.5px; color:var(--gold); margin-bottom:12px; text-transform:uppercase; }
+
+  /* DIVIDER */
+  .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(184,151,58,0.2),transparent); margin:24px 0; }
+
+  /* HIDDEN */
+  .section-kulanz { display:block; }
+  .section-ccr { display:none; }
+
+  /* SUBMIT */
+  .submit-area { display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:12px; }
+  .submit-hint { font-size:12px; color:#888; text-align:center; }
+  .submit-hint strong { color:var(--gold); }
+  .btn-submit { display:inline-flex; align-items:center; gap:10px; padding:16px 52px; background:linear-gradient(135deg,var(--charcoal),#2c2c50); color:var(--white); border:none; border-radius:50px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; letter-spacing:1px; cursor:pointer; transition:all 0.3s; box-shadow:0 4px 20px rgba(13,13,13,0.25); }
+  .btn-submit:hover { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--charcoal); transform:translateY(-2px); box-shadow:0 8px 28px rgba(184,151,58,0.35); }
+  .btn-submit svg { width:18px; height:18px; flex-shrink:0; }
+  .btn-print { display:inline-flex; align-items:center; gap:10px; padding:16px 36px; background:var(--white); color:var(--charcoal); border:2px solid rgba(184,151,58,0.35); border-radius:50px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.3s; }
+  .btn-print:hover { border-color:var(--gold); background:rgba(184,151,58,0.06); color:var(--gold); transform:translateY(-2px); }
+  .btn-print svg { width:17px; height:17px; flex-shrink:0; }
+
+  /* TOAST */
+  #toast { position:fixed; bottom:32px; right:32px; background:var(--charcoal); color:var(--white); padding:14px 24px; border-radius:10px; font-size:13px; box-shadow:0 4px 24px rgba(0,0,0,0.25); border-left:4px solid var(--gold); transform:translateY(80px); opacity:0; transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); z-index:999; pointer-events:none; }
+  #toast.show { transform:translateY(0); opacity:1; }
+
+  @media(max-width:680px) {
+    .header-top { padding:14px 20px; }
+    .site-bar { padding:0 10px; }
+    main { padding:24px 14px 60px; }
+    .section-body { padding:20px 18px; }
+    .grid-2,.grid-3 { grid-template-columns:1fr; }
+    .span-2 { grid-column:span 1; }
+    .type-toggle-wrap { padding:0 20px 24px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ─── HEADER ─────────────────────────────────────────────────────── -->
 <header>
   <div class="header-top">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold-light);letter-spacing:1px;">
-      Demande Kulanz / CCR
-    </div>
-    <div id="site-display" style="font-size:13px;color:var(--gold-light);font-weight:500;text-align:right;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold-light);letter-spacing:1px;">Demande Kulanz / CCR</div>
+    <div style="font-size:13px;color:var(--gold-light);font-weight:500;text-align:right;">
       <span style="font-size:10px;color:var(--silver);display:block;letter-spacing:1px;text-transform:uppercase;">Site sélectionné</span>
       <span id="site-display-name">Aucun site sélectionné</span>
     </div>
   </div>
   <div class="site-bar">
     <div class="site-bar-label">Sélectionner un site</div>
-    <button class="site-btn" onclick="selectSite(this, 'Audi Hœnheim')">Audi Hœnheim</button>
-    <button class="site-btn" onclick="selectSite(this, 'Audi Obernai')">Audi Obernai</button>
-    <button class="site-btn" onclick="selectSite(this, 'SEAT Hœnheim')">SEAT Hœnheim</button>
-    <button class="site-btn" onclick="selectSite(this, 'SKODA Hœnheim')">SKODA Hœnheim</button>
-    <button class="site-btn" onclick="selectSite(this, 'VW Bischheim')">VW Bischheim</button>
-    <button class="site-btn" onclick="selectSite(this, 'VW Illkirch')">VW Illkirch</button>
-    <button class="site-btn" onclick="selectSite(this, 'VW Obernai')">VW Obernai</button>
+    <button class="site-btn" onclick="selectSite(this,'Audi Hœnheim')">Audi Hœnheim</button>
+    <button class="site-btn" onclick="selectSite(this,'Audi Obernai')">Audi Obernai</button>
+    <button class="site-btn" onclick="selectSite(this,'SEAT Hœnheim')">SEAT Hœnheim</button>
+    <button class="site-btn" onclick="selectSite(this,'SKODA Hœnheim')">SKODA Hœnheim</button>
+    <button class="site-btn" onclick="selectSite(this,'VW Bischheim')">VW Bischheim</button>
+    <button class="site-btn" onclick="selectSite(this,'VW Illkirch')">VW Illkirch</button>
+    <button class="site-btn" onclick="selectSite(this,'VW Obernai')">VW Obernai</button>
   </div>
 </header>
 
-<!-- ─── TYPE TOGGLE ────────────────────────────────────────────────── -->
 <div class="type-toggle-wrap">
   <div class="type-toggle">
     <button class="type-btn active" id="btn-kulanz" onclick="switchType('kulanz')">Demande KULANZ</button>
@@ -658,29 +158,12 @@
   </div>
 </div>
 
-<!-- ─── PRINT HEADER (visible uniquement à l'impression) ──────────── -->
-<div class="print-header" style="display:none;" id="printHeader">
-  <div class="print-header-logo">
-    <div class="ph-icon">GE</div>
-    <div>
-      <div class="ph-title">GE Auto Garantie</div>
-      <div id="ph-type-badge" class="print-type-badge">Kulanz</div>
-    </div>
-  </div>
-  <div class="print-header-meta">
-    <div id="ph-site" style="font-weight:600;color:#1a1a2e;font-size:12px;">—</div>
-    <div id="ph-date"></div>
-    <div>teamgarantie@geauto.fr</div>
-  </div>
-</div>
-
-<!-- ─── MAIN ───────────────────────────────────────────────────────── -->
 <main>
   <form id="mainForm">
     <input type="hidden" id="f_site" name="site" value="">
     <input type="hidden" id="f_type" name="type_demande" value="Kulanz">
 
-    <!-- ═══════════ SECTION COMMUNE : VÉHICULE ═══════════ -->
+    <!-- VÉHICULE -->
     <div class="form-section" style="animation-delay:0.05s">
       <div class="section-header">
         <div class="section-number">1</div>
@@ -690,23 +173,23 @@
         <div class="grid-2">
           <div class="field">
             <label>Numéro de châssis <span class="req">*</span></label>
-            <input type="text" name="chassis" placeholder="Ex : WAUZZZ8R3LA000000" required>
+            <input type="text" name="chassis" placeholder="Ex : WAUZZZ8R3LA000000">
           </div>
           <div class="field">
             <label>Kilométrage <span class="req">*</span></label>
-            <input type="number" name="kilometrage" placeholder="Ex : 45000" required min="0">
+            <input type="number" name="kilometrage" placeholder="Ex : 45000" min="0">
           </div>
           <div class="field">
             <label>N° d'Ordre de Réparation <span class="req">*</span></label>
-            <input type="text" name="or_number" placeholder="Ex : 000123" required>
+            <input type="text" name="or_number" placeholder="Ex : 000123">
           </div>
           <div class="field">
             <label>Date de l'OR <span class="req">*</span></label>
-            <input type="date" name="date_or" required>
+            <input type="date" name="date_or">
           </div>
           <div class="field">
             <label>KVPS <span class="opt">(optionnel)</span></label>
-            <input type="text" name="kvps" placeholder="Ex : 02155">
+            <input type="text" name="kvps" id="kvps_input" placeholder="Ex : 02155">
           </div>
           <div class="field">
             <label>Nom du technicien <span class="opt">(optionnel)</span></label>
@@ -716,7 +199,7 @@
       </div>
     </div>
 
-    <!-- ═══════════ SECTION COMMUNE : PLAINTE ═══════════ -->
+    <!-- PLAINTE -->
     <div class="form-section" style="animation-delay:0.1s">
       <div class="section-header">
         <div class="section-number">2</div>
@@ -726,11 +209,11 @@
         <div class="grid-2">
           <div class="field span-2">
             <label>Plainte du client <span class="req">*</span></label>
-            <textarea name="plainte_client" placeholder="Décrivez la plainte du client avec précision…" required></textarea>
+            <textarea name="plainte_client" placeholder="Décrivez la plainte du client avec précision…"></textarea>
           </div>
           <div class="field">
             <label>Type d'avarie <span class="req">*</span></label>
-            <select name="type_avarie" required>
+            <select name="type_avarie">
               <option value="">— Sélectionner —</option>
               <option>Défaillance mécanique</option>
               <option>Défaillance électrique</option>
@@ -745,21 +228,13 @@
             <label>Emplacement <span class="opt">(optionnel)</span></label>
             <select name="emplacement">
               <option value="">— Sélectionner —</option>
-              <option>Gauche</option>
-              <option>Droit</option>
-              <option>Avant</option>
-              <option>Arrière</option>
-              <option>Avant gauche</option>
-              <option>Avant droit</option>
-              <option>Arrière gauche</option>
-              <option>Arrière droit</option>
-              <option>Non applicable</option>
+              <option>Gauche</option><option>Droit</option><option>Avant</option><option>Arrière</option>
+              <option>Avant gauche</option><option>Avant droit</option><option>Arrière gauche</option>
+              <option>Arrière droit</option><option>Non applicable</option>
             </select>
           </div>
         </div>
-
         <div class="divider"></div>
-
         <div class="grid-2">
           <div class="field">
             <label>Référence pièce <span class="opt">(optionnel)</span></label>
@@ -781,7 +256,7 @@
       </div>
     </div>
 
-    <!-- ═══════════ SECTION KULANZ UNIQUEMENT ═══════════ -->
+    <!-- KULANZ -->
     <div class="form-section section-kulanz" style="animation-delay:0.15s">
       <div class="section-header">
         <div class="section-number">3</div>
@@ -789,87 +264,76 @@
       </div>
       <div class="section-body">
         <div style="display:flex;flex-direction:column;gap:14px;">
-
           <div class="field">
-            <label>Y a-t-il une TPI ? <span class="req">*</span></label>
+            <label>Y a-t-il une TPI ?</label>
             <div class="radio-group">
               <label class="radio-item"><input type="radio" name="tpi" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="tpi" value="NON"> Non</label>
             </div>
           </div>
-
           <div class="field" id="tpi_num_field" style="display:none">
             <label>Numéro de TPI</label>
             <input type="text" name="num_tpi" placeholder="Ex : TPI-2025-0042">
           </div>
-
           <div class="divider"></div>
-
           <div class="field">
-            <label>Garantie OPTEVEN visible dans les données véhicule ELSA ? <span class="req">*</span></label>
+            <label>Garantie OPTEVEN visible dans les données véhicule ELSA ?</label>
             <div class="radio-group">
               <label class="radio-item"><input type="radio" name="opteven" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="opteven" value="NON"> Non</label>
             </div>
           </div>
-
           <div class="field">
-            <label>Code "tuning" enregistré dans SAGA/2 ou ODIS ? <span class="req">*</span></label>
+            <label>Code "tuning" enregistré dans SAGA/2 ou ODIS ?</label>
             <div class="radio-group">
               <label class="radio-item"><input type="radio" name="tuning" value="OUI"> Oui <small style="color:var(--red);margin-left:4px;">→ NOK</small></label>
               <label class="radio-item"><input type="radio" name="tuning" value="NON"> Non</label>
             </div>
           </div>
-
           <div class="field">
-            <label>Préconisations constructeur respectées (y compris dernier entretien) ? <span class="req">*</span></label>
+            <label>Préconisations constructeur respectées (y compris dernier entretien) ?</label>
             <div class="radio-group">
               <label class="radio-item"><input type="radio" name="preconisations" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="preconisations" value="NON"> Non</label>
             </div>
           </div>
-
           <div class="field">
-            <label>Dernier entretien fait chez le site ou vendu lors de la réparation ? <span class="req">*</span></label>
+            <label>Dernier entretien fait chez le site ou vendu lors de la réparation ?</label>
             <div class="radio-group">
               <label class="radio-item"><input type="radio" name="dernier_entretien" value="OUI"> Oui</label>
               <label class="radio-item"><input type="radio" name="dernier_entretien" value="NON"> Non <small style="color:var(--red);margin-left:4px;">→ NOK</small></label>
             </div>
           </div>
-
           <div class="field">
-            <label>Lien entre la cause du dommage et l'entretien ? <span class="req">*</span></label>
+            <label>Lien entre la cause du dommage et l'entretien ?</label>
             <div class="radio-group">
               <label class="radio-item"><input type="radio" name="lien_entretien" value="OUI"> Oui <small style="color:var(--red);margin-left:4px;">→ NOK sauf entretiens OK</small></label>
               <label class="radio-item"><input type="radio" name="lien_entretien" value="NON"> Non</label>
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
-    <!-- ═══════════ SECTION CCR UNIQUEMENT ═══════════ -->
+    <!-- CCR PRÉREQUIS -->
     <div class="form-section section-ccr" style="animation-delay:0.15s">
       <div class="section-header">
         <div class="section-number">3</div>
         <div class="section-title">Prérequis CCR</div>
       </div>
       <div class="section-body">
-        <div class="info-box">
-          Une demande <strong>KULANZ</strong> doit obligatoirement avoir été effectuée avant toute demande CCR.
-        </div>
+        <div class="info-box">Une demande <strong>KULANZ</strong> doit obligatoirement avoir été effectuée avant toute demande CCR.</div>
         <div class="field">
-          <label>Demande KULANZ effectuée ? <span class="req">*</span></label>
+          <label>Demande KULANZ effectuée ?</label>
           <div class="radio-group">
-            <label class="radio-item"><input type="radio" name="kulanz_done" value="OUI" required> Oui – joindre la KULANZ à la demande</label>
+            <label class="radio-item"><input type="radio" name="kulanz_done" value="OUI"> Oui – joindre la KULANZ à la demande</label>
             <label class="radio-item"><input type="radio" name="kulanz_done" value="NON"> Non – effectuer la demande KULANZ d'abord</label>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ═══════════ SECTION CCR : PIÈCES ═══════════ -->
+    <!-- CCR PIÈCES -->
     <div class="form-section section-ccr" style="animation-delay:0.2s">
       <div class="section-header">
         <div class="section-number">4</div>
@@ -878,81 +342,42 @@
       <div class="section-body">
         <p style="font-size:12px;color:#888;margin-bottom:16px;">Cochez les documents joints à cette demande.</p>
         <div class="checklist">
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="devis_taux_garantie">
-            <span class="checklist-item-text"><strong>Devis établi au taux garantie</strong> – sans forfait, sans diagnostic, sans essai<br><small style="color:#999;">(Comptes : 90003 Bischheim &amp; Hœnheim / 90013 Obernai / 90023 Illkirch)</small></span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="accord_technique">
-            <span class="checklist-item-text"><strong>Accord Technique Préalable</strong> – si nécessaire (code dommage 1/2/3 &gt; 2 000 € HT ou autres codes &gt; 5 000 € HT)</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="photo_chassis">
-            <span class="checklist-item-text"><strong>Photo ou vidéo</strong> avec numéro de châssis visible (ServiceCam)</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="plan_entretien_elsa">
-            <span class="checklist-item-text"><strong>Plan d'entretien numérique ELSA</strong> (impression non nécessaire)</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="factures_reseau">
-            <span class="checklist-item-text"><strong>Factures d'entretien – réseau</strong> (si pas de plan ELSA)</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="factures_hors_reseau">
-            <span class="checklist-item-text"><strong>Factures d'entretien – hors réseau</strong> (si pas de plan ELSA)</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="iq_plainte">
-            <span class="checklist-item-text"><strong>IQ</strong> avec plainte client et codage correspondant</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="commentaire_tech">
-            <span class="checklist-item-text"><strong>Feuille Commentaire Technicien</strong> avec diagnostic précis</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="protocole_ligne">
-            <span class="checklist-item-text"><strong>Protocole en ligne</strong> avec plan de contrôle lancé pour tous les défauts liés à la plainte</span>
-          </label>
-          <label class="checklist-item">
-            <input type="checkbox" name="pieces[]" value="codes_garantie">
-            <span class="checklist-item-text"><strong>Contrôle des codes de garantie</strong> (TD1, …)</span>
-          </label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Devis établi au taux garantie"><span class="checklist-item-text"><strong>Devis établi au taux garantie</strong> – sans forfait, sans diagnostic, sans essai</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Accord Technique Préalable"><span class="checklist-item-text"><strong>Accord Technique Préalable</strong> – si nécessaire</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Photo ou vidéo avec châssis"><span class="checklist-item-text"><strong>Photo ou vidéo</strong> avec numéro de châssis visible (ServiceCam)</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Plan d'entretien numérique ELSA"><span class="checklist-item-text"><strong>Plan d'entretien numérique ELSA</strong></span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Factures entretien réseau"><span class="checklist-item-text"><strong>Factures d'entretien – réseau</strong></span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Factures entretien hors réseau"><span class="checklist-item-text"><strong>Factures d'entretien – hors réseau</strong></span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="IQ avec plainte client"><span class="checklist-item-text"><strong>IQ</strong> avec plainte client et codage correspondant</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Feuille Commentaire Technicien"><span class="checklist-item-text"><strong>Feuille Commentaire Technicien</strong> avec diagnostic précis</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Protocole en ligne"><span class="checklist-item-text"><strong>Protocole en ligne</strong> avec plan de contrôle lancé</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Contrôle des codes de garantie"><span class="checklist-item-text"><strong>Contrôle des codes de garantie</strong> (TD1, …)</span></label>
         </div>
       </div>
     </div>
 
-    <!-- ═══════════ SECTION CCR : CIG ═══════════ -->
+    <!-- CCR CIG -->
     <div class="form-section section-ccr" style="animation-delay:0.25s">
       <div class="section-header">
         <div class="section-number">5</div>
         <div class="section-title">Règles CIG</div>
       </div>
       <div class="section-body">
-        <div class="info-box">
-          Un CIG 70/30 de <strong>16 %</strong> est obligatoire — 11 % à la charge du constructeur, 5 % à la charge de la concession. Sauf cas de non-applicabilité.
-        </div>
+        <div class="info-box">Un CIG 70/30 de <strong>16 %</strong> est obligatoire — 11 % à la charge du constructeur, 5 % à la charge de la concession.</div>
         <div class="cig-box">
           <div class="cig-title">CIG appliqué</div>
           <div class="radio-group" style="flex-direction:column;gap:10px;">
-            <label class="radio-item">
-              <input type="radio" name="cig" value="standard_16"> CIG standard 16 %
-            </label>
+            <label class="radio-item"><input type="radio" name="cig" value="standard_16"> CIG standard 16 %</label>
             <label class="radio-item" style="align-items:center;gap:10px;">
               <input type="radio" name="cig" value="superieur"> CIG supérieur à 16 % →
-              <input type="number" name="cig_taux" placeholder="…%" min="0" max="100" step="0.5"
-                style="width:90px;padding:6px 10px;font-size:13px;" disabled
-                id="cig_taux_input">
+              <input type="number" name="cig_taux" placeholder="…%" min="0" max="100" step="0.5" style="width:90px;padding:6px 10px;font-size:13px;" disabled id="cig_taux_input">
             </label>
           </div>
         </div>
-        <p style="font-size:11.5px;color:#999;margin-top:12px;line-height:1.6;">
-          ⚠ Toute demande de CIG supérieur doit être validée <strong>avant l'établissement de la demande CCR</strong>.
-        </p>
       </div>
     </div>
 
-    <!-- ═══════════ SECTION COMMUNE : COMMENTAIRES ═══════════ -->
+    <!-- COMMENTAIRES -->
     <div class="form-section" style="animation-delay:0.3s">
       <div class="section-header">
         <div class="section-number" id="comm-num">4</div>
@@ -961,27 +386,21 @@
       <div class="section-body">
         <div class="field">
           <label>Commentaires <span class="opt">(optionnel)</span></label>
-          <textarea name="commentaires" rows="4" placeholder="Toute information utile au traitement de votre demande…"></textarea>
+          <textarea name="commentaires" rows="4" placeholder="Toute information utile…"></textarea>
         </div>
       </div>
     </div>
 
-    <!-- ═══════════ SUBMIT ═══════════ -->
+    <!-- BOUTONS -->
     <div class="submit-area">
-      <p class="submit-hint">
-        En soumettant, le formulaire sera envoyé par e-mail à <strong>teamgarantie@geauto.fr</strong>
-      </p>
+      <p class="submit-hint">En soumettant, le formulaire sera envoyé par e-mail à <strong>teamgarantie@geauto.fr</strong></p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
         <button type="button" onclick="envoyerFormulaire()" class="btn-submit">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
           Envoyer la demande
         </button>
-        <button type="button" onclick="printForm()" class="btn-print">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
-          </svg>
+        <button type="button" onclick="genererPDF()" class="btn-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Enregistrer en PDF
         </button>
       </div>
@@ -989,259 +408,234 @@
   </form>
 </main>
 
-<!-- ─── TOAST ───────────────────────────────────────────────────────── -->
-<div id="toast">✔ Formulaire envoyé avec succès</div>
+<div id="toast"></div>
 
 <script>
-  // ─── Site selector ───────────────────────────────────────────────
-  const kvpsMap = {
-    'Audi Hœnheim': '02155',
-    'Audi Obernai': '02486',
-    'SEAT Hœnheim': '63930',
-    'SKODA Hœnheim': '02376',
-    'VW Bischheim': '02154',
-    'VW Illkirch': '02153',
-    'VW Obernai': '02485'
-  };
+// ── KVPS MAP ────────────────────────────────────────────────
+const kvpsMap = {
+  'Audi Hœnheim':'02155','Audi Obernai':'02486',
+  'SEAT Hœnheim':'63930','SKODA Hœnheim':'02376',
+  'VW Bischheim':'02154','VW Illkirch':'02153','VW Obernai':'02485'
+};
 
-  function selectSite(btn, name) {
-    document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('f_site').value = name;
-    document.getElementById('site-display-name').textContent = name;
-    // Auto-fill KVPS
-    const kvps = kvpsMap[name] || '';
-    const kvpsInput = document.querySelector('input[name="kvps"]');
-    if (kvpsInput) kvpsInput.value = kvps;
+// ── SITE ────────────────────────────────────────────────────
+function selectSite(btn, name) {
+  document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('f_site').value = name;
+  document.getElementById('site-display-name').textContent = name;
+  document.getElementById('kvps_input').value = kvpsMap[name] || '';
+}
+
+// ── TYPE TOGGLE ─────────────────────────────────────────────
+function switchType(type) {
+  const isK = type === 'kulanz';
+  document.getElementById('btn-kulanz').classList.toggle('active', isK);
+  document.getElementById('btn-ccr').classList.toggle('active', !isK);
+  document.getElementById('f_type').value = isK ? 'Kulanz' : 'CCR';
+  document.querySelectorAll('.section-kulanz').forEach(el => el.style.display = isK ? 'block' : 'none');
+  document.querySelectorAll('.section-ccr').forEach(el => el.style.display = !isK ? 'block' : 'none');
+  document.getElementById('comm-num').textContent = isK ? '4' : '6';
+}
+
+// ── EVENTS ──────────────────────────────────────────────────
+document.addEventListener('change', function(e) {
+  if (e.target.name === 'tpi') {
+    document.getElementById('tpi_num_field').style.display = e.target.value === 'OUI' ? 'flex' : 'none';
   }
-
-  // ─── Kulanz / CCR toggle ──────────────────────────────────────────
-  function switchType(type) {
-    const isKulanz = type === 'kulanz';
-    document.getElementById('btn-kulanz').classList.toggle('active', isKulanz);
-    document.getElementById('btn-ccr').classList.toggle('active', !isKulanz);
-    document.getElementById('f_type').value = isKulanz ? 'Kulanz' : 'CCR';
-
-    document.querySelectorAll('.section-kulanz').forEach(el => el.style.display = isKulanz ? 'block' : 'none');
-    document.querySelectorAll('.section-ccr').forEach(el => el.style.display = !isKulanz ? 'block' : 'none');
-    document.getElementById('comm-num').textContent = isKulanz ? '4' : '6';
+  if (e.target.name === 'cig') {
+    const inp = document.getElementById('cig_taux_input');
+    inp.disabled = e.target.value !== 'superieur';
+    if (!inp.disabled) inp.focus();
   }
+});
 
-  // ─── TPI field toggle ────────────────────────────────────────────
-  document.addEventListener('change', function(e) {
-    if (e.target.name === 'tpi') {
-      document.getElementById('tpi_num_field').style.display = e.target.value === 'OUI' ? 'flex' : 'none';
-    }
-    if (e.target.name === 'cig') {
-      const inp = document.getElementById('cig_taux_input');
-      inp.disabled = e.target.value !== 'superieur';
-      if (!inp.disabled) inp.focus();
-    }
-  });
+// ── COLLECTE DONNÉES ────────────────────────────────────────
+function collecterDonnees() {
+  const f = document.getElementById('mainForm');
+  const site = document.getElementById('f_site').value;
+  const type = document.getElementById('f_type').value || 'Kulanz';
+  const get = n => { const el = f.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
+  const getRadio = n => { const el = f.querySelector(`[name="${n}"]:checked`); return el ? el.value : ''; };
 
-  // ─── Submit → mailto ─────────────────────────────────────────────
-  async function envoyerFormulaire() {
-    const form = document.getElementById('mainForm');
-    const data = new FormData(form);
+  const fields = [
+    { label:'Site', value:site },
+    { label:'Type de demande', value:type },
+    { label:'N° de châssis', value:get('chassis') },
+    { label:'Kilométrage', value:get('kilometrage') ? get('kilometrage')+' km' : '' },
+    { label:"N° d'Ordre de Réparation", value:get('or_number') },
+    { label:"Date de l'OR", value:get('date_or') },
+    { label:'KVPS', value:get('kvps') },
+    { label:'Technicien', value:get('technicien') },
+    { label:'Plainte client', value:get('plainte_client') },
+    { label:"Type d'avarie", value:get('type_avarie') },
+    { label:'Emplacement', value:get('emplacement') },
+    { label:'Référence pièce', value:get('ref_piece') },
+    { label:'Désignation pièce', value:get('desig_piece') },
+    { label:'Code dommage', value:get('code_dommage') },
+    { label:'Code avarie', value:get('code_avarie') },
+  ];
 
-    if (!data.get('site')) {
-      alert('⚠ Veuillez sélectionner un site dans la barre de navigation.');
-      return;
-    }
-
-    // Vérifier champs obligatoires manuellement
-    const chassis = form.querySelector('[name="chassis"]').value.trim();
-    const km = form.querySelector('[name="kilometrage"]').value.trim();
-    const or = form.querySelector('[name="or_number"]').value.trim();
-    const dateOR = form.querySelector('[name="date_or"]').value.trim();
-    if (!chassis || !km || !or || !dateOR) {
-      alert('⚠ Veuillez remplir tous les champs obligatoires (châssis, kilométrage, N° OR, date OR).');
-      return;
-    }
-
-    const type = data.get('type_demande');
-    const site = data.get('site');
-
-    const labels = {
-      chassis: 'N° de châssis', kilometrage: 'Kilométrage (km)',
-      or_number: 'N° OR', date_or: "Date de l'OR",
-      kvps: 'KVPS', technicien: 'Technicien',
-      plainte_client: 'Plainte client', type_avarie: "Type d'avarie",
-      emplacement: 'Emplacement', ref_piece: 'Référence pièce',
-      desig_piece: 'Désignation pièce', code_dommage: 'Code dommage',
-      code_avarie: 'Code avarie',
-      tpi: 'TPI présente', num_tpi: 'N° TPI',
-      opteven: 'Garantie OPTEVEN visible',
-      tuning: 'Code tuning détecté',
-      preconisations: 'Préconisations constructeur respectées',
-      dernier_entretien: 'Dernier entretien OK',
-      lien_entretien: 'Lien dommage / entretien',
-      kulanz_done: 'Demande KULANZ effectuée',
-      cig: 'CIG appliqué', cig_taux: 'Taux CIG (%)',
-      commentaires: 'Commentaires'
-    };
-
-    let message = `DEMANDE DE PRISE EN CHARGE – ${type.toUpperCase()}\n`;
-    message += `${'═'.repeat(50)}\n\n`;
-    message += `Site : ${site}\nType de demande : ${type}\n\n`;
-
-    for (const [key, label] of Object.entries(labels)) {
-      const val = data.get(key);
-      if (val && val.trim()) message += `${label} : ${val}\n`;
-    }
-
-    const pieces = data.getAll('pieces[]');
-    if (pieces.length > 0) {
-      message += `\nPièces jointes déclarées :\n`;
-      pieces.forEach(p => message += `  – ${p}\n`);
-    }
-
-    message += `\n${'─'.repeat(50)}\nEnvoyé depuis le formulaire GE Auto Garantie`;
-
-    const btn = document.querySelector('.btn-submit');
-    btn.disabled = true;
-    btn.textContent = 'Envoi en cours…';
-
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '7bf5b927-e39f-4fc1-9f60-642e4741e445',
-          subject: `[${type}] Demande – ${site} – OR ${data.get('or_number') || '?'}`,
-          message: message,
-          from_name: 'Formulaire GE Auto Garantie',
-          redirect: 'https://ruizbf96-hash.github.io/Kulanz/'
-        })
-      });
-
-      const result = await res.json();
-
-      if (result.success) {
-        showToast('✔ Demande envoyée à teamgarantie@geauto.fr');
-        form.reset();
-        document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('site-display-name').textContent = 'Aucun site sélectionné';
-        document.getElementById('f_site').value = '';
-      } else {
-        throw new Error('Échec envoi');
-      }
-    } catch (err) {
-      showToast('❌ Erreur — vérifiez votre connexion');
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande`;
-    }
+  if (type === 'Kulanz') {
+    fields.push(
+      { label:'TPI présente', value:getRadio('tpi') },
+      { label:'N° TPI', value:get('num_tpi') },
+      { label:'Garantie OPTEVEN visible', value:getRadio('opteven') },
+      { label:'Code tuning détecté', value:getRadio('tuning') },
+      { label:'Préconisations respectées', value:getRadio('preconisations') },
+      { label:'Dernier entretien OK', value:getRadio('dernier_entretien') },
+      { label:'Lien dommage / entretien', value:getRadio('lien_entretien') },
+    );
+  } else {
+    fields.push(
+      { label:'Demande KULANZ effectuée', value:getRadio('kulanz_done') },
+      { label:'CIG appliqué', value:getRadio('cig') },
+      { label:'Taux CIG (%)', value:get('cig_taux') },
+    );
+    const pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(el => el.value);
+    if (pieces.length) fields.push({ label:'Pièces jointes', value:pieces.join('\n') });
   }
+  fields.push({ label:'Commentaires', value:get('commentaires') });
 
-  function printForm() {
-    const site = document.getElementById('f_site').value;
-    const type = document.getElementById('f_type').value || 'Kulanz';
-    const orNum = document.querySelector('input[name="or_number"]').value || '';
+  return { site, type, fields, get };
+}
 
-    // Vérifications avant génération
-    if (!site) { alert('⚠ Veuillez sélectionner un site avant d\'enregistrer.'); return; }
-    if (!orNum) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation avant d\'enregistrer.'); return; }
+// ── ENVOYER ─────────────────────────────────────────────────
+function envoyerFormulaire() {
+  const { site, type, fields, get } = collecterDonnees();
 
-    const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
-    const f = document.getElementById('mainForm');
-    const get = n => { const el = f.querySelector(`[name="${n}"]`); return el ? el.value : ''; };
-    const getRadio = n => { const el = f.querySelector(`[name="${n}"]:checked`); return el ? el.value : ''; };
+  if (!site) { alert('⚠ Veuillez sélectionner un site.'); return; }
+  if (!get('chassis')) { alert('⚠ Veuillez remplir le numéro de châssis.'); return; }
+  if (!get('or_number')) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.'); return; }
 
-    const fields = [
-      { label: 'Site', value: site },
-      { label: 'Type de demande', value: type },
-      { label: 'N° de châssis', value: get('chassis') },
-      { label: 'Kilométrage', value: get('kilometrage') ? get('kilometrage') + ' km' : '' },
-      { label: "N° d'Ordre de Réparation", value: orNum },
-      { label: "Date de l'OR", value: get('date_or') },
-      { label: 'KVPS', value: get('kvps') },
-      { label: 'Technicien', value: get('technicien') },
-      { label: 'Plainte client', value: get('plainte_client') },
-      { label: "Type d'avarie", value: get('type_avarie') },
-      { label: 'Emplacement', value: get('emplacement') },
-      { label: 'Référence pièce', value: get('ref_piece') },
-      { label: 'Désignation pièce', value: get('desig_piece') },
-      { label: 'Code dommage', value: get('code_dommage') },
-      { label: 'Code avarie', value: get('code_avarie') },
-    ];
+  const btn = document.querySelector('.btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
 
-    if (type === 'Kulanz') {
-      fields.push(
-        { label: 'TPI présente', value: getRadio('tpi') },
-        { label: 'N° TPI', value: get('num_tpi') },
-        { label: 'Garantie OPTEVEN visible', value: getRadio('opteven') },
-        { label: 'Code tuning détecté', value: getRadio('tuning') },
-        { label: 'Préconisations respectées', value: getRadio('preconisations') },
-        { label: 'Dernier entretien OK', value: getRadio('dernier_entretien') },
-        { label: 'Lien dommage / entretien', value: getRadio('lien_entretien') },
-      );
+  let message = `DEMANDE DE PRISE EN CHARGE – ${type.toUpperCase()}\n${'═'.repeat(50)}\n\n`;
+  fields.filter(fi => fi.value).forEach(fi => { message += `${fi.label} : ${fi.value}\n`; });
+  message += `\n${'─'.repeat(50)}\nEnvoyé depuis le formulaire GE Auto Garantie`;
+
+  fetch('https://api.web3forms.com/submit', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      access_key:'7bf5b927-e39f-4fc1-9f60-642e4741e445',
+      subject:`[${type}] Demande – ${site} – OR ${get('or_number') || '?'}`,
+      message: message,
+      from_name:'Formulaire GE Auto Garantie'
+    })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) {
+      showToast('✔ Demande envoyée à teamgarantie@geauto.fr');
+      document.getElementById('mainForm').reset();
+      document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('site-display-name').textContent = 'Aucun site sélectionné';
+      document.getElementById('f_site').value = '';
+      document.getElementById('f_type').value = 'Kulanz';
     } else {
-      fields.push(
-        { label: 'Demande KULANZ effectuée', value: getRadio('kulanz_done') },
-        { label: 'CIG appliqué', value: getRadio('cig') },
-        { label: 'Taux CIG (%)', value: get('cig_taux') },
-      );
-      const pieces = Array.from(f.querySelectorAll('[name="pieces[]"]:checked')).map(el => el.value);
-      if (pieces.length) fields.push({ label: 'Pièces jointes', value: '• ' + pieces.join('\n• ') });
+      showToast('❌ Erreur envoi — réessayez.');
     }
-    fields.push({ label: 'Commentaires', value: get('commentaires') });
-
-    const rows = fields
-      .filter(fi => fi.value && fi.value.trim())
-      .map((fi, i) => `<tr style="background:${i%2===0?'#fff':'#f7f6f2'}">
-        <td style="font-size:11px;font-weight:600;color:#444;padding:6px 10px;border:1px solid #ddd;width:38%;vertical-align:top">${fi.label}</td>
-        <td style="font-size:11px;color:#1a1a2e;padding:6px 10px;border:1px solid #ddd;vertical-align:top;white-space:pre-wrap">${fi.value}</td>
-      </tr>`).join('');
-
-    const filename = `Demande_${type}_${site.replace(/\s+/g,'_')}_OR${orNum}`;
-
-    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${filename}</title>
-<style>
-  @page{size:A4 portrait;margin:12mm 14mm}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Arial,sans-serif;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1a1a2e;padding-bottom:10px;margin-bottom:14px}
-  .hdr-l h1{font-size:18px;font-weight:700;color:#1a1a2e}
-  .badge{display:inline-block;background:#1a1a2e;color:#d4ae52;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-top:5px}
-  .hdr-r{text-align:right;font-size:10px;color:#555;line-height:1.8}
-  .hdr-r strong{color:#1a1a2e;font-size:12px;display:block}
-  .sec{font-size:11px;font-weight:700;color:#fff;background:#1a1a2e;padding:5px 10px;margin-top:12px;letter-spacing:.5px}
-  table{width:100%;border-collapse:collapse}
-  .footer{margin-top:18px;border-top:1px solid #ddd;padding-top:7px;font-size:8.5px;color:#aaa;text-align:center}
-</style></head><body>
-<div class="hdr">
-  <div class="hdr-l">
-    <h1>${site} — ${get('kvps') || 'KVPS'} — ${get('code_dommage') || 'Code dommage'}</h1>
-    <div class="badge">Demande ${type}</div>
-  </div>
-  <div class="hdr-r"><strong>OR : ${orNum}</strong>Date : ${now}<br>teamgarantie@geauto.fr</div>
-</div>
-<div class="sec">Détails de la demande</div>
-<table>${rows}</table>
-<div class="footer">Document généré depuis le formulaire GE Auto Garantie — ${now}</div>
-<script>
-  window.addEventListener('load', function() {
-    window.print();
-    window.addEventListener('afterprint', function() { window.close(); });
+  })
+  .catch(() => showToast('❌ Erreur réseau — vérifiez votre connexion.'))
+  .finally(() => {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande`;
   });
-<\/script>
-</body></html>`;
+}
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (!win) { alert('⚠ Autorisez les popups pour ce site puis réessayez.'); return; }
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
+// ── PDF ──────────────────────────────────────────────────────
+function genererPDF() {
+  const { site, type, fields, get } = collecterDonnees();
+
+  if (!site) { alert('⚠ Veuillez sélectionner un site.'); return; }
+  if (!get('or_number')) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.'); return; }
+
+  if (!window.jspdf) { alert('⚠ Bibliothèque PDF non chargée, réessayez dans quelques secondes.'); return; }
+
+  const btn = document.querySelector('.btn-print');
+  btn.disabled = true;
+  btn.textContent = 'Génération PDF…';
+
+  try {
+    const kvps = get('kvps') || '';
+    const codeDom = get('code_dommage') || '';
+    const orNum = get('or_number');
+    const now = new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
+
+    const titleDoc = `[DEMANDE ${type.toUpperCase()}] ${site}${kvps?' — '+kvps:''}${codeDom?' — '+codeDom:''}`;
+    const filename = `[${type.toUpperCase()}] ${site.replace(/\s+/g,'_')}${kvps?'_'+kvps:''}${codeDom?'_'+codeDom:''}_OR${orNum}.pdf`;
+
+    const doc = new window.jspdf.jsPDF({ unit:'mm', format:'a4' });
+    const W=210, ml=14, usableW=W-ml*2;
+    let y=14;
+
+    // En-tête
+    doc.setFillColor(26,26,46);
+    doc.rect(ml,y,usableW,18,'F');
+    doc.setTextColor(212,174,82);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    const tLines = doc.splitTextToSize(titleDoc, usableW-8);
+    doc.text(tLines, ml+4, y+6);
+    doc.setTextColor(180,180,180);
+    doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+    doc.text(`OR : ${orNum}   |   Date : ${now}   |   teamgarantie@geauto.fr`, ml+4, y+15);
+    y+=24;
+
+    // Titre tableau
+    doc.setFillColor(240,237,232);
+    doc.rect(ml,y,usableW,7,'F');
+    doc.setTextColor(26,26,46);
+    doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('Détails de la demande', ml+3, y+5);
+    y+=9;
+
+    // Lignes
+    const colL=65, colV=usableW-colL;
+    fields.filter(fi => fi.value && fi.value.trim()).forEach((fi,i) => {
+      const lines = doc.splitTextToSize(fi.value, colV-4);
+      const rowH = Math.max(7, lines.length*5+2);
+      if (y+rowH>282) { doc.addPage(); y=14; }
+      if (i%2===0) doc.setFillColor(255,255,255); else doc.setFillColor(247,246,242);
+      doc.rect(ml,y,usableW,rowH,'F');
+      doc.setDrawColor(221,221,221);
+      doc.rect(ml,y,colL,rowH,'S');
+      doc.rect(ml+colL,y,colV,rowH,'S');
+      doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80); doc.setFontSize(9);
+      doc.text(fi.label, ml+3, y+5);
+      doc.setFont('helvetica','normal'); doc.setTextColor(26,26,46);
+      doc.text(lines, ml+colL+3, y+5);
+      y+=rowH;
+    });
+
+    // Footer
+    y+=5;
+    doc.setDrawColor(200,200,200);
+    doc.line(ml,y,ml+usableW,y);
+    doc.setFontSize(7.5); doc.setTextColor(170,170,170); doc.setFont('helvetica','normal');
+    doc.text(`Document généré depuis le formulaire GE Auto Garantie — ${now}`, W/2, y+4, {align:'center'});
+
+    doc.save(filename);
+    showToast('✔ PDF enregistré : ' + filename);
+
+  } catch(err) {
+    showToast('❌ Erreur : ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Enregistrer en PDF`;
   }
+}
 
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-  }
+// ── TOAST ────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
 </script>
 </body>
 </html>
