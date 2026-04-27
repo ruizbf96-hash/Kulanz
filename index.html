@@ -831,38 +831,49 @@ function setVal(n,v){ var el=document.getElementById('mainForm').querySelector('
 function getRadio(n){ var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]:checked'); return el?el.value:''; }
 function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},3500); }
 
-// ── STORAGE PARTAGÉ ───────────────────────────────────────────
-function chargerDemandes(){
-  try{
-    window.storage.get('ge_auto_demandes', true).then(function(res){
-      demandes = res ? JSON.parse(res.value) : [];
-      if(typeof renderHistorique === 'function' && document.getElementById('page-historique').classList.contains('active')){
-        renderHistorique();
-      }
-    }).catch(function(){ demandes = []; });
-  }catch(e){ demandes = []; }
-}
+// ── STORAGE PARTAGÉ via JSONBin.io ───────────────────────────
+var JSONBIN_BIN_ID = '69ef52a536566621a8f87edc';
+var JSONBIN_KEY = '$2a$10$i3aWC3RnZZnw/uL7Y2jF7.9WxOjrIIsb3h9FIp1fO2..qe/kNwNJy';
+var JSONBIN_URL = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
 
-function sauvegarderDemandes(){
-  try{
-    window.storage.set('ge_auto_demandes', JSON.stringify(demandes), true)
-    .catch(function(e){ console.error('Erreur sauvegarde:', e); });
-  }catch(e){ console.error('Storage non disponible:', e); }
+function chargerDemandes(){
+  chargerDemandesSync(function(){});
 }
 
 function chargerDemandesSync(callback){
-  try{
-    window.storage.get('ge_auto_demandes', true).then(function(res){
-      demandes = res ? JSON.parse(res.value) : [];
-      if(callback) callback();
-    }).catch(function(){
-      demandes = [];
-      if(callback) callback();
-    });
-  }catch(e){
-    demandes = [];
+  fetch(JSONBIN_URL + '/latest', {
+    method: 'GET',
+    headers: {
+      'X-Master-Key': JSONBIN_KEY,
+      'X-Bin-Meta': 'false'
+    }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    demandes = (data && data.demandes) ? data.demandes : [];
     if(callback) callback();
-  }
+  })
+  .catch(function(){
+    // Fallback localStorage
+    try{ var s=localStorage.getItem('ge_auto_demandes'); demandes=s?JSON.parse(s):[]; }catch(e){demandes=[];}
+    if(callback) callback();
+  });
+}
+
+function sauvegarderDemandes(){
+  fetch(JSONBIN_URL, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_KEY
+    },
+    body: JSON.stringify({ demandes: demandes })
+  })
+  .then(function(){
+    // Backup localStorage aussi
+    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
+  })
+  .catch(function(e){ console.error('Erreur sauvegarde JSONBin:', e); });
 }
 
 // ── ACCÈS ─────────────────────────────────────────────────────
@@ -1466,9 +1477,10 @@ document.addEventListener('keydown', function(e){
 });
 function confirmerSuppression(){
   if(confirm('⚠ Supprimer tout l\'historique partagé ?')){
-    window.storage.delete('ge_auto_demandes', true)
-    .then(function(){ demandes=[]; renderHistorique(); showToast('🗑 Historique supprimé.'); })
-    .catch(function(){ showToast('❌ Erreur suppression.'); });
+    demandes = [];
+    sauvegarderDemandes();
+    renderHistorique();
+    showToast('🗑 Historique supprimé.');
   }
 }
 
