@@ -209,9 +209,20 @@
 <header>
   <div class="header-top">
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold-light);letter-spacing:1px;">Demande Kulanz / CCR</div>
-    <div style="font-size:13px;color:var(--gold-light);font-weight:500;text-align:right;">
-      <span style="font-size:10px;color:var(--silver);display:block;letter-spacing:1px;text-transform:uppercase;">Site sélectionné</span>
-      <span id="site-display-name">Aucun site sélectionné</span>
+    <div style="font-size:13px;color:var(--gold-light);font-weight:500;text-align:right;display:flex;align-items:center;gap:12px;">
+      <div>
+        <span style="font-size:10px;color:var(--silver);display:block;letter-spacing:1px;text-transform:uppercase;">Site sélectionné</span>
+        <span id="site-display-name">Aucun site sélectionné</span>
+      </div>
+      <div id="user-info" style="display:none">
+        <div class="user-badge">
+          <span id="user-role-badge" class="ub-role"></span>
+          <button class="btn-logout" onclick="deconnecter()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Déconnexion
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="site-bar">
@@ -258,9 +269,10 @@
       <div class="section-header"><div class="section-number">1</div><div class="section-title">Identification du véhicule</div></div>
       <div class="section-body">
         <div class="grid-2">
-          <div class="field">
+          <div class="field autocomplete-wrap">
             <label>Numéro de châssis <span class="req">*</span></label>
-            <input type="text" name="chassis" id="chassis_input" placeholder="Ex : WAUZZZ8R3LA000000" maxlength="17">
+            <input type="text" name="chassis" id="chassis_input" placeholder="Ex : WAUZZZ8R3LA000000" maxlength="17" autocomplete="off" oninput="chassisInput(this)">
+            <div class="autocomplete-list" id="chassis-ac-list"></div>
             <span class="hint" id="chassis_hint">0 / 17 caractères</span>
           </div>
           <div class="field">
@@ -793,7 +805,42 @@
   </div>
 </div>
 
-<!-- SUCCES OVERLAY -->
+<!-- PAGE DE CONNEXION -->
+<div class="login-page" id="login-page">
+  <div class="login-wrap">
+    <div>
+      <div class="login-logo">Team Garantie <span>GEA - VW</span></div>
+      <div class="login-subtitle">Gestion des demandes Garantie</div>
+    </div>
+    <div class="login-cards">
+      <div class="login-card" onclick="choisirAcces('usager')">
+        <div class="lc-icon">👤</div>
+        <div class="lc-title">Usager</div>
+        <div class="lc-desc">Créer et suivre vos demandes Kulanz / CCR</div>
+      </div>
+      <div class="login-card" onclick="choisirAcces('team')">
+        <div class="lc-icon">🔐</div>
+        <div class="lc-title">TeamGarantie</div>
+        <div class="lc-desc">Valider les demandes et accéder à l'historique complet</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MOT DE PASSE TEAM -->
+<div class="login-modal" id="login-modal">
+  <div class="login-modal-box">
+    <h3>🔐 Accès TeamGarantie</h3>
+    <p>Saisissez votre mot de passe pour accéder à l'espace de validation.</p>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="login-pwd" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')validerLogin()">
+      <div class="login-modal-error" id="login-error">Mot de passe incorrect.</div>
+    </div>
+    <button class="btn-connexion" onclick="validerLogin()">Se connecter</button>
+    <button class="btn-modal-cancel" style="width:100%;margin-top:10px;" onclick="fermerLoginModal()">Annuler</button>
+  </div>
+</div>
 <div class="success-overlay" id="success-overlay">
   <div class="success-card">
     <div class="success-icon">✅</div>
@@ -845,6 +892,65 @@ var kvpsMap = {
   'VW Bischheim':'02154','VW Illkirch':'02153','VW Obernai':'02485'
 };
 var MOT_DE_PASSE = 'Garantie2026';
+var typeAcces = ''; // 'usager' ou 'team'
+
+// ── GESTION ACCÈS ─────────────────────────────────────────────
+function choisirAcces(type) {
+  if (type === 'usager') {
+    typeAcces = 'usager';
+    ouvrirApp();
+  } else {
+    document.getElementById('login-modal').classList.add('open');
+    setTimeout(function(){ document.getElementById('login-pwd').focus(); }, 150);
+  }
+}
+
+function validerLogin() {
+  var pwd = document.getElementById('login-pwd').value;
+  var err = document.getElementById('login-error');
+  if (pwd !== MOT_DE_PASSE) {
+    err.style.display = 'block';
+    document.getElementById('login-pwd').focus();
+    return;
+  }
+  err.style.display = 'none';
+  typeAcces = 'team';
+  fermerLoginModal();
+  ouvrirApp();
+}
+
+function fermerLoginModal() {
+  document.getElementById('login-modal').classList.remove('open');
+  document.getElementById('login-pwd').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+function ouvrirApp() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('user-info').style.display = 'flex';
+  if (typeAcces === 'team') {
+    document.getElementById('user-role-badge').textContent = '🔐 TeamGarantie';
+    // TeamGarantie : accès onglet historique activé
+    document.querySelectorAll('.nav-tab').forEach(function(t){ t.style.display = 'block'; });
+  } else {
+    document.getElementById('user-role-badge').textContent = '👤 Usager';
+    // Usager : masquer onglet historique
+    document.querySelectorAll('.nav-tab').forEach(function(t,i){
+      if (i === 1) t.style.display = 'none';
+    });
+  }
+}
+
+function deconnecter() {
+  typeAcces = '';
+  document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('user-info').style.display = 'none';
+  // Revenir au formulaire si on était sur historique
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-formulaire').classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(function(t,i){ t.classList.toggle('active', i===0); });
+  document.getElementById('toggle-bar').style.display = 'block';
+}
 var donneesKulanz = {};
 var demandes = [];
 var demandeEnCours = null;
