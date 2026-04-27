@@ -749,7 +749,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
 <div id="toast"></div>
 
 <script>
-// ── FIREBASE CONFIG ───────────────────────────────────────────
+// ── FIREBASE STORAGE ──────────────────────────────────────────
 var firebaseConfig = {
   apiKey: "AIzaSyDPsep7yTE-UAjGGSioZfVAozGEo_lSmSQ",
   authDomain: "demande-kulanzccr.firebaseapp.com",
@@ -759,51 +759,53 @@ var firebaseConfig = {
   messagingSenderId: "128572691256",
   appId: "1:128572691256:web:43cd3e057b5287199967cd"
 };
-firebase.initializeApp(firebaseConfig);
+
+if(!firebase.apps.length){ firebase.initializeApp(firebaseConfig); }
 var db = firebase.database();
 var demandesRef = db.ref('demandes');
 
-// ── FIREBASE STORAGE ──────────────────────────────────────────
-function chargerDemandes(){chargerDemandesSync(function(){});}
+function chargerDemandes(){ chargerDemandesSync(function(){}); }
 
 function chargerDemandesSync(callback){
-  var tbody=document.getElementById('histo-tbody');
-  if(tbody)tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
-  demandesRef.orderByChild('id').once('value')
+  var tbody = document.getElementById('histo-tbody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
+  demandesRef.once('value')
   .then(function(snapshot){
-    demandes=[];
-    snapshot.forEach(function(child){demandes.push(child.val());});
-    demandes.sort(function(a,b){return b.id-a.id;});
-    if(callback)callback();
+    demandes = [];
+    snapshot.forEach(function(child){ demandes.push(child.val()); });
+    demandes.sort(function(a,b){ return b.id - a.id; });
+    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
+    if(callback) callback();
   })
   .catch(function(err){
-    console.error('Firebase erreur:',err);
-    try{var s=localStorage.getItem('ge_auto_demandes');demandes=s?JSON.parse(s):[];}catch(e){demandes=[];}
-    if(callback)callback();
+    console.error('Firebase erreur:', err);
+    try{ var s=localStorage.getItem('ge_auto_demandes'); demandes=s?JSON.parse(s):[]; }catch(e){ demandes=[]; }
+    if(callback) callback();
   });
 }
 
 function sauvegarderDemandes(callback){
-  // Réécrire toute la liste
-  var obj={};
-  demandes.forEach(function(d){obj['d'+d.id]=d;});
+  var obj = {};
+  demandes.forEach(function(d){ obj['d'+d.id] = d; });
   demandesRef.set(obj)
   .then(function(){
-    try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}
-    if(callback)callback();
+    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
+    if(callback) callback();
   })
   .catch(function(err){
-    console.error('Erreur sauvegarde Firebase:',err);
-    try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}
-    if(callback)callback();
+    console.error('Erreur sauvegarde Firebase:', err);
+    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
+    if(callback) callback();
   });
 }
 
-// ── CONSTANTES ────────────────────────────────────────────────
-var MOT_DE_PASSE = 'Garantie2026';
-var WEB3_KEY = '7bf5b927-e39f-4fc1-9f60-642e4741e445';
-
-var kvpsMap = {
+function confirmerSuppression(){
+  if(confirm('⚠ Supprimer tout l\'historique partagé ?')){
+    demandesRef.remove()
+    .then(function(){ demandes=[]; renderHistorique(); showToast('🗑 Historique supprimé.'); })
+    .catch(function(){ showToast('❌ Erreur suppression.'); });
+  }
+}
   'Audi Hœnheim':'02155','Audi Obernai':'02486',
   'SEAT Hœnheim':'63930','SKODA Hœnheim':'02376',
   'VW Bischheim':'02154','VW Illkirch':'02153','VW Obernai':'02485'
