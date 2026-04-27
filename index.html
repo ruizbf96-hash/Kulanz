@@ -292,17 +292,36 @@ table.histo-table{width:100%;border-collapse:collapse;}
       <div class="login-logo">Team Garantie <span>GEA - VW</span></div>
       <div class="login-subtitle">Gestion des demandes Garantie</div>
     </div>
-    <div class="login-cards">
-      <div class="login-card" onclick="choisirAcces('usager')">
-        <div class="lc-icon">👤</div>
-        <div class="lc-title">Usager</div>
-        <div class="lc-desc">Créer et suivre vos demandes Kulanz / CCR</div>
+
+    <!-- Choix accès -->
+    <div id="login-step-1" style="width:100%;">
+      <div class="login-cards">
+        <div class="login-card" onclick="choisirAcces('usager')">
+          <div class="lc-icon">👤</div>
+          <div class="lc-title">Usager</div>
+          <div class="lc-desc">Créer et suivre vos demandes Kulanz / CCR</div>
+        </div>
+        <div class="login-card" onclick="choisirAcces('team')">
+          <div class="lc-icon">🔐</div>
+          <div class="lc-title">TeamGarantie</div>
+          <div class="lc-desc">Valider les demandes et accéder à l'historique complet</div>
+        </div>
       </div>
-      <div class="login-card" onclick="choisirAcces('team')">
-        <div class="lc-icon">🔐</div>
-        <div class="lc-title">TeamGarantie</div>
-        <div class="lc-desc">Valider les demandes et accéder à l'historique complet</div>
+    </div>
+
+    <!-- Sélection site usager -->
+    <div id="login-step-2" style="display:none;width:100%;">
+      <p style="color:var(--silver);font-size:13px;text-align:center;margin-bottom:16px;letter-spacing:0.5px;">Sélectionnez votre site :</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;">
+        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('Audi Hœnheim')">Audi Hœnheim</div>
+        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('Audi Obernai')">Audi Obernai</div>
+        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('SEAT Hœnheim')">SEAT Hœnheim</div>
+        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('SKODA Hœnheim')">SKODA Hœnheim</div>
+        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('VW Bischheim')">VW Bischheim</div>
+        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('VW Illkirch')">VW Illkirch</div>
+        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;grid-column:span 2;transition:all 0.25s;" onclick="choisirSiteUsager('VW Obernai')">VW Obernai</div>
       </div>
+      <button onclick="retourStep1()" style="margin-top:16px;background:none;border:none;color:var(--silver);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline;display:block;text-align:center;width:100%;">← Retour</button>
     </div>
   </div>
 </div>
@@ -357,7 +376,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
       </div>
     </div>
   </div>
-  <div class="site-bar">
+  <div id="site-bar-wrap" style="display:flex;align-items:center;padding:0 40px;overflow-x:auto;">
     <div class="site-bar-label">Sélectionner un site</div>
     <button class="site-btn" onclick="selectSite(this,'Audi Hœnheim')">Audi Hœnheim</button>
     <button class="site-btn" onclick="selectSite(this,'Audi Obernai')">Audi Obernai</button>
@@ -419,6 +438,10 @@ table.histo-table{width:100%;border-collapse:collapse;}
           <div class="field">
             <label>Date de l'OR <span class="req">*</span></label>
             <input type="date" name="date_or">
+          </div>
+          <div class="field" id="site_display_field" style="display:none;">
+            <label>Site</label>
+            <input type="text" id="f_site_display" readonly style="background:#f0ede8;color:#444;cursor:default;">
           </div>
           <div class="field">
             <label>KVPS <span class="opt">(optionnel)</span></label>
@@ -808,46 +831,127 @@ function setVal(n,v){ var el=document.getElementById('mainForm').querySelector('
 function getRadio(n){ var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]:checked'); return el?el.value:''; }
 function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},3500); }
 
-// ── STORAGE ──────────────────────────────────────────────────
-function chargerDemandes(){ try{ var s=localStorage.getItem('ge_auto_demandes'); demandes=s?JSON.parse(s):[]; }catch(e){demandes=[];} }
-function sauvegarderDemandes(){ try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){} }
+// ── STORAGE PARTAGÉ ───────────────────────────────────────────
+function chargerDemandes(){
+  try{
+    window.storage.get('ge_auto_demandes', true).then(function(res){
+      demandes = res ? JSON.parse(res.value) : [];
+      if(typeof renderHistorique === 'function' && document.getElementById('page-historique').classList.contains('active')){
+        renderHistorique();
+      }
+    }).catch(function(){ demandes = []; });
+  }catch(e){ demandes = []; }
+}
+
+function sauvegarderDemandes(){
+  try{
+    window.storage.set('ge_auto_demandes', JSON.stringify(demandes), true)
+    .catch(function(e){ console.error('Erreur sauvegarde:', e); });
+  }catch(e){ console.error('Storage non disponible:', e); }
+}
+
+function chargerDemandesSync(callback){
+  try{
+    window.storage.get('ge_auto_demandes', true).then(function(res){
+      demandes = res ? JSON.parse(res.value) : [];
+      if(callback) callback();
+    }).catch(function(){
+      demandes = [];
+      if(callback) callback();
+    });
+  }catch(e){
+    demandes = [];
+    if(callback) callback();
+  }
+}
 
 // ── ACCÈS ─────────────────────────────────────────────────────
+var siteUsager = ''; // site sélectionné par l'usager à la connexion
+
 function choisirAcces(type){
-  if(type==='usager'){ typeAcces='usager'; ouvrirApp(); }
-  else{ document.getElementById('login-modal').classList.add('open'); setTimeout(function(){document.getElementById('login-pwd').focus();},150); }
+  if(type==='usager'){
+    // Afficher la grille de sites
+    document.getElementById('login-step-1').style.display='none';
+    document.getElementById('login-step-2').style.display='block';
+  } else {
+    document.getElementById('login-modal').classList.add('open');
+    setTimeout(function(){document.getElementById('login-pwd').focus();},150);
+  }
 }
+
+function retourStep1(){
+  document.getElementById('login-step-2').style.display='none';
+  document.getElementById('login-step-1').style.display='block';
+}
+
+function choisirSiteUsager(site){
+  siteUsager = site;
+  typeAcces = 'usager';
+  ouvrirApp();
+}
+
 function validerLogin(){
   var pwd=document.getElementById('login-pwd').value;
   var err=document.getElementById('login-error');
   if(pwd!==MOT_DE_PASSE){err.style.display='block';document.getElementById('login-pwd').focus();return;}
-  err.style.display='none'; typeAcces='team'; fermerLoginModal(); ouvrirApp();
+  err.style.display='none';
+  typeAcces='team';
+  siteUsager='';
+  fermerLoginModal();
+  ouvrirApp();
 }
+
 function fermerLoginModal(){
   document.getElementById('login-modal').classList.remove('open');
   document.getElementById('login-pwd').value='';
   document.getElementById('login-error').style.display='none';
 }
+
 function ouvrirApp(){
   document.getElementById('login-page').classList.add('hidden');
   document.getElementById('user-info').style.display='flex';
+
   if(typeAcces==='team'){
     document.getElementById('user-role-badge').textContent='🔐 TeamGarantie';
     document.getElementById('tab-historique').style.display='block';
+    document.getElementById('site-bar-wrap').style.display='flex'; // barre sites visible
   } else {
-    document.getElementById('user-role-badge').textContent='👤 Usager';
-    document.getElementById('tab-historique').style.display='none';
+    document.getElementById('user-role-badge').textContent='👤 '+siteUsager;
+    document.getElementById('tab-historique').style.display='block'; // historique visible mais filtré
+    document.getElementById('site-bar-wrap').style.display='none'; // barre sites masquée
+
+    // Pré-sélectionner le site dans le formulaire
+    document.getElementById('f_site').value = siteUsager;
+    document.getElementById('site-display-name').textContent = siteUsager;
+    document.querySelectorAll('.site-btn').forEach(function(b){
+      b.classList.toggle('active', b.textContent.trim()===siteUsager);
+    });
+    document.getElementById('kvps_input').value = kvpsMap[siteUsager]||'';
+
+    // Rendre site et KVPS en lecture seule
+    document.getElementById('kvps_input').readOnly = true;
+    document.getElementById('kvps_input').closest('.field').classList.add('field-readonly');
+    document.getElementById('f_site_display').value = siteUsager;
+    document.getElementById('site_display_field').style.display = 'flex';
   }
 }
+
 function deconnecter(){
-  typeAcces='';
+  typeAcces=''; siteUsager='';
   document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('login-step-1').style.display='block';
+  document.getElementById('login-step-2').style.display='none';
   document.getElementById('user-info').style.display='none';
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-formulaire').classList.add('active');
   document.getElementById('tab-formulaire').classList.add('active');
   document.getElementById('tab-historique').classList.remove('active');
   document.getElementById('toggle-bar').style.display='block';
+  // Réinitialiser lecture seule
+  document.getElementById('kvps_input').readOnly=false;
+  document.getElementById('kvps_input').closest('.field').classList.remove('field-readonly');
+  document.getElementById('site_display_field').style.display='none';
+  document.getElementById('site-bar-wrap').style.display='flex';
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
@@ -1083,20 +1187,21 @@ function envoyerFormulaire(){
     } else {throw new Error('Échec');}
   })
   .then(function(){
-    chargerDemandes();
-    var selDom=document.getElementById('code_dom_input');
-    var domLabel=selDom&&selDom.value?selDom.options[selDom.selectedIndex].text:getVal('code_dommage');
-    demandes.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR'),
-      site:site,type:type,or:getVal('or_number'),chassis:getVal('chassis'),
-      code_dommage:domLabel,email_usager:emailUsager,statut:'En attente',commentaire_team:''});
-    sauvegarderDemandes();
-    document.getElementById('success-details').innerHTML=
-      '<strong>Site :</strong> '+site+'<br>'+
-      '<strong>Type :</strong> '+type+'<br>'+
-      '<strong>N° OR :</strong> '+getVal('or_number')+'<br>'+
-      '<strong>Châssis :</strong> '+getVal('chassis')+'<br>'+
-      '<strong>E-mail :</strong> '+emailUsager;
-    document.getElementById('success-overlay').classList.add('open');
+    chargerDemandesSync(function(){
+      var selDom=document.getElementById('code_dom_input');
+      var domLabel=selDom&&selDom.value?selDom.options[selDom.selectedIndex].text:getVal('code_dommage');
+      demandes.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR'),
+        site:site,type:type,or:getVal('or_number'),chassis:getVal('chassis'),
+        code_dommage:domLabel,email_usager:emailUsager,statut:'En attente',commentaire_team:'',commerce:null});
+      sauvegarderDemandes();
+      document.getElementById('success-details').innerHTML=
+        '<strong>Site :</strong> '+site+'<br>'+
+        '<strong>Type :</strong> '+type+'<br>'+
+        '<strong>N° OR :</strong> '+getVal('or_number')+'<br>'+
+        '<strong>Châssis :</strong> '+getVal('chassis')+'<br>'+
+        '<strong>E-mail :</strong> '+emailUsager;
+      document.getElementById('success-overlay').classList.add('open');
+    });
   })
   .catch(function(){showToast('❌ Erreur réseau.');})
   .finally(function(){
@@ -1179,47 +1284,58 @@ function genererPDF(){
   }
 }
 
-// ── HISTORIQUE ────────────────────────────────────────────────
 function renderHistorique(){
-  chargerDemandes();
-  var fS=document.getElementById('filter-site').value;
-  var fT=document.getElementById('filter-type').value;
-  var fSt=document.getElementById('filter-statut').value;
-  var filtered=demandes.filter(function(d){return(!fS||d.site===fS)&&(!fT||d.type===fT)&&(!fSt||d.statut===fSt);});
-  document.getElementById('stat-total').textContent=demandes.length;
-  document.getElementById('stat-attente').textContent=demandes.filter(function(d){return d.statut==='En attente';}).length;
-  document.getElementById('stat-validee').textContent=demandes.filter(function(d){return d.statut==='Validée';}).length;
-  document.getElementById('stat-refusee').textContent=demandes.filter(function(d){return d.statut==='Refusée';}).length;
-  var tbody=document.getElementById('histo-tbody');
-  var empty=document.getElementById('histo-empty');
-  if(filtered.length===0){tbody.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  tbody.innerHTML=filtered.map(function(d){
-    var bc={'En attente':'badge-attente','Validée':'badge-validee','Refusée':'badge-refusee','Complément requis':'badge-complement'}[d.statut]||'badge-attente';
-    var ic={'En attente':'🟡','Validée':'✅','Refusée':'❌','Complément requis':'🔄'}[d.statut]||'🟡';
-    var pecHtml = '—';
-    if (d.statut === 'Validée' && d.commerce) {
-      var c = d.commerce;
-      var parts = [];
-      if (c.mo_de||c.mo_jusqua) parts.push('<span>MO: '+(c.mo_de||'?')+'→'+(c.mo_jusqua||'?')+'%'+(c.mo_qte?' ('+c.mo_qte+'%)':'')+'</span>');
-      if (c.pi_de||c.pi_jusqua) parts.push('<span>Pièces: '+(c.pi_de||'?')+'→'+(c.pi_jusqua||'?')+'%'+(c.pi_qte?' ('+c.pi_qte+'%)':'')+'</span>');
-      if (c.moe_de||c.moe_jusqua) parts.push('<span>MO ext.: '+(c.moe_de||'?')+'→'+(c.moe_jusqua||'?')+'%'+(c.moe_qte?' ('+c.moe_qte+'%)':'')+'</span>');
-      if (c.pe_de||c.pe_jusqua) parts.push('<span>Pièces ext.: '+(c.pe_de||'?')+'→'+(c.pe_jusqua||'?')+'%'+(c.pe_qte?' ('+c.pe_qte+'%)':'')+'</span>');
-      if (parts.length) pecHtml = '<div class="pec-cell">'+parts.join('')+'</div>';
-    }
-    return '<tr>'+
-      '<td>'+d.date+'</td>'+
-      '<td style="font-weight:500">'+d.site+'</td>'+
-      '<td><span style="font-size:11px;font-weight:600;color:var(--gold)">'+d.type+'</span></td>'+
-      '<td style="font-family:monospace">'+d.or+'</td>'+
-      '<td style="font-family:monospace;font-size:12px">'+d.chassis+'</td>'+
-      '<td style="font-size:12px">'+d.code_dommage+'</td>'+
-      '<td><span class="badge-statut '+bc+'">'+ic+' '+d.statut+'</span></td>'+
-      '<td>'+pecHtml+'</td>'+
-      '<td style="font-size:12px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(d.commentaire_team||'')+'">'+(d.commentaire_team||'—')+'</td>'+
-      '<td><button class="btn-valider" onclick="ouvrirModal('+d.id+')">Valider</button></td>'+
-    '</tr>';
-  }).join('');
+  chargerDemandesSync(function(){
+    var fS = typeAcces==='usager' ? siteUsager : document.getElementById('filter-site').value;
+    var fT=document.getElementById('filter-type').value;
+    var fSt=document.getElementById('filter-statut').value;
+
+    // Masquer le filtre site pour l'usager
+    document.getElementById('filter-site').style.display = typeAcces==='team' ? 'block' : 'none';
+
+    var filtered=demandes.filter(function(d){return(!fS||d.site===fS)&&(!fT||d.type===fT)&&(!fSt||d.statut===fSt);});
+
+    // Stats filtrées sur le périmètre de l'usager
+    var scope = typeAcces==='usager' ? demandes.filter(function(d){return d.site===siteUsager;}) : demandes;
+    document.getElementById('stat-total').textContent=scope.length;
+    document.getElementById('stat-attente').textContent=scope.filter(function(d){return d.statut==='En attente';}).length;
+    document.getElementById('stat-validee').textContent=scope.filter(function(d){return d.statut==='Validée';}).length;
+    document.getElementById('stat-refusee').textContent=scope.filter(function(d){return d.statut==='Refusée';}).length;
+
+    var tbody=document.getElementById('histo-tbody');
+    var empty=document.getElementById('histo-empty');
+    if(filtered.length===0){tbody.innerHTML='';empty.style.display='block';return;}
+    empty.style.display='none';
+    tbody.innerHTML=filtered.map(function(d){
+      var bc={'En attente':'badge-attente','Validée':'badge-validee','Refusée':'badge-refusee','Complément requis':'badge-complement'}[d.statut]||'badge-attente';
+      var ic={'En attente':'🟡','Validée':'✅','Refusée':'❌','Complément requis':'🔄'}[d.statut]||'🟡';
+      var pecHtml='—';
+      if(d.statut==='Validée'&&d.commerce){
+        var c=d.commerce;
+        var parts=[];
+        if(c.mo_de||c.mo_jusqua) parts.push('<span>MO: '+(c.mo_de||'?')+'→'+(c.mo_jusqua||'?')+'%'+(c.mo_qte?' ('+c.mo_qte+'%)':'')+'</span>');
+        if(c.pi_de||c.pi_jusqua) parts.push('<span>Pièces: '+(c.pi_de||'?')+'→'+(c.pi_jusqua||'?')+'%'+(c.pi_qte?' ('+c.pi_qte+'%)':'')+'</span>');
+        if(c.moe_de||c.moe_jusqua) parts.push('<span>MO ext.: '+(c.moe_de||'?')+'→'+(c.moe_jusqua||'?')+'%'+(c.moe_qte?' ('+c.moe_qte+'%)':'')+'</span>');
+        if(c.pe_de||c.pe_jusqua) parts.push('<span>Pièces ext.: '+(c.pe_de||'?')+'→'+(c.pe_jusqua||'?')+'%'+(c.pe_qte?' ('+c.pe_qte+'%)':'')+'</span>');
+        if(parts.length) pecHtml='<div class="pec-cell">'+parts.join('')+'</div>';
+      }
+      var actionBtn = typeAcces==='team'
+        ? '<button class="btn-valider" onclick="ouvrirModal('+d.id+')">Valider</button>'
+        : '<span style="font-size:11px;color:#aaa;">—</span>';
+      return '<tr>'+
+        '<td>'+d.date+'</td>'+
+        '<td style="font-weight:500">'+d.site+'</td>'+
+        '<td><span style="font-size:11px;font-weight:600;color:var(--gold)">'+d.type+'</span></td>'+
+        '<td style="font-family:monospace">'+d.or+'</td>'+
+        '<td style="font-family:monospace;font-size:12px">'+d.chassis+'</td>'+
+        '<td style="font-size:12px">'+d.code_dommage+'</td>'+
+        '<td><span class="badge-statut '+bc+'">'+ic+' '+d.statut+'</span></td>'+
+        '<td>'+pecHtml+'</td>'+
+        '<td style="font-size:12px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(d.commentaire_team||'')+'">'+(d.commentaire_team||'—')+'</td>'+
+        '<td>'+actionBtn+'</td>'+
+      '</tr>';
+    }).join('');
+  });
 }
 
 // ── PANNEAU LATÉRAL ───────────────────────────────────────────
@@ -1278,91 +1394,86 @@ function onStatutChange() {
 }
 
 function confirmerPanneau() {
-  var pwd = document.getElementById('sp-pwd').value;
-  var errEl = document.getElementById('sp-pwd-error');
-  if (pwd !== MOT_DE_PASSE) { errEl.style.display='block'; document.getElementById('sp-pwd').focus(); return; }
-  errEl.style.display = 'none';
-
-  var statut = document.getElementById('sp-statut').value;
-  var commentaire = document.getElementById('sp-commentaire').value.trim();
-
-  // Collecter commerce de détail
-  var commerce = {
-    mo_de: document.getElementById('mo_de').value,
-    mo_jusqua: document.getElementById('mo_jusqua').value,
-    mo_qte: document.getElementById('mo_qte').value,
-    pi_de: document.getElementById('pi_de').value,
-    pi_jusqua: document.getElementById('pi_jusqua').value,
-    pi_qte: document.getElementById('pi_qte').value,
-    moe_de: document.getElementById('moe_de').value,
-    moe_jusqua: document.getElementById('moe_jusqua').value,
-    moe_qte: document.getElementById('moe_qte').value,
-    pe_de: document.getElementById('pe_de').value,
-    pe_jusqua: document.getElementById('pe_jusqua').value,
-    pe_qte: document.getElementById('pe_qte').value,
-    type_ext: document.getElementById('sp-type-ext').value.trim()
+  var pwd=document.getElementById('sp-pwd').value;
+  var errEl=document.getElementById('sp-pwd-error');
+  if(pwd!==MOT_DE_PASSE){errEl.style.display='block';document.getElementById('sp-pwd').focus();return;}
+  errEl.style.display='none';
+  var statut=document.getElementById('sp-statut').value;
+  var commentaire=document.getElementById('sp-commentaire').value.trim();
+  var commerce={
+    mo_de:document.getElementById('mo_de').value,
+    mo_jusqua:document.getElementById('mo_jusqua').value,
+    mo_qte:document.getElementById('mo_qte').value,
+    pi_de:document.getElementById('pi_de').value,
+    pi_jusqua:document.getElementById('pi_jusqua').value,
+    pi_qte:document.getElementById('pi_qte').value,
+    moe_de:document.getElementById('moe_de').value,
+    moe_jusqua:document.getElementById('moe_jusqua').value,
+    moe_qte:document.getElementById('moe_qte').value,
+    pe_de:document.getElementById('pe_de').value,
+    pe_jusqua:document.getElementById('pe_jusqua').value,
+    pe_qte:document.getElementById('pe_qte').value,
+    type_ext:document.getElementById('sp-type-ext').value.trim()
   };
 
-  chargerDemandes();
-  var idx = demandes.findIndex(function(x){ return x.id === demandeEnCours; });
-  if (idx === -1) { fermerPanneau(); return; }
+  chargerDemandesSync(function(){
+    var idx=demandes.findIndex(function(x){return x.id===demandeEnCours;});
+    if(idx===-1){fermerPanneau();return;}
+    var d=demandes[idx];
+    demandes[idx].statut=statut;
+    demandes[idx].commentaire_team=commentaire;
+    if(statut==='Validée') demandes[idx].commerce=commerce;
+    sauvegarderDemandes();
+    fermerPanneau();
+    renderHistorique();
+    showToast('✔ Demande mise à jour : '+statut);
 
-  var d = demandes[idx];
-  demandes[idx].statut = statut;
-  demandes[idx].commentaire_team = commentaire;
-  if (statut === 'Validée') demandes[idx].commerce = commerce;
-  sauvegarderDemandes();
-  fermerPanneau();
-  renderHistorique();
-  showToast('✔ Demande mise à jour : '+statut);
-
-  // E-mail à l'usager
-  if (d.email_usager) {
-    var ic = {'Validée':'✅','Refusée':'❌','Complément requis':'🔄','En attente':'🟡'}[statut]||'🟡';
-    var pecMsg = '';
-    if (statut === 'Validée' && commerce) {
-      pecMsg = '\n\nPrise en charge accordée :\n';
-      if (commerce.mo_de||commerce.mo_jusqua) pecMsg += '• Main d\'œuvre      : de '+( commerce.mo_de||'—')+'% jusqu\'à '+(commerce.mo_jusqua||'—')+'%'+(commerce.mo_qte?' — Qté: '+commerce.mo_qte+'%':'')+'\n';
-      if (commerce.pi_de||commerce.pi_jusqua) pecMsg += '• Pièces            : de '+(commerce.pi_de||'—')+'% jusqu\'à '+(commerce.pi_jusqua||'—')+'%'+(commerce.pi_qte?' — Qté: '+commerce.pi_qte+'%':'')+'\n';
-      if (commerce.moe_de||commerce.moe_jusqua) pecMsg += '• MO extérieure     : de '+(commerce.moe_de||'—')+'% jusqu\'à '+(commerce.moe_jusqua||'—')+'%'+(commerce.moe_qte?' — Qté: '+commerce.moe_qte+'%':'')+'\n';
-      if (commerce.pe_de||commerce.pe_jusqua) pecMsg += '• Pièces ext.       : de '+(commerce.pe_de||'—')+'% jusqu\'à '+(commerce.pe_jusqua||'—')+'%'+(commerce.pe_qte?' — Qté: '+commerce.pe_qte+'%':'')+'\n';
-      if (commerce.type_ext) pecMsg += '• Type ext./Kulanz  : '+commerce.type_ext+'\n';
-    }
-    fetch('https://api.web3forms.com/submit',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        access_key:'7bf5b927-e39f-4fc1-9f60-642e4741e445',
-        subject:ic+' Demande '+d.type+' '+statut+' – OR '+d.or,
-        to_email:d.email_usager, from_name:'Team Garantie GEA - VW',
-        message:'Bonjour,\n\nVotre demande '+d.type+' a été traitée.\n\n'+'━'.repeat(40)+
-          '\nStatut     : '+ic+' '+statut+
-          '\nSite       : '+d.site+
-          '\nN° OR      : '+d.or+
-          '\nN° Châssis : '+d.chassis+
-          (commentaire?'\nCommentaire: '+commentaire:'')+
-          pecMsg+
-          '\n'+'━'.repeat(40)+'\n\n'+
-          (statut==='Validée'?'Vous pouvez procéder à la saisie dans SAGA/2.\n':
-           statut==='Refusée'?'Veuillez contacter la TeamGarantie.\n':
-           'Un complément de dossier est nécessaire.\n')+
-          '\nCordialement,\nTeam Garantie GEA - VW'
+    // E-mail à l'usager
+    if(d.email_usager){
+      var ic={'Validée':'✅','Refusée':'❌','Complément requis':'🔄','En attente':'🟡'}[statut]||'🟡';
+      var pecMsg='';
+      if(statut==='Validée'&&commerce){
+        pecMsg='\n\nPrise en charge accordée :\n';
+        if(commerce.mo_de||commerce.mo_jusqua) pecMsg+='• Main d\'œuvre     : de '+(commerce.mo_de||'—')+'% jusqu\'à '+(commerce.mo_jusqua||'—')+'%'+(commerce.mo_qte?' — Qté: '+commerce.mo_qte+'%':'')+'\n';
+        if(commerce.pi_de||commerce.pi_jusqua) pecMsg+='• Pièces           : de '+(commerce.pi_de||'—')+'% jusqu\'à '+(commerce.pi_jusqua||'—')+'%'+(commerce.pi_qte?' — Qté: '+commerce.pi_qte+'%':'')+'\n';
+        if(commerce.moe_de||commerce.moe_jusqua) pecMsg+='• MO extérieure    : de '+(commerce.moe_de||'—')+'% jusqu\'à '+(commerce.moe_jusqua||'—')+'%'+(commerce.moe_qte?' — Qté: '+commerce.moe_qte+'%':'')+'\n';
+        if(commerce.pe_de||commerce.pe_jusqua) pecMsg+='• Pièces ext.      : de '+(commerce.pe_de||'—')+'% jusqu\'à '+(commerce.pe_jusqua||'—')+'%'+(commerce.pe_qte?' — Qté: '+commerce.pe_qte+'%':'')+'\n';
+        if(commerce.type_ext) pecMsg+='• Type ext./Kulanz : '+commerce.type_ext+'\n';
+      }
+      fetch('https://api.web3forms.com/submit',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({access_key:'7bf5b927-e39f-4fc1-9f60-642e4741e445',
+          subject:ic+' Demande '+d.type+' '+statut+' – OR '+d.or,
+          to_email:d.email_usager,from_name:'Team Garantie GEA - VW',
+          message:'Bonjour,\n\nVotre demande '+d.type+' a été traitée.\n\n'+'━'.repeat(40)+
+            '\nStatut     : '+ic+' '+statut+'\nSite       : '+d.site+
+            '\nN° OR      : '+d.or+'\nN° Châssis : '+d.chassis+
+            (commentaire?'\nCommentaire: '+commentaire:'')+pecMsg+
+            '\n'+'━'.repeat(40)+'\n\n'+
+            (statut==='Validée'?'Vous pouvez procéder à la saisie dans SAGA/2.\n':
+             statut==='Refusée'?'Veuillez contacter la TeamGarantie.\n':
+             'Un complément de dossier est nécessaire.\n')+
+            '\nCordialement,\nTeam Garantie GEA - VW'})
       })
-    })
-    .then(function(){ showToast('📧 E-mail envoyé à '+d.email_usager); })
-    .catch(function(){ showToast('⚠ Statut OK mais e-mail non envoyé.'); });
-  }
+      .then(function(){showToast('📧 E-mail envoyé à '+d.email_usager);})
+      .catch(function(){showToast('⚠ Statut OK mais e-mail non envoyé.');});
+    }
+  });
 }
 
 document.addEventListener('keydown', function(e){
   if (e.key==='Escape') fermerPanneau();
 });
 function confirmerSuppression(){
-  if(confirm('⚠ Supprimer tout l\'historique ?')){
-    localStorage.removeItem('ge_auto_demandes');demandes=[];renderHistorique();showToast('🗑 Historique supprimé.');
+  if(confirm('⚠ Supprimer tout l\'historique partagé ?')){
+    window.storage.delete('ge_auto_demandes', true)
+    .then(function(){ demandes=[]; renderHistorique(); showToast('🗑 Historique supprimé.'); })
+    .catch(function(){ showToast('❌ Erreur suppression.'); });
   }
 }
 
-chargerDemandes();
+// Init — précharger les demandes partagées
+chargerDemandesSync(function(){});
 </script>
 </body>
 </html>
