@@ -645,8 +645,59 @@ function envoyerFormulaire() {
   btn.disabled = true;
   btn.textContent = 'Envoi en cours…';
 
-  var message = 'DEMANDE DE PRISE EN CHARGE – '+type.toUpperCase()+'\n'+'═'.repeat(50)+'\n\n';
-  d.fields.filter(function(fi){ return fi.value; }).forEach(function(fi){ message += fi.label+' : '+fi.value+'\n'; });
+  // En-tête
+  var message = '═'.repeat(50)+'\n';
+  message += 'DEMANDE '+type.toUpperCase()+' — '+site+' — KVPS : '+(getVal('kvps')||'—')+'\n';
+  message += '═'.repeat(50)+'\n\n';
+
+  // Ordre exact des champs SAGA/2
+  var sagaFields = [
+    {label:'Numéro identification véhicule (Châssis)', value:getVal('chassis')},
+    {label:'Kilométrage',                              value:getVal('kilometrage') ? getVal('kilometrage')+' km' : ''},
+    {label:'Code dommage',                             value:getVal('code_dommage')},
+    {label:'Code avarie',                              value:getVal('code_avarie')},
+    {label:'Emplacement du dommage',                   value:getVal('emplacement')},
+    {label:'Référence pièce',                          value:getVal('ref_piece')},
+    {label:'Désignation pièce',                        value:getVal('desig_piece')},
+    {label:'Description de l\'avarie (Plainte client)',value:getVal('plainte_client')},
+    {label:'Type d\'avarie',                           value:getVal('type_avarie')},
+    {label:'N° d\'Ordre de Réparation',                value:getVal('or_number')},
+    {label:'Date de l\'OR',                            value:getVal('date_or')},
+    {label:'KVPS',                                     value:getVal('kvps')},
+    {label:'Technicien',                               value:getVal('technicien')},
+  ];
+
+  // Champs spécifiques Kulanz ou CCR
+  if (type === 'Kulanz') {
+    sagaFields = sagaFields.concat([
+      {label:'TPI présente',                value:getRadio('tpi')},
+      {label:'N° TPI',                      value:getVal('num_tpi')},
+      {label:'Garantie OPTEVEN visible',    value:getRadio('opteven')},
+      {label:'Code tuning détecté',         value:getRadio('tuning')},
+      {label:'Préconisations respectées',   value:getRadio('preconisations')},
+      {label:'Dernier entretien OK',        value:getRadio('dernier_entretien')},
+      {label:'Lien dommage / entretien',    value:getRadio('lien_entretien')},
+    ]);
+  } else {
+    var pieces = Array.from(document.getElementById('mainForm').querySelectorAll('[name="pieces[]"]:checked')).map(function(el){ return el.value; });
+    sagaFields = sagaFields.concat([
+      {label:'Demande KULANZ effectuée',    value:getRadio('kulanz_done')},
+      {label:'CIG appliqué',               value:getRadio('cig')},
+      {label:'Taux CIG (%)',               value:getVal('cig_taux')},
+      {label:'Pièces jointes',             value:pieces.length ? pieces.join(' | ') : ''},
+    ]);
+  }
+
+  sagaFields.push({label:'Commentaires', value:getVal('commentaires')});
+
+  // Formater en tableau aligné
+  var maxLen = 0;
+  sagaFields.forEach(function(f){ if(f.value && f.label.length > maxLen) maxLen = f.label.length; });
+  sagaFields.filter(function(f){ return f.value; }).forEach(function(f){
+    var pad = Array(maxLen - f.label.length + 2).join(' ');
+    message += f.label+pad+': '+f.value+'\n';
+  });
+
   message += '\n'+'─'.repeat(50)+'\nEnvoyé depuis le formulaire GE Auto Garantie';
 
   fetch('https://api.web3forms.com/submit', {
