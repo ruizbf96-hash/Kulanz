@@ -6,11 +6,13 @@
 <title>Team Garantie GEA - VW</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
-:root {
-  --charcoal:#1a1a2e; --silver:#c8c8d4; --cream:#f5f3ee;
-  --gold:#b8973a; --gold-light:#d4ae52; --white:#ffffff;
-  --red:#c0392b; --green:#27ae60; --orange:#e67e22;
+:root{
+  --charcoal:#1a1a2e;--silver:#c8c8d4;--cream:#f5f3ee;
+  --gold:#b8973a;--gold-light:#d4ae52;--white:#ffffff;
+  --red:#c0392b;--green:#27ae60;--orange:#e67e22;
   --card-bg:rgba(255,255,255,0.98);
   --shadow:0 4px 32px rgba(13,13,13,0.10);
   --radius:12px;
@@ -18,10 +20,10 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;}
 
-/* LOGIN PAGE */
+/* LOGIN */
 .login-page{position:fixed;inset:0;background:var(--charcoal);z-index:300;display:flex;align-items:center;justify-content:center;}
 .login-page.hidden{display:none;}
-.login-wrap{display:flex;flex-direction:column;align-items:center;gap:32px;width:100%;max-width:480px;padding:24px;}
+.login-wrap{display:flex;flex-direction:column;align-items:center;gap:28px;width:100%;max-width:500px;padding:24px;}
 .login-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--white);letter-spacing:2px;text-transform:uppercase;text-align:center;line-height:1.3;}
 .login-logo span{color:var(--gold-light);}
 .login-subtitle{font-size:11px;color:var(--silver);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-top:6px;}
@@ -31,11 +33,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 .login-card .lc-icon{font-size:36px;margin-bottom:12px;}
 .login-card .lc-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--white);margin-bottom:6px;}
 .login-card .lc-desc{font-size:11px;color:var(--silver);line-height:1.5;}
-
-/* LOGIN MODAL */
 .login-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:none;align-items:center;justify-content:center;}
 .login-modal.open{display:flex;}
-.login-modal-box{background:var(--white);border-radius:16px;padding:36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.4);animation:fadeUp 0.3s ease;}
+.login-modal-box{background:var(--white);border-radius:16px;padding:36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
 .login-modal-box h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--charcoal);margin-bottom:6px;}
 .login-modal-box p{font-size:13px;color:#888;margin-bottom:20px;}
 .login-modal-error{font-size:12px;color:var(--red);margin-top:6px;display:none;}
@@ -52,14 +52,10 @@ header{background:var(--charcoal);position:sticky;top:0;z-index:100;box-shadow:0
 .site-btn:hover{color:var(--gold-light);}
 .site-btn:hover::after,.site-btn.active::after{transform:scaleX(1);}
 .site-btn.active{color:var(--gold-light);font-weight:500;}
-
-/* NAV TABS */
 .nav-tabs{background:var(--charcoal);display:flex;padding:0 40px;border-top:1px solid rgba(184,151,58,0.15);}
 .nav-tab{padding:14px 28px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--silver);border-bottom:3px solid transparent;transition:all 0.2s;}
 .nav-tab:hover{color:var(--gold-light);}
 .nav-tab.active{color:var(--gold-light);border-bottom-color:var(--gold);}
-
-/* USER BADGE */
 .user-badge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--silver);}
 .user-badge .ub-role{font-weight:600;color:var(--gold-light);}
 .btn-logout{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);border-radius:20px;color:#c0392b;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s;}
@@ -69,33 +65,23 @@ header{background:var(--charcoal);position:sticky;top:0;z-index:100;box-shadow:0
 .type-toggle-wrap{background:var(--charcoal);padding:0 40px 24px;display:flex;justify-content:center;}
 .type-toggle{display:flex;background:rgba(255,255,255,0.05);border:1px solid rgba(184,151,58,0.2);border-radius:50px;padding:5px;gap:4px;}
 .type-btn{padding:10px 32px;border:none;border-radius:40px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--silver);background:none;transition:all 0.3s;}
-.type-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);font-weight:600;box-shadow:0 2px 16px rgba(184,151,58,0.4);}
-
-/* COPIER KULANZ */
+.type-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);font-weight:600;}
 .copier-bar{background:var(--charcoal);display:flex;justify-content:center;padding:0 40px 20px;}
 #btn-copier-kulanz{display:none;align-items:center;gap:8px;padding:10px 28px;background:rgba(184,151,58,0.15);border:1.5px solid var(--gold);border-radius:50px;color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;}
-#btn-copier-kulanz:hover{background:rgba(184,151,58,0.28);}
 
 /* PAGES */
 .page{display:none;}
 .page.active{display:block;}
-
-/* MAIN */
 main{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
 
 /* SECTIONS */
-.form-section{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:24px;overflow:hidden;border:1px solid rgba(184,151,58,0.1);animation:fadeUp 0.4s ease both;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.form-section{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:24px;overflow:hidden;border:1px solid rgba(184,151,58,0.1);}
 .section-header{display:flex;align-items:center;gap:14px;padding:20px 28px;background:linear-gradient(90deg,rgba(184,151,58,0.08) 0%,transparent 100%);border-bottom:1px solid rgba(184,151,58,0.12);}
 .section-number{width:30px;height:30px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--charcoal);flex-shrink:0;}
 .section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--charcoal);}
 .section-body{padding:28px;}
-
-/* GRID */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 .span-2{grid-column:span 2;}
-
-/* FIELDS */
 .field{display:flex;flex-direction:column;gap:4px;}
 label{font-size:11px;font-weight:500;letter-spacing:0.8px;text-transform:uppercase;color:#666;}
 label .opt{font-size:9px;color:var(--gold);font-weight:400;margin-left:4px;}
@@ -116,6 +102,8 @@ textarea{resize:vertical;min-height:88px;}
 select{cursor:pointer;appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8973a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+input[readonly]{background:#f0ede8!important;color:#666!important;cursor:default!important;border-color:#ddd!important;}
+input[readonly]:focus{box-shadow:none!important;border-color:#ddd!important;}
 
 /* AUTOCOMPLETE */
 .autocomplete-wrap{position:relative;}
@@ -127,15 +115,13 @@ select{cursor:pointer;appearance:none;
 .ac-chassis{font-weight:600;color:var(--charcoal);}
 .ac-detail{font-size:11px;color:#888;margin-top:2px;}
 
-/* RADIO */
+/* RADIO / CHECK */
 .radio-group{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
 .radio-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;}
 .radio-item input[type="radio"]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
-
-/* CHECKLIST */
 .checklist{display:flex;flex-direction:column;gap:10px;}
 .checklist-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid #e8e5df;border-radius:8px;cursor:pointer;transition:all 0.2s;background:#fafaf8;}
-.checklist-item:hover{border-color:var(--gold);background:rgba(184,151,58,0.04);}
+.checklist-item:hover{border-color:var(--gold);}
 .checklist-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
 .checklist-item-text{font-size:13px;line-height:1.5;color:#444;}
 
@@ -143,7 +129,7 @@ select{cursor:pointer;appearance:none;
 .info-box{background:rgba(184,151,58,0.07);border:1px solid rgba(184,151,58,0.25);border-radius:8px;padding:14px 18px;font-size:12.5px;color:#5a4a1a;line-height:1.6;margin-bottom:20px;}
 .info-box strong{color:var(--gold);}
 .cig-box{border:1.5px solid rgba(184,151,58,0.25);border-radius:8px;padding:18px;background:rgba(184,151,58,0.04);}
-.cig-box .cig-title{font-size:12px;font-weight:500;letter-spacing:0.5px;color:var(--gold);margin-bottom:12px;text-transform:uppercase;}
+.cig-box .cig-title{font-size:12px;font-weight:500;color:var(--gold);margin-bottom:12px;text-transform:uppercase;}
 .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(184,151,58,0.2),transparent);margin:24px 0;}
 .section-kulanz{display:block;}
 .section-ccr{display:none;}
@@ -152,35 +138,32 @@ select{cursor:pointer;appearance:none;
 .submit-area{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:12px;}
 .submit-hint{font-size:12px;color:#888;text-align:center;}
 .submit-hint strong{color:var(--gold);}
-.btn-submit{display:inline-flex;align-items:center;gap:10px;padding:16px 52px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;letter-spacing:1px;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 20px rgba(13,13,13,0.25);}
+.btn-submit{display:inline-flex;align-items:center;gap:10px;padding:16px 52px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.3s;}
 .btn-submit:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);transform:translateY(-2px);}
 .btn-submit:disabled,.btn-print:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 .btn-print{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--white);color:var(--charcoal);border:2px solid rgba(184,151,58,0.35);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.3s;}
 .btn-print:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
 
-/* SUCCES OVERLAY */
+/* SUCCESS OVERLAY */
 .success-overlay{position:fixed;inset:0;background:rgba(26,26,46,0.85);z-index:200;display:none;align-items:center;justify-content:center;}
 .success-overlay.open{display:flex;}
-.success-card{background:var(--white);border-radius:20px;padding:48px 40px;max-width:480px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:fadeUp 0.4s ease;}
+.success-card{background:var(--white);border-radius:20px;padding:48px 40px;max-width:480px;width:90%;text-align:center;}
 .success-icon{font-size:56px;margin-bottom:16px;}
 .success-card h2{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--charcoal);margin-bottom:8px;}
 .success-card p{font-size:14px;color:#666;line-height:1.6;margin-bottom:8px;}
 .success-details{background:var(--cream);border-radius:10px;padding:14px 18px;margin:16px 0;text-align:left;font-size:13px;color:#444;line-height:1.8;}
 .success-details strong{color:var(--charcoal);}
 .btn-nouvelle{display:inline-flex;align-items:center;gap:8px;padding:14px 36px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s;margin-top:8px;}
-.btn-nouvelle:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(184,151,58,0.4);}
+.btn-nouvelle:hover{transform:translateY(-2px);}
 
 /* HISTORIQUE */
 .histo-wrap{max-width:1100px;margin:0 auto;padding:40px 24px 80px;}
 .histo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
 .histo-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--charcoal);}
 .histo-filters{display:flex;gap:10px;flex-wrap:wrap;}
-.histo-filters select,.histo-filters input{padding:8px 14px;border:1.5px solid #e0ddd8;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:#fff;outline:none;cursor:pointer;}
-.histo-filters select:focus,.histo-filters input:focus{border-color:var(--gold);}
-.btn-clear-histo{padding:8px 18px;background:rgba(192,57,43,0.08);border:1.5px solid rgba(192,57,43,0.3);border-radius:8px;color:var(--red);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;}
-.btn-clear-histo:hover{background:rgba(192,57,43,0.15);}
-
-/* STATS */
+.histo-filters select{padding:8px 14px;border:1.5px solid #e0ddd8;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:#fff;outline:none;cursor:pointer;}
+.histo-filters select:focus{border-color:var(--gold);}
+.btn-clear-histo{padding:8px 18px;background:rgba(192,57,43,0.08);border:1.5px solid rgba(192,57,43,0.3);border-radius:8px;color:var(--red);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;}
 .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
 .stat-card{background:var(--card-bg);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border:1px solid rgba(184,151,58,0.1);text-align:center;}
 .stat-num{font-size:28px;font-weight:700;color:var(--charcoal);}
@@ -189,8 +172,6 @@ select{cursor:pointer;appearance:none;
 .stat-num.red{color:var(--red);}
 .stat-num.orange{color:var(--orange);}
 .stat-label{font-size:11px;color:#888;letter-spacing:0.5px;text-transform:uppercase;margin-top:4px;}
-
-/* TABLE */
 .table-wrap{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(184,151,58,0.1);overflow:hidden;}
 .table-scroll{overflow-x:auto;}
 table.histo-table{width:100%;border-collapse:collapse;}
@@ -198,34 +179,18 @@ table.histo-table{width:100%;border-collapse:collapse;}
 .histo-table td{padding:11px 14px;font-size:13px;border-bottom:1px solid #f0ede8;vertical-align:middle;}
 .histo-table tr:last-child td{border-bottom:none;}
 .histo-table tr:hover td{background:rgba(184,151,58,0.04);}
-
-/* BADGES */
 .badge-statut{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
 .badge-attente{background:rgba(230,126,34,0.12);color:#c0642b;border:1px solid rgba(230,126,34,0.3);}
 .badge-validee{background:rgba(39,174,96,0.12);color:#1e8449;border:1px solid rgba(39,174,96,0.3);}
 .badge-refusee{background:rgba(192,57,43,0.12);color:var(--red);border:1px solid rgba(192,57,43,0.3);}
 .badge-complement{background:rgba(52,152,219,0.12);color:#1a6fa8;border:1px solid rgba(52,152,219,0.3);}
-.btn-valider{padding:5px 12px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-valider{padding:5px 12px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
 .btn-valider:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);}
 .empty-state{text-align:center;padding:60px 20px;color:#aaa;}
-.empty-state svg{width:48px;height:48px;opacity:0.3;margin-bottom:12px;}
-.empty-state p{font-size:14px;}
+.pec-cell{font-size:11px;color:#444;line-height:1.6;}
+.pec-cell span{display:block;}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:none;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal{background:var(--white);border-radius:16px;padding:32px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:fadeUp 0.3s ease;}
-.modal h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:6px;color:var(--charcoal);}
-.modal p{font-size:13px;color:#888;margin-bottom:20px;}
-.modal .field{margin-bottom:14px;}
-.modal-actions{display:flex;gap:10px;margin-top:20px;}
-.btn-modal-ok{flex:1;padding:12px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;}
-.btn-modal-ok:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);}
-.btn-modal-cancel{flex:1;padding:12px;background:none;color:#888;border:1.5px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;}
-.btn-modal-cancel:hover{border-color:#aaa;color:var(--charcoal);}
-.modal-error{font-size:12px;color:var(--red);margin-top:6px;display:none;}
-
-/* PANNEAU LATÉRAL VALIDATION */
+/* PANNEAU LATÉRAL */
 .side-panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;display:none;}
 .side-panel-overlay.open{display:block;}
 .side-panel{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:100vw;background:var(--white);box-shadow:-8px 0 40px rgba(0,0,0,0.2);z-index:601;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);display:flex;flex-direction:column;}
@@ -233,7 +198,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
 .sp-header{background:var(--charcoal);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .sp-header h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--white);}
 .sp-header p{font-size:11px;color:var(--silver);margin-top:3px;}
-.sp-close{background:none;border:none;cursor:pointer;color:var(--silver);padding:4px;border-radius:6px;transition:all 0.2s;}
+.sp-close{background:none;border:none;cursor:pointer;color:var(--silver);padding:4px;border-radius:6px;}
 .sp-close:hover{color:var(--white);background:rgba(255,255,255,0.1);}
 .sp-body{flex:1;overflow-y:auto;padding:24px;}
 .sp-section{margin-bottom:24px;}
@@ -242,44 +207,39 @@ table.histo-table{width:100%;border-collapse:collapse;}
 .sp-info-item{background:var(--cream);border-radius:8px;padding:10px 12px;}
 .sp-info-label{font-size:9px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:#888;margin-bottom:3px;}
 .sp-info-value{font-size:13px;font-weight:500;color:var(--charcoal);}
-/* Commerce de détail */
 .commerce-table{width:100%;border-collapse:collapse;margin-top:8px;}
-.commerce-table th{font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:#888;padding:6px 8px;text-align:center;background:#f8f6f2;border:1px solid #e8e5df;}
+.commerce-table th{font-size:10px;font-weight:600;text-transform:uppercase;color:#888;padding:6px 8px;text-align:center;background:#f8f6f2;border:1px solid #e8e5df;}
 .commerce-table th:first-child{text-align:left;}
 .commerce-table td{padding:8px;border:1px solid #e8e5df;vertical-align:middle;}
 .commerce-table td:first-child{font-size:12px;font-weight:500;color:var(--charcoal);background:#fafaf8;}
-.commerce-input{width:64px;padding:6px 8px;border:1.5px solid #e0ddd8;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;text-align:center;outline:none;transition:all 0.2s;}
-.commerce-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(184,151,58,0.12);}
+.commerce-input{width:64px;padding:6px 8px;border:1.5px solid #e0ddd8;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;text-align:center;outline:none;}
+.commerce-input:focus{border-color:var(--gold);}
 .pct-wrap{display:flex;align-items:center;gap:4px;justify-content:center;}
 .pct-wrap span{font-size:12px;color:#888;}
-/* Statut select dans panneau */
 .sp-statut-select{width:100%;padding:11px 14px;border:1.5px solid #e0ddd8;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--charcoal);background:#fafaf8;outline:none;cursor:pointer;appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8973a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
-.sp-statut-select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,151,58,0.12);}
+.sp-statut-select:focus{border-color:var(--gold);}
 .sp-pwd-error{font-size:12px;color:var(--red);margin-top:6px;display:none;}
 .sp-footer{padding:16px 24px;border-top:1px solid #f0ede8;flex-shrink:0;display:flex;gap:10px;}
-.sp-btn-ok{flex:1;padding:13px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.sp-btn-ok{flex:1;padding:13px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;}
 .sp-btn-ok:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);}
 .sp-btn-cancel{padding:13px 24px;background:none;color:#888;border:1.5px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;}
-.sp-btn-cancel:hover{border-color:#aaa;color:var(--charcoal);}
-/* Colonne prise en charge dans tableau */
-.pec-cell{font-size:11px;color:#444;line-height:1.6;}
-.pec-cell span{display:block;}
-@media(max-width:520px){.side-panel{width:100vw;}}
+
+/* TOAST */
 #toast{position:fixed;bottom:32px;right:32px;background:var(--charcoal);color:var(--white);padding:14px 24px;border-radius:10px;font-size:13px;box-shadow:0 4px 24px rgba(0,0,0,0.25);border-left:4px solid var(--gold);transform:translateY(80px);opacity:0;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);z-index:999;pointer-events:none;}
 #toast.show{transform:translateY(0);opacity:1;}
 
 @media(max-width:680px){
-  .header-top{padding:14px 20px;}
-  .site-bar,.nav-tabs{padding:0 10px;}
-  main,.histo-wrap{padding:24px 14px 60px;}
-  .section-body{padding:20px 18px;}
+  .header-top,.site-bar,.nav-tabs{padding-left:16px;padding-right:16px;}
+  main,.histo-wrap{padding:20px 14px 60px;}
+  .section-body{padding:20px 16px;}
   .grid-2{grid-template-columns:1fr;}
   .span-2{grid-column:span 1;}
-  .type-toggle-wrap,.copier-bar{padding-left:20px;padding-right:20px;}
+  .type-toggle-wrap,.copier-bar{padding-left:16px;padding-right:16px;}
   .stats-bar{grid-template-columns:1fr 1fr;}
   .login-cards{grid-template-columns:1fr;}
+  .side-panel{width:100vw;}
 }
 </style>
 </head>
@@ -293,8 +253,8 @@ table.histo-table{width:100%;border-collapse:collapse;}
       <div class="login-subtitle">Gestion des demandes Garantie</div>
     </div>
 
-    <!-- Choix accès -->
-    <div id="login-step-1" style="width:100%;">
+    <!-- Étape 1 : choix accès -->
+    <div id="login-step-1" style="width:100%">
       <div class="login-cards">
         <div class="login-card" onclick="choisirAcces('usager')">
           <div class="lc-icon">👤</div>
@@ -309,17 +269,17 @@ table.histo-table{width:100%;border-collapse:collapse;}
       </div>
     </div>
 
-    <!-- Sélection site usager -->
-    <div id="login-step-2" style="display:none;width:100%;">
-      <p style="color:var(--silver);font-size:13px;text-align:center;margin-bottom:16px;letter-spacing:0.5px;">Sélectionnez votre site :</p>
+    <!-- Étape 2 : choix site usager -->
+    <div id="login-step-2" style="display:none;width:100%">
+      <p style="color:var(--silver);font-size:13px;text-align:center;margin-bottom:16px;">Sélectionnez votre site :</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;">
-        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('Audi Hœnheim')">Audi Hœnheim</div>
-        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('Audi Obernai')">Audi Obernai</div>
-        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('SEAT Hœnheim')">SEAT Hœnheim</div>
-        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('SKODA Hœnheim')">SKODA Hœnheim</div>
-        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('VW Bischheim')">VW Bischheim</div>
-        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.25s;" onclick="choisirSiteUsager('VW Illkirch')">VW Illkirch</div>
-        <div style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;grid-column:span 2;transition:all 0.25s;" onclick="choisirSiteUsager('VW Obernai')">VW Obernai</div>
+        <div onclick="choisirSiteUsager('Audi Hœnheim')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">Audi Hœnheim</div>
+        <div onclick="choisirSiteUsager('Audi Obernai')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">Audi Obernai</div>
+        <div onclick="choisirSiteUsager('SEAT Hœnheim')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">SEAT Hœnheim</div>
+        <div onclick="choisirSiteUsager('SKODA Hœnheim')"   style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">SKODA Hœnheim</div>
+        <div onclick="choisirSiteUsager('VW Bischheim')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">VW Bischheim</div>
+        <div onclick="choisirSiteUsager('VW Illkirch')"     style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">VW Illkirch</div>
+        <div onclick="choisirSiteUsager('VW Obernai')"      style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;grid-column:span 2;">VW Obernai</div>
       </div>
       <button onclick="retourStep1()" style="margin-top:16px;background:none;border:none;color:var(--silver);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline;display:block;text-align:center;width:100%;">← Retour</button>
     </div>
@@ -337,11 +297,11 @@ table.histo-table{width:100%;border-collapse:collapse;}
       <div class="login-modal-error" id="login-error">Mot de passe incorrect.</div>
     </div>
     <button class="btn-connexion" onclick="validerLogin()">Se connecter</button>
-    <button class="btn-modal-cancel" style="width:100%;margin-top:10px;" onclick="fermerLoginModal()">Annuler</button>
+    <button style="width:100%;margin-top:10px;background:none;border:1.5px solid #ddd;border-radius:8px;padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:#888;" onclick="fermerLoginModal()">Annuler</button>
   </div>
 </div>
 
-<!-- SUCCES OVERLAY -->
+<!-- SUCCESS OVERLAY -->
 <div class="success-overlay" id="success-overlay">
   <div class="success-card">
     <div class="success-icon">✅</div>
@@ -350,7 +310,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <div class="success-details" id="success-details"></div>
     <p style="font-size:12px;color:#aaa;">Vous recevrez une notification dès validation par la TeamGarantie.</p>
     <button class="btn-nouvelle" onclick="nouvelledemande()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Faire une nouvelle demande
     </button>
   </div>
@@ -402,7 +362,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
   </div>
   <div class="copier-bar">
     <button id="btn-copier-kulanz" onclick="copierDepuisKulanz()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       Copier les données depuis Kulanz
     </button>
   </div>
@@ -416,7 +376,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <input type="hidden" id="f_type" name="type_demande" value="Kulanz">
 
     <!-- 1. VÉHICULE -->
-    <div class="form-section" style="animation-delay:0.05s">
+    <div class="form-section">
       <div class="section-header"><div class="section-number">1</div><div class="section-title">Identification du véhicule</div></div>
       <div class="section-body">
         <div class="grid-2">
@@ -441,7 +401,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
           </div>
           <div class="field" id="site_display_field" style="display:none;">
             <label>Site</label>
-            <input type="text" id="f_site_display" readonly style="background:#f0ede8;color:#444;cursor:default;">
+            <input type="text" id="f_site_display" readonly>
           </div>
           <div class="field">
             <label>KVPS <span class="opt">(optionnel)</span></label>
@@ -461,7 +421,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </div>
 
     <!-- 2. DOMMAGE -->
-    <div class="form-section" style="animation-delay:0.1s">
+    <div class="form-section">
       <div class="section-header"><div class="section-number">2</div><div class="section-title">Nature du dommage</div></div>
       <div class="section-body">
         <div class="grid-2">
@@ -501,7 +461,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
             <label>Code dommage <span class="req">*</span></label>
             <select name="code_dommage" id="code_dom_input" onchange="updateCodeDesc('dommage')">
               <option value="">— Sélectionner —</option>
-              <option value="1001">1001 — Moteur</option><option value="1002">1002 — Moteur nu</option><option value="1009">1009 — Bloc-cylindres</option><option value="1030">1030 — Support de moteur</option><option value="1045">1045 — Amortisseur de vibrations</option><option value="1050">1050 — Reniflard</option><option value="1055">1055 — Séparateur d'huile</option><option value="1061">1061 — Flasque d'étanchéité du vilebrequin</option><option value="1080">1080 — Cadre protection moteur</option><option value="1310">1310 — Piston</option><option value="1319">1319 — Jeu de segments de piston</option><option value="1326">1326 — Axe de piston</option><option value="1330">1330 — Coussinet de bielle</option><option value="1340">1340 — Bielle</option><option value="1348">1348 — Vilebrequin</option><option value="1360">1360 — Volant-moteur</option><option value="1362">1362 — Volant moteur bimasse</option><option value="1370">1370 — Pignon entraînement arbre à cames</option><option value="1505">1505 — Arbre à cames</option><option value="1524">1524 — Courroie crantée</option><option value="1535">1535 — Chaîne de distribution</option><option value="1536">1536 — Tendeur de chaîne</option><option value="1540">1540 — Poussoir</option><option value="1560">1560 — Soupape d'admission</option><option value="1561">1561 — Soupape</option><option value="1562">1562 — Soupape d'échappement</option><option value="1563">1563 — Joint de tige de soupape</option><option value="1570">1570 — Culasse</option><option value="1571">1571 — Joint de culasse</option><option value="1580">1580 — Joint de couvre-culasse</option><option value="1582">1582 — Couvre-culasse</option><option value="1584">1584 — Variateur calage arbre à cames</option><option value="1701">1701 — Huile-moteur</option><option value="1704">1704 — Transmetteur pression d'huile</option><option value="1720">1720 — Pompe à huile</option><option value="1730">1730 — Filtre à huile</option><option value="1740">1740 — Radiateur d'huile</option><option value="1750">1750 — Carter d'huile</option><option value="1901">1901 — Système de refroidissement</option><option value="1950">1950 — Pompe liquide refroidissement</option><option value="1958">1958 — Régulateur liquide refroidissement</option><option value="1970">1970 — Radiateur</option><option value="2003">2003 — Carburant</option><option value="2010">2010 — Réservoir à carburant</option><option value="2031">2031 — Filtre à carburant</option><option value="2045">2045 — Pompe à carburant</option><option value="2066">2066 — Pompe à carburant électrique</option><option value="2130">2130 — Turbocompresseur</option><option value="2143">2143 — Radiateur air de suralimentation</option><option value="2225">2225 — Filtre à air</option><option value="2280">2280 — Tubulure d'admission</option><option value="2287">2287 — Sonde lambda</option><option value="2301">2301 — Système d'injection</option><option value="2329">2329 — Pompe d'injection</option><option value="2338">2338 — Injecteur-pompe</option><option value="2340">2340 — Injecteur</option><option value="2360">2360 — App. commande EDC</option><option value="2373">2373 — Rampe de distribution</option><option value="2463">2463 — Pompe haute pression</option><option value="2609">2609 — Joint collecteur d'échappement</option><option value="2610">2610 — Collecteur d'échappement</option><option value="2625">2625 — Silencieux de détente</option><option value="2633">2633 — Silencieux de sortie</option><option value="2639">2639 — Soupape recyclage des gaz</option><option value="2643">2643 — Radiateur recyclage gaz échap.</option><option value="2673">2673 — Catalyseur</option><option value="2674">2674 — Filtre à particules</option><option value="2706">2706 — Batterie</option><option value="2722">2722 — Alternateur</option><option value="2760">2760 — Démarreur</option><option value="2820">2820 — Bobine d'allumage</option><option value="2870">2870 — Bougie d'allumage</option><option value="2884">2884 — Bougie de préchauffage</option><option value="3020">3020 — Cylindre-émetteur d'embrayage</option><option value="3045">3045 — Butée de débrayage</option><option value="3052">3052 — Mécanisme d'embrayage</option><option value="3056">3056 — Disque d'embrayage</option><option value="3250">3250 — Convertisseur de couple</option><option value="3401">3401 — Huile de BV</option><option value="3435">3435 — Boîte de vitesses</option><option value="3511">3511 — Mécatronique</option><option value="3735">3735 — Boîte de vitesses automatique</option><option value="3901">3901 — Transmission</option><option value="3965">3965 — Boîte-transfert</option><option value="4001">4001 — Essieu AV</option><option value="4044">4044 — Joint homocinétique int.</option><option value="4045">4045 — Joint homocinétique ext.</option><option value="4067">4067 — Moyeu de roue avec roulement</option><option value="4075">4075 — Ressort hélicoïdal AV</option><option value="4077">4077 — Barre stabilisatrice AV</option><option value="4085">4085 — Jambe de force</option><option value="4090">4090 — Amortisseur AV</option><option value="4201">4201 — Train AR</option><option value="4258">4258 — Roulement de roue</option><option value="4272">4272 — Ressort hélicoïdal AR</option><option value="4290">4290 — Barre stabilisatrice AR</option><option value="4405">4405 — Roue</option><option value="4440">4440 — Pneus</option><option value="4511">4511 — Capteur de régime AV</option><option value="4515">4515 — Capteur de régime AR</option><option value="4530">4530 — Unité hydraulique ABS</option><option value="4545">4545 — App. commande ABS+EDS</option><option value="4605">4605 — Pédale de frein</option><option value="4636">4636 — Plaquettes frein à disque AV</option><option value="4638">4638 — Plaquettes frein à disque AR</option><option value="4650">4650 — Disque de frein AV</option><option value="4653">4653 — Disque de frein AR</option><option value="4661">4661 — Levier de frein à main</option><option value="4708">4708 — Liquide de frein</option><option value="4715">4715 — Maître-cylindre</option><option value="4739">4739 — Etrier de frein AV</option><option value="4741">4741 — Etrier de frein AR</option><option value="4770">4770 — Servofrein</option><option value="4810">4810 — Volant de direction</option><option value="4840">4840 — Mécanisme de direction</option><option value="4879">4879 — Barre de direction</option><option value="4881">4881 — Rotule de barre de direction</option><option value="4890">4890 — Direction assistée</option><option value="5002">5002 — Avant de carrosserie</option><option value="5055">5055 — Aile AV</option><option value="5101">5101 — Carrosserie</option><option value="5302">5302 — Arrière de carrosserie</option><option value="5354">5354 — Aile AR</option><option value="5522">5522 — Capot AV</option><option value="5559">5559 — Hayon</option><option value="5717">5717 — Serrure de porte</option><option value="5751">5751 — Porte AV</option><option value="5851">5851 — Porte AR</option><option value="6005">6005 — Toit coulissant</option><option value="6101">6101 — Capote</option><option value="6310">6310 — Pare-chocs AV</option><option value="6350">6350 — Pare-chocs AR</option><option value="6409">6409 — Pare-brise avec antenne</option><option value="6410">6410 — Pare-brise</option><option value="6440">6440 — Glace de porte AV</option><option value="6452">6452 — Lève-glace électr. AV</option><option value="6460">6460 — Glace de porte AR</option><option value="6486">6486 — Glace AR</option><option value="6605">6605 — Calandre</option><option value="6689">6689 — Rétroviseur</option><option value="6690">6690 — Dispositif d'attelage</option><option value="7018">7018 — Tableau de bord</option><option value="7201">7201 — Siège AV</option><option value="7249">7249 — Banquette AR</option><option value="7280">7280 — Appuie-tête</option><option value="8023">8023 — Echangeur de chaleur</option><option value="8530">8530 — Soufflante</option><option value="8701">8701 — Climatiseur</option><option value="8734">8734 — Compresseur clim.</option><option value="8750">8750 — Condenseur</option><option value="8760">8760 — Evaporateur</option><option value="9005">9005 — Tachymètre</option><option value="9025">9025 — Bloc-cadrans</option><option value="9130">9130 — Autoradio</option><option value="9215">9215 — Moteur d'essuie-glace</option><option value="9256">9256 — Pompe de lave-glace</option><option value="9303">9303 — Batterie haute tension</option><option value="9415">9415 — Phare</option><option value="9431">9431 — Feu AR</option><option value="9464">9464 — Phare antibrouillard</option><option value="9709">9709 — Câblage central</option><option value="9794">9794 — Centrale électrique</option>
+              <option value="1001">1001 — Moteur</option><option value="1002">1002 — Moteur nu</option><option value="1009">1009 — Bloc-cylindres</option><option value="1030">1030 — Support de moteur</option><option value="1045">1045 — Amortisseur de vibrations</option><option value="1050">1050 — Reniflard</option><option value="1055">1055 — Séparateur d'huile</option><option value="1310">1310 — Piston</option><option value="1319">1319 — Jeu de segments de piston</option><option value="1340">1340 — Bielle</option><option value="1348">1348 — Vilebrequin</option><option value="1360">1360 — Volant-moteur</option><option value="1362">1362 — Volant moteur bimasse</option><option value="1370">1370 — Pignon entraînement arbre à cames</option><option value="1505">1505 — Arbre à cames</option><option value="1524">1524 — Courroie crantée</option><option value="1535">1535 — Chaîne de distribution</option><option value="1536">1536 — Tendeur de chaîne</option><option value="1540">1540 — Poussoir</option><option value="1560">1560 — Soupape d'admission</option><option value="1562">1562 — Soupape d'échappement</option><option value="1570">1570 — Culasse</option><option value="1571">1571 — Joint de culasse</option><option value="1580">1580 — Joint de couvre-culasse</option><option value="1582">1582 — Couvre-culasse</option><option value="1584">1584 — Variateur calage arbre à cames</option><option value="1701">1701 — Huile-moteur</option><option value="1720">1720 — Pompe à huile</option><option value="1730">1730 — Filtre à huile</option><option value="1740">1740 — Radiateur d'huile</option><option value="1750">1750 — Carter d'huile</option><option value="1901">1901 — Système de refroidissement</option><option value="1950">1950 — Pompe liquide refroidissement</option><option value="1958">1958 — Régulateur liquide refroidissement</option><option value="1970">1970 — Radiateur</option><option value="2003">2003 — Carburant</option><option value="2010">2010 — Réservoir à carburant</option><option value="2031">2031 — Filtre à carburant</option><option value="2045">2045 — Pompe à carburant</option><option value="2130">2130 — Turbocompresseur</option><option value="2143">2143 — Radiateur air de suralimentation</option><option value="2225">2225 — Filtre à air</option><option value="2280">2280 — Tubulure d'admission</option><option value="2287">2287 — Sonde lambda</option><option value="2301">2301 — Système d'injection</option><option value="2329">2329 — Pompe d'injection</option><option value="2340">2340 — Injecteur</option><option value="2360">2360 — App. commande EDC</option><option value="2373">2373 — Rampe de distribution</option><option value="2463">2463 — Pompe haute pression</option><option value="2610">2610 — Collecteur d'échappement</option><option value="2625">2625 — Silencieux de détente</option><option value="2633">2633 — Silencieux de sortie</option><option value="2639">2639 — Soupape recyclage des gaz</option><option value="2673">2673 — Catalyseur</option><option value="2674">2674 — Filtre à particules</option><option value="2706">2706 — Batterie</option><option value="2722">2722 — Alternateur</option><option value="2760">2760 — Démarreur</option><option value="2820">2820 — Bobine d'allumage</option><option value="2870">2870 — Bougie d'allumage</option><option value="2884">2884 — Bougie de préchauffage</option><option value="3020">3020 — Cylindre-émetteur d'embrayage</option><option value="3045">3045 — Butée de débrayage</option><option value="3052">3052 — Mécanisme d'embrayage</option><option value="3056">3056 — Disque d'embrayage</option><option value="3250">3250 — Convertisseur de couple</option><option value="3401">3401 — Huile de BV</option><option value="3435">3435 — Boîte de vitesses</option><option value="3511">3511 — Mécatronique</option><option value="3735">3735 — Boîte de vitesses automatique</option><option value="3901">3901 — Transmission</option><option value="3965">3965 — Boîte-transfert</option><option value="4001">4001 — Essieu AV</option><option value="4044">4044 — Joint homocinétique int.</option><option value="4045">4045 — Joint homocinétique ext.</option><option value="4067">4067 — Moyeu de roue avec roulement</option><option value="4075">4075 — Ressort hélicoïdal AV</option><option value="4077">4077 — Barre stabilisatrice AV</option><option value="4085">4085 — Jambe de force</option><option value="4090">4090 — Amortisseur AV</option><option value="4201">4201 — Train AR</option><option value="4258">4258 — Roulement de roue</option><option value="4272">4272 — Ressort hélicoïdal AR</option><option value="4290">4290 — Barre stabilisatrice AR</option><option value="4405">4405 — Roue</option><option value="4440">4440 — Pneus</option><option value="4530">4530 — Unité hydraulique ABS</option><option value="4545">4545 — App. commande ABS+EDS</option><option value="4636">4636 — Plaquettes frein à disque AV</option><option value="4638">4638 — Plaquettes frein à disque AR</option><option value="4650">4650 — Disque de frein AV</option><option value="4653">4653 — Disque de frein AR</option><option value="4661">4661 — Levier de frein à main</option><option value="4708">4708 — Liquide de frein</option><option value="4715">4715 — Maître-cylindre</option><option value="4739">4739 — Etrier de frein AV</option><option value="4741">4741 — Etrier de frein AR</option><option value="4770">4770 — Servofrein</option><option value="4810">4810 — Volant de direction</option><option value="4840">4840 — Mécanisme de direction</option><option value="4879">4879 — Barre de direction</option><option value="4881">4881 — Rotule de barre de direction</option><option value="4890">4890 — Direction assistée</option><option value="5002">5002 — Avant de carrosserie</option><option value="5055">5055 — Aile AV</option><option value="5101">5101 — Carrosserie</option><option value="5302">5302 — Arrière de carrosserie</option><option value="5354">5354 — Aile AR</option><option value="5522">5522 — Capot AV</option><option value="5559">5559 — Hayon</option><option value="5717">5717 — Serrure de porte</option><option value="5751">5751 — Porte AV</option><option value="5851">5851 — Porte AR</option><option value="6005">6005 — Toit coulissant</option><option value="6310">6310 — Pare-chocs AV</option><option value="6350">6350 — Pare-chocs AR</option><option value="6410">6410 — Pare-brise</option><option value="6440">6440 — Glace de porte AV</option><option value="6460">6460 — Glace de porte AR</option><option value="6486">6486 — Glace AR</option><option value="6605">6605 — Calandre</option><option value="6689">6689 — Rétroviseur</option><option value="7018">7018 — Tableau de bord</option><option value="7201">7201 — Siège AV</option><option value="7249">7249 — Banquette AR</option><option value="8023">8023 — Echangeur de chaleur</option><option value="8530">8530 — Soufflante</option><option value="8701">8701 — Climatiseur</option><option value="8734">8734 — Compresseur clim.</option><option value="8750">8750 — Condenseur</option><option value="8760">8760 — Evaporateur</option><option value="9005">9005 — Tachymètre</option><option value="9130">9130 — Autoradio</option><option value="9215">9215 — Moteur d'essuie-glace</option><option value="9303">9303 — Batterie haute tension</option><option value="9415">9415 — Phare</option><option value="9431">9431 — Feu AR</option><option value="9709">9709 — Câblage central</option><option value="9794">9794 — Centrale électrique</option>
             </select>
             <span class="hint" id="code_dom_hint"></span>
           </div>
@@ -518,7 +478,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </div>
 
     <!-- 3. KULANZ -->
-    <div class="form-section section-kulanz" style="animation-delay:0.15s">
+    <div class="form-section section-kulanz">
       <div class="section-header"><div class="section-number">3</div><div class="section-title">Vérifications KULANZ</div></div>
       <div class="section-body">
         <div style="display:flex;flex-direction:column;gap:14px;">
@@ -574,7 +534,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </div>
 
     <!-- 3. CCR PRÉREQUIS -->
-    <div class="form-section section-ccr" style="animation-delay:0.15s">
+    <div class="form-section section-ccr">
       <div class="section-header"><div class="section-number">3</div><div class="section-title">Prérequis CCR</div></div>
       <div class="section-body">
         <div class="info-box">Une demande <strong>KULANZ</strong> doit obligatoirement avoir été effectuée avant toute demande CCR.</div>
@@ -589,7 +549,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </div>
 
     <!-- 4. CCR PIÈCES -->
-    <div class="form-section section-ccr" style="animation-delay:0.2s">
+    <div class="form-section section-ccr">
       <div class="section-header"><div class="section-number">4</div><div class="section-title">Pièces à fournir</div></div>
       <div class="section-body">
         <p style="font-size:12px;color:#888;margin-bottom:16px;">Cochez les documents joints à cette demande.</p>
@@ -609,7 +569,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </div>
 
     <!-- 5. CCR CIG -->
-    <div class="form-section section-ccr" style="animation-delay:0.25s">
+    <div class="form-section section-ccr">
       <div class="section-header"><div class="section-number">5</div><div class="section-title">Règles CIG</div></div>
       <div class="section-body">
         <div class="info-box">Un CIG 70/30 de <strong>16 %</strong> est obligatoire — 11 % à la charge du constructeur, 5 % à la charge de la concession.</div>
@@ -627,7 +587,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </div>
 
     <!-- COMMENTAIRES -->
-    <div class="form-section" style="animation-delay:0.3s">
+    <div class="form-section">
       <div class="section-header"><div class="section-number" id="comm-num">4</div><div class="section-title">Commentaires & informations complémentaires</div></div>
       <div class="section-body">
         <div class="field">
@@ -642,11 +602,11 @@ table.histo-table{width:100%;border-collapse:collapse;}
       <p class="submit-hint">En soumettant, le formulaire sera envoyé par e-mail à <strong>teamgarantie@geauto.fr</strong></p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
         <button type="button" onclick="envoyerFormulaire()" class="btn-submit">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
           Envoyer la demande
         </button>
         <button type="button" onclick="genererPDF()" class="btn-print">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Enregistrer en PDF
         </button>
       </div>
@@ -689,14 +649,14 @@ table.histo-table{width:100%;border-collapse:collapse;}
           <thead>
             <tr>
               <th>Date</th><th>Site</th><th>Type</th><th>N° OR</th><th>Châssis</th>
-              <th>Code dom.</th><th>Statut</th><th>Commentaire</th><th>Action</th>
+              <th>Code dom.</th><th>Statut</th><th>Prise en charge</th><th>Commentaire</th><th>Action</th>
             </tr>
           </thead>
           <tbody id="histo-tbody"></tbody>
         </table>
       </div>
       <div id="histo-empty" class="empty-state" style="display:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:0.3;margin-bottom:12px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
         <p>Aucune demande trouvée</p>
       </div>
     </div>
@@ -716,8 +676,6 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </button>
   </div>
   <div class="sp-body">
-
-    <!-- Infos demande -->
     <div class="sp-section">
       <div class="sp-section-title">Informations de la demande</div>
       <div class="sp-info-grid">
@@ -729,8 +687,6 @@ table.histo-table{width:100%;border-collapse:collapse;}
         <div class="sp-info-item"><div class="sp-info-label">Date</div><div class="sp-info-value" id="sp-date">—</div></div>
       </div>
     </div>
-
-    <!-- Statut -->
     <div class="sp-section">
       <div class="sp-section-title">Statut de validation</div>
       <div class="field">
@@ -747,53 +703,34 @@ table.histo-table{width:100%;border-collapse:collapse;}
         <input type="text" id="sp-commentaire" placeholder="Ex : OK SAGA, dossier complet…">
       </div>
     </div>
-
-    <!-- Commerce de détail (visible si Validée) -->
     <div class="sp-section" id="sp-commerce" style="display:none;">
       <div class="sp-section-title">Commerce de détail</div>
       <table class="commerce-table">
-        <thead>
-          <tr>
-            <th style="width:38%"></th>
-            <th>De %</th>
-            <th>Jusqu'à %</th>
-            <th>Quantité %</th>
-          </tr>
-        </thead>
+        <thead><tr><th></th><th>De %</th><th>Jusqu'à %</th><th>Quantité %</th></tr></thead>
         <tbody>
-          <tr>
-            <td>Main d'œuvre</td>
+          <tr><td>Main d'œuvre</td>
             <td><div class="pct-wrap"><input class="commerce-input" id="mo_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
             <td><div class="pct-wrap"><input class="commerce-input" id="mo_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="mo_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-          </tr>
-          <tr>
-            <td>Pièces</td>
+            <td><div class="pct-wrap"><input class="commerce-input" id="mo_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+          <tr><td>Pièces</td>
             <td><div class="pct-wrap"><input class="commerce-input" id="pi_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
             <td><div class="pct-wrap"><input class="commerce-input" id="pi_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pi_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-          </tr>
-          <tr>
-            <td>Main d'œuvre ext.</td>
+            <td><div class="pct-wrap"><input class="commerce-input" id="pi_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+          <tr><td>MO extérieure</td>
             <td><div class="pct-wrap"><input class="commerce-input" id="moe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
             <td><div class="pct-wrap"><input class="commerce-input" id="moe_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="moe_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-          </tr>
-          <tr>
-            <td>Pièces extérieures</td>
+            <td><div class="pct-wrap"><input class="commerce-input" id="moe_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+          <tr><td>Pièces ext.</td>
             <td><div class="pct-wrap"><input class="commerce-input" id="pe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
             <td><div class="pct-wrap"><input class="commerce-input" id="pe_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pe_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-          </tr>
+            <td><div class="pct-wrap"><input class="commerce-input" id="pe_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
         </tbody>
       </table>
       <div class="field" style="margin-top:14px;">
         <label>Type d'extensions / Kulanz</label>
-        <input type="text" id="sp-type-ext" placeholder="Ex : Extension de garantie, Kulanz constructeur…">
+        <input type="text" id="sp-type-ext" placeholder="Ex : Extension de garantie…">
       </div>
     </div>
-
-    <!-- Mot de passe -->
     <div class="sp-section">
       <div class="sp-section-title">Authentification</div>
       <div class="field">
@@ -802,22 +739,69 @@ table.histo-table{width:100%;border-collapse:collapse;}
         <div class="sp-pwd-error" id="sp-pwd-error">Mot de passe incorrect.</div>
       </div>
     </div>
-
   </div>
   <div class="sp-footer">
     <button class="sp-btn-cancel" onclick="fermerPanneau()">Annuler</button>
-    <button class="sp-btn-ok" onclick="confirmerPanneau()">✔ Confirmer la validation</button>
+    <button class="sp-btn-ok" onclick="confirmerPanneau()">✔ Confirmer</button>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
+// ── FIREBASE CONFIG ───────────────────────────────────────────
+var firebaseConfig = {
+  apiKey: "AIzaSyDPsep7yTE-UAjGGSioZfVAozGEo_lSmSQ",
+  authDomain: "demande-kulanzccr.firebaseapp.com",
+  databaseURL: "https://demande-kulanzccr-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "demande-kulanzccr",
+  storageBucket: "demande-kulanzccr.firebasestorage.app",
+  messagingSenderId: "128572691256",
+  appId: "1:128572691256:web:43cd3e057b5287199967cd"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+var demandesRef = db.ref('demandes');
+
+// ── FIREBASE STORAGE ──────────────────────────────────────────
+function chargerDemandes(){chargerDemandesSync(function(){});}
+
+function chargerDemandesSync(callback){
+  var tbody=document.getElementById('histo-tbody');
+  if(tbody)tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
+  demandesRef.orderByChild('id').once('value')
+  .then(function(snapshot){
+    demandes=[];
+    snapshot.forEach(function(child){demandes.push(child.val());});
+    demandes.sort(function(a,b){return b.id-a.id;});
+    if(callback)callback();
+  })
+  .catch(function(err){
+    console.error('Firebase erreur:',err);
+    try{var s=localStorage.getItem('ge_auto_demandes');demandes=s?JSON.parse(s):[];}catch(e){demandes=[];}
+    if(callback)callback();
+  });
+}
+
+function sauvegarderDemandes(callback){
+  // Réécrire toute la liste
+  var obj={};
+  demandes.forEach(function(d){obj['d'+d.id]=d;});
+  demandesRef.set(obj)
+  .then(function(){
+    try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}
+    if(callback)callback();
+  })
+  .catch(function(err){
+    console.error('Erreur sauvegarde Firebase:',err);
+    try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}
+    if(callback)callback();
+  });
+}
+
+// ── CONSTANTES ────────────────────────────────────────────────
 var MOT_DE_PASSE = 'Garantie2026';
-var typeAcces = '';
-var donneesKulanz = {};
-var demandes = [];
-var demandeEnCours = null;
+var WEB3_KEY = '7bf5b927-e39f-4fc1-9f60-642e4741e445';
 
 var kvpsMap = {
   'Audi Hœnheim':'02155','Audi Obernai':'02486',
@@ -825,91 +809,60 @@ var kvpsMap = {
   'VW Bischheim':'02154','VW Illkirch':'02153','VW Obernai':'02485'
 };
 
-// ── HELPERS ──────────────────────────────────────────────────
-function getVal(n){ var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]'); return el?el.value.trim():''; }
-function setVal(n,v){ var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]'); if(el&&v!==undefined)el.value=v; }
-function getRadio(n){ var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]:checked'); return el?el.value:''; }
-function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},3500); }
+var typeAcces = '';
+var siteUsager = '';
+var donneesKulanz = {};
+var demandes = [];
+var demandeEnCours = null;
 
-// ── STORAGE PARTAGÉ via JSONBin.io ───────────────────────────
-var JSONBIN_BIN_ID = '69ef52a536566621a8f87edc';
-var JSONBIN_KEY = '$2a$10$i3aWC3RnZZnw/uL7Y2jF7.9WxOjrIIsb3h9FIp1fO2..qe/kNwNJy';
-var JSONBIN_URL = 'https://api.jsonbin.io/v3/b/' + JSONBIN_BIN_ID;
+// ── HELPERS ───────────────────────────────────────────────────
+function getVal(n){var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]');return el?el.value.trim():'';}
+function setVal(n,v){var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]');if(el&&v!==undefined)el.value=v;}
+function getRadio(n){var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]:checked');return el?el.value:'';}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500);}
 
-function chargerDemandes(){
-  chargerDemandesSync(function(){});
-}
+// ── JSONBIN STORAGE ───────────────────────────────────────────
+function chargerDemandes(){chargerDemandesSync(function(){});}
 
 function chargerDemandesSync(callback){
-  fetch(JSONBIN_URL + '/latest', {
-    method: 'GET',
-    headers: {
-      'X-Master-Key': JSONBIN_KEY,
-      'X-Bin-Meta': 'false'
-    }
-  })
-  .then(function(r){ return r.json(); })
+  var tbody=document.getElementById('histo-tbody');
+  if(tbody)tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
+  fetch(JSONBIN_URL+'/latest',{method:'GET',headers:{'X-Master-Key':JSONBIN_KEY,'X-Bin-Meta':'false'}})
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
   .then(function(data){
-    demandes = (data && data.demandes) ? data.demandes : [];
-    if(callback) callback();
+    demandes=(data&&Array.isArray(data.demandes))?data.demandes:[];
+    try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}
+    if(callback)callback();
   })
-  .catch(function(){
-    // Fallback localStorage
-    try{ var s=localStorage.getItem('ge_auto_demandes'); demandes=s?JSON.parse(s):[]; }catch(e){demandes=[];}
-    if(callback) callback();
+  .catch(function(err){
+    console.error('JSONBin erreur:',err);
+    try{var s=localStorage.getItem('ge_auto_demandes');demandes=s?JSON.parse(s):[];}catch(e){demandes=[];}
+    if(callback)callback();
   });
 }
 
-function sauvegarderDemandes(){
-  fetch(JSONBIN_URL, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Master-Key': JSONBIN_KEY
-    },
-    body: JSON.stringify({ demandes: demandes })
-  })
-  .then(function(){
-    // Backup localStorage aussi
-    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
-  })
-  .catch(function(e){ console.error('Erreur sauvegarde JSONBin:', e); });
+function sauvegarderDemandes(callback){
+  fetch(JSONBIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},body:JSON.stringify({demandes:demandes})})
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}if(callback)callback();})
+  .catch(function(e){console.error('Erreur sauvegarde:',e);try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(ex){}if(callback)callback();});
 }
 
 // ── ACCÈS ─────────────────────────────────────────────────────
-var siteUsager = ''; // site sélectionné par l'usager à la connexion
-
 function choisirAcces(type){
-  if(type==='usager'){
-    // Afficher la grille de sites
-    document.getElementById('login-step-1').style.display='none';
-    document.getElementById('login-step-2').style.display='block';
-  } else {
-    document.getElementById('login-modal').classList.add('open');
-    setTimeout(function(){document.getElementById('login-pwd').focus();},150);
-  }
+  if(type==='usager'){document.getElementById('login-step-1').style.display='none';document.getElementById('login-step-2').style.display='block';}
+  else{document.getElementById('login-modal').classList.add('open');setTimeout(function(){document.getElementById('login-pwd').focus();},150);}
 }
-
-function retourStep1(){
-  document.getElementById('login-step-2').style.display='none';
-  document.getElementById('login-step-1').style.display='block';
-}
+function retourStep1(){document.getElementById('login-step-2').style.display='none';document.getElementById('login-step-1').style.display='block';}
 
 function choisirSiteUsager(site){
-  siteUsager = site;
-  typeAcces = 'usager';
-  ouvrirApp();
+  siteUsager=site; typeAcces='usager'; ouvrirApp();
 }
 
 function validerLogin(){
   var pwd=document.getElementById('login-pwd').value;
   var err=document.getElementById('login-error');
   if(pwd!==MOT_DE_PASSE){err.style.display='block';document.getElementById('login-pwd').focus();return;}
-  err.style.display='none';
-  typeAcces='team';
-  siteUsager='';
-  fermerLoginModal();
-  ouvrirApp();
+  err.style.display='none'; typeAcces='team'; siteUsager=''; fermerLoginModal(); ouvrirApp();
 }
 
 function fermerLoginModal(){
@@ -921,29 +874,22 @@ function fermerLoginModal(){
 function ouvrirApp(){
   document.getElementById('login-page').classList.add('hidden');
   document.getElementById('user-info').style.display='flex';
-
   if(typeAcces==='team'){
     document.getElementById('user-role-badge').textContent='🔐 TeamGarantie';
     document.getElementById('tab-historique').style.display='block';
-    document.getElementById('site-bar-wrap').style.display='flex'; // barre sites visible
+    document.getElementById('site-bar-wrap').style.display='flex';
   } else {
     document.getElementById('user-role-badge').textContent='👤 '+siteUsager;
-    document.getElementById('tab-historique').style.display='block'; // historique visible mais filtré
-    document.getElementById('site-bar-wrap').style.display='none'; // barre sites masquée
-
-    // Pré-sélectionner le site dans le formulaire
-    document.getElementById('f_site').value = siteUsager;
-    document.getElementById('site-display-name').textContent = siteUsager;
-    document.querySelectorAll('.site-btn').forEach(function(b){
-      b.classList.toggle('active', b.textContent.trim()===siteUsager);
-    });
-    document.getElementById('kvps_input').value = kvpsMap[siteUsager]||'';
-
-    // Rendre site et KVPS en lecture seule
-    document.getElementById('kvps_input').readOnly = true;
-    document.getElementById('kvps_input').closest('.field').classList.add('field-readonly');
-    document.getElementById('f_site_display').value = siteUsager;
-    document.getElementById('site_display_field').style.display = 'flex';
+    document.getElementById('tab-historique').style.display='block';
+    document.getElementById('site-bar-wrap').style.display='none';
+    // Pré-sélectionner le site
+    document.getElementById('f_site').value=siteUsager;
+    document.getElementById('site-display-name').textContent=siteUsager;
+    document.getElementById('kvps_input').value=kvpsMap[siteUsager]||'';
+    document.getElementById('kvps_input').readOnly=true;
+    document.getElementById('f_site_display').value=siteUsager;
+    document.getElementById('site_display_field').style.display='flex';
+    document.querySelectorAll('.site-btn').forEach(function(b){b.classList.toggle('active',b.textContent.trim()===siteUsager);});
   }
 }
 
@@ -957,22 +903,21 @@ function deconnecter(){
   document.getElementById('page-formulaire').classList.add('active');
   document.getElementById('tab-formulaire').classList.add('active');
   document.getElementById('tab-historique').classList.remove('active');
+  document.getElementById('tab-historique').style.display='none';
   document.getElementById('toggle-bar').style.display='block';
-  // Réinitialiser lecture seule
   document.getElementById('kvps_input').readOnly=false;
-  document.getElementById('kvps_input').closest('.field').classList.remove('field-readonly');
   document.getElementById('site_display_field').style.display='none';
   document.getElementById('site-bar-wrap').style.display='flex';
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
-function showPage(page, tabEl){
+function showPage(page,tabEl){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('page-'+page).classList.add('active');
-  if(tabEl) tabEl.classList.add('active');
+  if(tabEl)tabEl.classList.add('active');
   document.getElementById('toggle-bar').style.display=page==='formulaire'?'block':'none';
-  if(page==='historique'){chargerDemandes();renderHistorique();}
+  if(page==='historique'){renderHistorique();}
 }
 
 // ── SITE ──────────────────────────────────────────────────────
@@ -987,7 +932,7 @@ function selectSite(btn,name){
 // ── TYPE TOGGLE ───────────────────────────────────────────────
 function switchType(type){
   var isK=type==='kulanz';
-  if(!isK) sauvegarderKulanz();
+  if(!isK)sauvegarderKulanz();
   document.getElementById('btn-kulanz').classList.toggle('active',isK);
   document.getElementById('btn-ccr').classList.toggle('active',!isK);
   document.getElementById('f_type').value=isK?'Kulanz':'CCR';
@@ -1021,8 +966,9 @@ function copierDepuisKulanz(){
     document.getElementById('site-display-name').textContent=donneesKulanz.site;
     document.querySelectorAll('.site-btn').forEach(function(b){b.classList.toggle('active',b.textContent.trim()===donneesKulanz.site);});
   }
-  updateCodeDesc('dommage'); updateCodeDesc('avarie');
-  var ci=document.getElementById('chassis_input'); if(ci){ci.dispatchEvent(new Event('input'));}
+  updateCodeDesc('dommage');updateCodeDesc('avarie');
+  var ci=document.getElementById('chassis_input');
+  if(ci){var h=document.getElementById('chassis_hint');var v=ci.value;h.textContent=v.length+' / 17 caractères';h.className='hint'+(v.length===17?' ok':v.length>0?' err':'');}
   showToast('✔ Données Kulanz copiées !');
 }
 
@@ -1034,50 +980,48 @@ function chassisInput(input){
   h.textContent=v.length+' / 17 caractères';
   h.className='hint'+(v.length===17?' ok':v.length>0?' err':'');
   input.className=v.length===17?'valid':v.length>0?'invalid':'';
-
   var list=document.getElementById('chassis-ac-list');
   if(v.length<5){list.classList.remove('open');return;}
-  chargerDemandes();
-  var vus={};
-  var res=demandes.filter(function(d){
-    if(d.chassis&&d.chassis.toUpperCase().indexOf(v)===0&&!vus[d.chassis]){vus[d.chassis]=true;return true;}
-    return false;
-  }).slice(0,5);
-  if(res.length===0){list.classList.remove('open');return;}
-  list.innerHTML=res.map(function(d){
-    return '<div class="ac-item" onclick="appliquerChassis(\''+d.chassis+'\')">'+
-      '<div class="ac-chassis">'+d.chassis+'</div>'+
-      '<div class="ac-detail">'+d.site+' — OR '+d.or+' — '+d.date+'</div>'+
-    '</div>';
-  }).join('');
-  list.classList.add('open');
+  chargerDemandesSync(function(){
+    var vus={};
+    var res=demandes.filter(function(d){
+      if(d.chassis&&d.chassis.toUpperCase().indexOf(v)===0&&!vus[d.chassis]){vus[d.chassis]=true;return true;}
+      return false;
+    }).slice(0,5);
+    if(res.length===0){list.classList.remove('open');return;}
+    list.innerHTML=res.map(function(d){
+      return '<div class="ac-item" onclick="appliquerChassis(\''+d.chassis+'\')">'+
+        '<div class="ac-chassis">'+d.chassis+'</div>'+
+        '<div class="ac-detail">'+d.site+' — OR '+d.or+' — '+d.date+'</div></div>';
+    }).join('');
+    list.classList.add('open');
+  });
 }
 function appliquerChassis(chassis){
-  chargerDemandes();
-  var d=demandes.find(function(x){return x.chassis===chassis;});
-  if(!d) return;
-  document.getElementById('chassis-ac-list').classList.remove('open');
-  document.getElementById('chassis_input').value=chassis;
-  document.getElementById('chassis_hint').textContent='17 / 17 caractères';
-  document.getElementById('chassis_hint').className='hint ok';
-  document.getElementById('chassis_input').className='valid';
-  if(d.kilometrage) setVal('kilometrage',d.kilometrage);
-  if(d.date_or) setVal('date_or',d.date_or);
-  if(d.kvps) setVal('kvps',d.kvps);
-  if(d.technicien) setVal('technicien',d.technicien);
-  if(d.email_usager) setVal('email_usager',d.email_usager);
-  if(d.site){
-    document.getElementById('f_site').value=d.site;
-    document.getElementById('site-display-name').textContent=d.site;
-    document.querySelectorAll('.site-btn').forEach(function(b){b.classList.toggle('active',b.textContent.trim()===d.site);});
-  }
-  showToast('✔ Véhicule reconnu — informations pré-remplies !');
+  chargerDemandesSync(function(){
+    var d=demandes.find(function(x){return x.chassis===chassis;});
+    if(!d)return;
+    document.getElementById('chassis-ac-list').classList.remove('open');
+    document.getElementById('chassis_input').value=chassis;
+    document.getElementById('chassis_hint').textContent='17 / 17 caractères';
+    document.getElementById('chassis_hint').className='hint ok';
+    document.getElementById('chassis_input').className='valid';
+    if(d.kilometrage)setVal('kilometrage',d.kilometrage);
+    if(d.date_or)setVal('date_or',d.date_or);
+    if(d.kvps&&!document.getElementById('kvps_input').readOnly)setVal('kvps',d.kvps);
+    if(d.technicien)setVal('technicien',d.technicien);
+    if(d.email_usager)setVal('email_usager',d.email_usager);
+    if(d.site&&typeAcces==='team'){
+      document.getElementById('f_site').value=d.site;
+      document.getElementById('site-display-name').textContent=d.site;
+      document.querySelectorAll('.site-btn').forEach(function(b){b.classList.toggle('active',b.textContent.trim()===d.site);});
+    }
+    showToast('✔ Véhicule reconnu — informations pré-remplies !');
+  });
 }
-document.addEventListener('click',function(e){
-  if(!e.target.closest('.autocomplete-wrap')) document.getElementById('chassis-ac-list').classList.remove('open');
-});
+document.addEventListener('click',function(e){if(!e.target.closest('.autocomplete-wrap'))document.getElementById('chassis-ac-list').classList.remove('open');});
 
-// ── VALIDATION TEMPS RÉEL ─────────────────────────────────────
+// ── VALIDATION ────────────────────────────────────────────────
 function orInput(input){
   var v=input.value.replace(/\D/g,'').slice(0,6);
   input.value=v;
@@ -1087,25 +1031,15 @@ function orInput(input){
   input.className=v.length===6?'valid':v.length>0?'invalid':'';
 }
 function updateCodeDesc(type){
-  if(type==='dommage'){
-    var s=document.getElementById('code_dom_input');
-    var h=document.getElementById('code_dom_hint');
-    h.textContent=s.value?'✔ '+s.options[s.selectedIndex].text:'';
-    h.className=s.value?'hint ok':'hint';
-  }
-  if(type==='avarie'){
-    var s=document.getElementById('code_ava_input');
-    var h=document.getElementById('code_ava_hint');
-    h.textContent=s.value?'✔ '+s.options[s.selectedIndex].text:'';
-    h.className=s.value?'hint ok':'hint';
-  }
+  if(type==='dommage'){var s=document.getElementById('code_dom_input');var h=document.getElementById('code_dom_hint');h.textContent=s.value?'✔ '+s.options[s.selectedIndex].text:'';h.className=s.value?'hint ok':'hint';}
+  if(type==='avarie'){var s=document.getElementById('code_ava_input');var h=document.getElementById('code_ava_hint');h.textContent=s.value?'✔ '+s.options[s.selectedIndex].text:'';h.className=s.value?'hint ok':'hint';}
 }
 document.addEventListener('change',function(e){
-  if(e.target.name==='tpi') document.getElementById('tpi_num_field').style.display=e.target.value==='OUI'?'flex':'none';
+  if(e.target.name==='tpi')document.getElementById('tpi_num_field').style.display=e.target.value==='OUI'?'flex':'none';
   if(e.target.name==='cig'){var i=document.getElementById('cig_taux_input');i.disabled=e.target.value!=='superieur';if(!i.disabled)i.focus();}
 });
 
-// ── COLLECTE ──────────────────────────────────────────────────
+// ── COLLECTE ─────────────────────────────────────────────────
 function collecterDonnees(){
   var site=document.getElementById('f_site').value;
   var type=document.getElementById('f_type').value||'Kulanz';
@@ -1149,7 +1083,7 @@ function collecterDonnees(){
     ]);
   }
   fields.push({label:'Commentaires',value:getVal('commentaires')});
-  return {site:site,type:type,fields:fields};
+  return{site:site,type:type,fields:fields};
 }
 
 // ── ENVOYER ───────────────────────────────────────────────────
@@ -1165,7 +1099,7 @@ function envoyerFormulaire(){
   if(!emailUsager||emailUsager.indexOf('@')===-1){alert('⚠ Veuillez saisir un e-mail valide.');return;}
 
   var btn=document.querySelector('.btn-submit');
-  btn.disabled=true; btn.textContent='Envoi en cours…';
+  btn.disabled=true;btn.textContent='Envoi en cours…';
 
   var site=d.site,type=d.type;
   var maxLen=0;
@@ -1179,45 +1113,71 @@ function envoyerFormulaire(){
   });
   message+='\n'+'─'.repeat(50)+'\nEnvoyé depuis le formulaire Team Garantie GEA - VW';
 
+  var technicien=getVal('technicien');
+
+  // E-mail 1 : teamgarantie
   fetch('https://api.web3forms.com/submit',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({access_key:'7bf5b927-e39f-4fc1-9f60-642e4741e445',
+    body:JSON.stringify({
+      access_key:WEB3_KEY,
       subject:'['+type+'] Nouvelle demande à valider – '+site+' – OR '+getVal('or_number'),
-      message:message,from_name:'Team Garantie GEA - VW'})
+      message:message,
+      from_name:technicien||site,
+      replyto:emailUsager
+    })
   })
   .then(function(r){return r.json();})
   .then(function(res){
-    if(res.success){
-      return fetch('https://api.web3forms.com/submit',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({access_key:'7bf5b927-e39f-4fc1-9f60-642e4741e445',
-          subject:'🟡 Demande '+type+' en cours – OR '+getVal('or_number'),
-          to_email:emailUsager,from_name:'Team Garantie GEA - VW',
-          message:'Bonjour,\n\nVotre demande '+type+' a bien été reçue.\n\n'+'━'.repeat(40)+'\nStatut       : 🟡 En attente\nSite         : '+site+'\nN° OR        : '+getVal('or_number')+'\nN° Châssis   : '+getVal('chassis')+'\n'+'━'.repeat(40)+'\n\nVous recevrez une notification dès validation.\n\nCordialement,\nTeam Garantie GEA - VW'})
-      });
-    } else {throw new Error('Échec');}
+    if(!res.success)throw new Error('Échec');
+    // E-mail 2 : confirmation à l'usager
+    return fetch('https://api.web3forms.com/submit',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        access_key:WEB3_KEY,
+        subject:'🟡 Demande '+type+' en cours – OR '+getVal('or_number'),
+        to_email:emailUsager,
+        from_name:'Team Garantie GEA - VW',
+        replyto:'teamgarantie@geauto.fr',
+        message:'Bonjour'+(technicien?' '+technicien:'')+',\n\nVotre demande '+type+' a bien été reçue.\n\n'+'━'.repeat(40)+
+          '\nStatut     : 🟡 En attente\nSite       : '+site+
+          '\nN° OR      : '+getVal('or_number')+'\nN° Châssis : '+getVal('chassis')+'\n'+'━'.repeat(40)+
+          '\n\nVous recevrez une notification dès validation.\n\nCordialement,\nTeam Garantie GEA - VW'
+      })
+    });
   })
   .then(function(){
+    // Sauvegarder dans JSONBin
     chargerDemandesSync(function(){
       var selDom=document.getElementById('code_dom_input');
       var domLabel=selDom&&selDom.value?selDom.options[selDom.selectedIndex].text:getVal('code_dommage');
-      demandes.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR'),
-        site:site,type:type,or:getVal('or_number'),chassis:getVal('chassis'),
-        code_dommage:domLabel,email_usager:emailUsager,statut:'En attente',commentaire_team:'',commerce:null});
-      sauvegarderDemandes();
-      document.getElementById('success-details').innerHTML=
-        '<strong>Site :</strong> '+site+'<br>'+
-        '<strong>Type :</strong> '+type+'<br>'+
-        '<strong>N° OR :</strong> '+getVal('or_number')+'<br>'+
-        '<strong>Châssis :</strong> '+getVal('chassis')+'<br>'+
-        '<strong>E-mail :</strong> '+emailUsager;
-      document.getElementById('success-overlay').classList.add('open');
+      demandes.unshift({
+        id:Date.now(),
+        date:new Date().toLocaleDateString('fr-FR'),
+        site:site,type:type,
+        or:getVal('or_number'),
+        chassis:getVal('chassis'),
+        code_dommage:domLabel,
+        email_usager:emailUsager,
+        technicien:technicien,
+        statut:'En attente',
+        commentaire_team:'',
+        commerce:null
+      });
+      sauvegarderDemandes(function(){
+        document.getElementById('success-details').innerHTML=
+          '<strong>Site :</strong> '+site+'<br>'+
+          '<strong>Type :</strong> '+type+'<br>'+
+          '<strong>N° OR :</strong> '+getVal('or_number')+'<br>'+
+          '<strong>Châssis :</strong> '+getVal('chassis')+'<br>'+
+          '<strong>E-mail :</strong> '+emailUsager;
+        document.getElementById('success-overlay').classList.add('open');
+      });
     });
   })
-  .catch(function(){showToast('❌ Erreur réseau.');})
+  .catch(function(){showToast('❌ Erreur réseau — réessayez.');})
   .finally(function(){
     btn.disabled=false;
-    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande';
+    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande';
   });
 }
 
@@ -1225,9 +1185,6 @@ function envoyerFormulaire(){
 function nouvelledemande(){
   document.getElementById('success-overlay').classList.remove('open');
   document.getElementById('mainForm').reset();
-  document.querySelectorAll('.site-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('site-display-name').textContent='Aucun site sélectionné';
-  document.getElementById('f_site').value='';
   document.getElementById('f_type').value='Kulanz';
   document.getElementById('chassis_hint').className='hint';
   document.getElementById('chassis_hint').textContent='0 / 17 caractères';
@@ -1241,6 +1198,17 @@ function nouvelledemande(){
   document.getElementById('btn-ccr').classList.remove('active');
   document.getElementById('comm-num').textContent='4';
   document.getElementById('btn-copier-kulanz').style.display='none';
+  // Restaurer site pour usager
+  if(typeAcces==='usager'){
+    document.getElementById('f_site').value=siteUsager;
+    document.getElementById('kvps_input').value=kvpsMap[siteUsager]||'';
+    document.getElementById('kvps_input').readOnly=true;
+    document.getElementById('f_site_display').value=siteUsager;
+  } else {
+    document.querySelectorAll('.site-btn').forEach(function(b){b.classList.remove('active');});
+    document.getElementById('f_site').value='';
+    document.getElementById('site-display-name').textContent='Aucun site sélectionné';
+  }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1251,25 +1219,23 @@ function genererPDF(){
   if(!getVal('or_number')){alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.');return;}
   if(!window.jspdf){alert('⚠ Bibliothèque PDF non chargée.');return;}
   var btn=document.querySelector('.btn-print');
-  btn.disabled=true; btn.textContent='Génération PDF…';
+  btn.disabled=true;btn.textContent='Génération PDF…';
   try{
     var kvps=getVal('kvps'),codeDom=getVal('code_dommage'),orNum=getVal('or_number');
     var now=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-    var selDom=document.getElementById('code_dom_input');
-    var domLabel=selDom&&selDom.value?selDom.options[selDom.selectedIndex].text:codeDom;
     var titleDoc='[DEMANDE '+d.type.toUpperCase()+'] '+d.site+(kvps?' — '+kvps:'')+(codeDom?' — '+codeDom:'');
     var filename='['+d.type.toUpperCase()+'] '+d.site.replace(/\s+/g,'_')+(kvps?'_'+kvps:'')+(codeDom?'_'+codeDom:'')+'_OR'+orNum+'.pdf';
     var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
     var W=210,ml=14,usableW=W-ml*2,y=14;
-    doc.setFillColor(26,26,46); doc.rect(ml,y,usableW,18,'F');
-    doc.setTextColor(212,174,82); doc.setFontSize(10); doc.setFont('helvetica','bold');
-    var tL=doc.splitTextToSize(titleDoc,usableW-8); doc.text(tL,ml+4,y+6);
-    doc.setTextColor(180,180,180); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+    doc.setFillColor(26,26,46);doc.rect(ml,y,usableW,18,'F');
+    doc.setTextColor(212,174,82);doc.setFontSize(10);doc.setFont('helvetica','bold');
+    var tL=doc.splitTextToSize(titleDoc,usableW-8);doc.text(tL,ml+4,y+6);
+    doc.setTextColor(180,180,180);doc.setFontSize(7.5);doc.setFont('helvetica','normal');
     doc.text('OR : '+orNum+'   |   Date : '+now+'   |   teamgarantie@geauto.fr',ml+4,y+15);
     y+=24;
-    doc.setFillColor(240,237,232); doc.rect(ml,y,usableW,7,'F');
-    doc.setTextColor(26,26,46); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text('Détails de la demande',ml+3,y+5); y+=9;
+    doc.setFillColor(240,237,232);doc.rect(ml,y,usableW,7,'F');
+    doc.setTextColor(26,26,46);doc.setFontSize(9);doc.setFont('helvetica','bold');
+    doc.text('Détails de la demande',ml+3,y+5);y+=9;
     var colL=70,colV=usableW-colL;
     d.fields.filter(function(fi){return fi.value&&fi.value.trim();}).forEach(function(fi,i){
       var lines=doc.splitTextToSize(fi.value,colV-4);
@@ -1277,42 +1243,34 @@ function genererPDF(){
       if(y+rowH>282){doc.addPage();y=14;}
       if(i%2===0)doc.setFillColor(255,255,255);else doc.setFillColor(247,246,242);
       doc.rect(ml,y,usableW,rowH,'F');
-      doc.setDrawColor(221,221,221); doc.rect(ml,y,colL,rowH,'S'); doc.rect(ml+colL,y,colV,rowH,'S');
-      doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80); doc.setFontSize(9);
+      doc.setDrawColor(221,221,221);doc.rect(ml,y,colL,rowH,'S');doc.rect(ml+colL,y,colV,rowH,'S');
+      doc.setFont('helvetica','bold');doc.setTextColor(80,80,80);doc.setFontSize(9);
       doc.text(fi.label,ml+3,y+5);
-      doc.setFont('helvetica','normal'); doc.setTextColor(26,26,46);
-      doc.text(lines,ml+colL+3,y+5); y+=rowH;
+      doc.setFont('helvetica','normal');doc.setTextColor(26,26,46);
+      doc.text(lines,ml+colL+3,y+5);y+=rowH;
     });
-    y+=5; doc.setDrawColor(200,200,200); doc.line(ml,y,ml+usableW,y);
-    doc.setFontSize(7.5); doc.setTextColor(170,170,170); doc.setFont('helvetica','normal');
+    y+=5;doc.setDrawColor(200,200,200);doc.line(ml,y,ml+usableW,y);
+    doc.setFontSize(7.5);doc.setTextColor(170,170,170);doc.setFont('helvetica','normal');
     doc.text('Document généré — Team Garantie GEA - VW — '+now,W/2,y+4,{align:'center'});
     doc.save(filename);
     showToast('✔ PDF enregistré : '+filename);
   }catch(err){showToast('❌ Erreur : '+err.message);console.error(err);}
-  finally{
-    btn.disabled=false;
-    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Enregistrer en PDF';
-  }
+  finally{btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Enregistrer en PDF';}
 }
 
+// ── HISTORIQUE ────────────────────────────────────────────────
 function renderHistorique(){
   chargerDemandesSync(function(){
-    var fS = typeAcces==='usager' ? siteUsager : document.getElementById('filter-site').value;
+    var fS=typeAcces==='usager'?siteUsager:document.getElementById('filter-site').value;
     var fT=document.getElementById('filter-type').value;
     var fSt=document.getElementById('filter-statut').value;
-
-    // Masquer le filtre site pour l'usager
-    document.getElementById('filter-site').style.display = typeAcces==='team' ? 'block' : 'none';
-
+    document.getElementById('filter-site').style.display=typeAcces==='team'?'block':'none';
     var filtered=demandes.filter(function(d){return(!fS||d.site===fS)&&(!fT||d.type===fT)&&(!fSt||d.statut===fSt);});
-
-    // Stats filtrées sur le périmètre de l'usager
-    var scope = typeAcces==='usager' ? demandes.filter(function(d){return d.site===siteUsager;}) : demandes;
+    var scope=typeAcces==='usager'?demandes.filter(function(d){return d.site===siteUsager;}):demandes;
     document.getElementById('stat-total').textContent=scope.length;
     document.getElementById('stat-attente').textContent=scope.filter(function(d){return d.statut==='En attente';}).length;
     document.getElementById('stat-validee').textContent=scope.filter(function(d){return d.statut==='Validée';}).length;
     document.getElementById('stat-refusee').textContent=scope.filter(function(d){return d.statut==='Refusée';}).length;
-
     var tbody=document.getElementById('histo-tbody');
     var empty=document.getElementById('histo-empty');
     if(filtered.length===0){tbody.innerHTML='';empty.style.display='block';return;}
@@ -1322,20 +1280,16 @@ function renderHistorique(){
       var ic={'En attente':'🟡','Validée':'✅','Refusée':'❌','Complément requis':'🔄'}[d.statut]||'🟡';
       var pecHtml='—';
       if(d.statut==='Validée'&&d.commerce){
-        var c=d.commerce;
-        var parts=[];
-        if(c.mo_de||c.mo_jusqua) parts.push('<span>MO: '+(c.mo_de||'?')+'→'+(c.mo_jusqua||'?')+'%'+(c.mo_qte?' ('+c.mo_qte+'%)':'')+'</span>');
-        if(c.pi_de||c.pi_jusqua) parts.push('<span>Pièces: '+(c.pi_de||'?')+'→'+(c.pi_jusqua||'?')+'%'+(c.pi_qte?' ('+c.pi_qte+'%)':'')+'</span>');
-        if(c.moe_de||c.moe_jusqua) parts.push('<span>MO ext.: '+(c.moe_de||'?')+'→'+(c.moe_jusqua||'?')+'%'+(c.moe_qte?' ('+c.moe_qte+'%)':'')+'</span>');
-        if(c.pe_de||c.pe_jusqua) parts.push('<span>Pièces ext.: '+(c.pe_de||'?')+'→'+(c.pe_jusqua||'?')+'%'+(c.pe_qte?' ('+c.pe_qte+'%)':'')+'</span>');
-        if(parts.length) pecHtml='<div class="pec-cell">'+parts.join('')+'</div>';
+        var c=d.commerce;var parts=[];
+        if(c.mo_de||c.mo_jusqua)parts.push('<span>MO: '+(c.mo_de||'?')+'→'+(c.mo_jusqua||'?')+'%'+(c.mo_qte?' ('+c.mo_qte+'%)':'')+'</span>');
+        if(c.pi_de||c.pi_jusqua)parts.push('<span>Pièces: '+(c.pi_de||'?')+'→'+(c.pi_jusqua||'?')+'%'+(c.pi_qte?' ('+c.pi_qte+'%)':'')+'</span>');
+        if(c.moe_de||c.moe_jusqua)parts.push('<span>MO ext.: '+(c.moe_de||'?')+'→'+(c.moe_jusqua||'?')+'%'+(c.moe_qte?' ('+c.moe_qte+'%)':'')+'</span>');
+        if(c.pe_de||c.pe_jusqua)parts.push('<span>Pièces ext.: '+(c.pe_de||'?')+'→'+(c.pe_jusqua||'?')+'%'+(c.pe_qte?' ('+c.pe_qte+'%)':'')+'</span>');
+        if(parts.length)pecHtml='<div class="pec-cell">'+parts.join('')+'</div>';
       }
-      var actionBtn = typeAcces==='team'
-        ? '<button class="btn-valider" onclick="ouvrirModal('+d.id+')">Valider</button>'
-        : '<span style="font-size:11px;color:#aaa;">—</span>';
+      var actionBtn=typeAcces==='team'?'<button class="btn-valider" onclick="ouvrirModal('+d.id+')">Valider</button>':'<span style="font-size:11px;color:#aaa;">—</span>';
       return '<tr>'+
-        '<td>'+d.date+'</td>'+
-        '<td style="font-weight:500">'+d.site+'</td>'+
+        '<td>'+d.date+'</td><td style="font-weight:500">'+d.site+'</td>'+
         '<td><span style="font-size:11px;font-weight:600;color:var(--gold)">'+d.type+'</span></td>'+
         '<td style="font-family:monospace">'+d.or+'</td>'+
         '<td style="font-family:monospace;font-size:12px">'+d.chassis+'</td>'+
@@ -1343,68 +1297,51 @@ function renderHistorique(){
         '<td><span class="badge-statut '+bc+'">'+ic+' '+d.statut+'</span></td>'+
         '<td>'+pecHtml+'</td>'+
         '<td style="font-size:12px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(d.commentaire_team||'')+'">'+(d.commentaire_team||'—')+'</td>'+
-        '<td>'+actionBtn+'</td>'+
-      '</tr>';
+        '<td>'+actionBtn+'</td></tr>';
     }).join('');
   });
 }
 
 // ── PANNEAU LATÉRAL ───────────────────────────────────────────
-function ouvrirModal(id) {
-  demandeEnCours = id;
-  chargerDemandes();
-  var d = demandes.find(function(x){ return x.id === id; });
-  if (!d) return;
-
-  // Remplir les infos
-  document.getElementById('sp-subtitle').textContent = d.type+' — OR '+d.or+' — '+d.date;
-  document.getElementById('sp-site').textContent = d.site;
-  document.getElementById('sp-type').textContent = d.type;
-  document.getElementById('sp-or').textContent = d.or;
-  document.getElementById('sp-chassis').textContent = d.chassis;
-  document.getElementById('sp-coddom').textContent = d.code_dommage||'—';
-  document.getElementById('sp-date').textContent = d.date;
-  document.getElementById('sp-statut').value = d.statut||'En attente';
-  document.getElementById('sp-commentaire').value = d.commentaire_team||'';
-  document.getElementById('sp-pwd').value = '';
-  document.getElementById('sp-pwd-error').style.display = 'none';
-
-  // Commerce de détail — restaurer valeurs si déjà remplies
-  var c = d.commerce || {};
-  document.getElementById('mo_de').value = c.mo_de||'';
-  document.getElementById('mo_jusqua').value = c.mo_jusqua||'';
-  document.getElementById('mo_qte').value = c.mo_qte||'';
-  document.getElementById('pi_de').value = c.pi_de||'';
-  document.getElementById('pi_jusqua').value = c.pi_jusqua||'';
-  document.getElementById('pi_qte').value = c.pi_qte||'';
-  document.getElementById('moe_de').value = c.moe_de||'';
-  document.getElementById('moe_jusqua').value = c.moe_jusqua||'';
-  document.getElementById('moe_qte').value = c.moe_qte||'';
-  document.getElementById('pe_de').value = c.pe_de||'';
-  document.getElementById('pe_jusqua').value = c.pe_jusqua||'';
-  document.getElementById('pe_qte').value = c.pe_qte||'';
-  document.getElementById('sp-type-ext').value = c.type_ext||'';
-
-  // Afficher/masquer commerce selon statut
-  onStatutChange();
-
-  document.getElementById('sp-overlay').classList.add('open');
-  document.getElementById('side-panel').classList.add('open');
-  setTimeout(function(){ document.getElementById('sp-pwd').focus(); }, 400);
+function ouvrirModal(id){
+  demandeEnCours=id;
+  chargerDemandesSync(function(){
+    var d=demandes.find(function(x){return x.id===id;});
+    if(!d)return;
+    document.getElementById('sp-subtitle').textContent=d.type+' — OR '+d.or+' — '+d.date;
+    document.getElementById('sp-site').textContent=d.site;
+    document.getElementById('sp-type').textContent=d.type;
+    document.getElementById('sp-or').textContent=d.or;
+    document.getElementById('sp-chassis').textContent=d.chassis;
+    document.getElementById('sp-coddom').textContent=d.code_dommage||'—';
+    document.getElementById('sp-date').textContent=d.date;
+    document.getElementById('sp-statut').value=d.statut||'En attente';
+    document.getElementById('sp-commentaire').value=d.commentaire_team||'';
+    document.getElementById('sp-pwd').value='';
+    document.getElementById('sp-pwd-error').style.display='none';
+    var c=d.commerce||{};
+    ['mo_de','mo_jusqua','mo_qte','pi_de','pi_jusqua','pi_qte','moe_de','moe_jusqua','moe_qte','pe_de','pe_jusqua','pe_qte'].forEach(function(k){
+      var el=document.getElementById(k);if(el)el.value=c[k]||'';
+    });
+    document.getElementById('sp-type-ext').value=c.type_ext||'';
+    onStatutChange();
+    document.getElementById('sp-overlay').classList.add('open');
+    document.getElementById('side-panel').classList.add('open');
+    setTimeout(function(){document.getElementById('sp-pwd').focus();},400);
+  });
 }
 
-function fermerPanneau() {
+function fermerPanneau(){
   document.getElementById('sp-overlay').classList.remove('open');
   document.getElementById('side-panel').classList.remove('open');
-  demandeEnCours = null;
+  demandeEnCours=null;
 }
 
-function onStatutChange() {
-  var statut = document.getElementById('sp-statut').value;
-  document.getElementById('sp-commerce').style.display = statut === 'Validée' ? 'block' : 'none';
+function onStatutChange(){
+  document.getElementById('sp-commerce').style.display=document.getElementById('sp-statut').value==='Validée'?'block':'none';
 }
 
-function confirmerPanneau() {
+function confirmerPanneau(){
   var pwd=document.getElementById('sp-pwd').value;
   var errEl=document.getElementById('sp-pwd-error');
   if(pwd!==MOT_DE_PASSE){errEl.style.display='block';document.getElementById('sp-pwd').focus();return;}
@@ -1412,80 +1349,66 @@ function confirmerPanneau() {
   var statut=document.getElementById('sp-statut').value;
   var commentaire=document.getElementById('sp-commentaire').value.trim();
   var commerce={
-    mo_de:document.getElementById('mo_de').value,
-    mo_jusqua:document.getElementById('mo_jusqua').value,
-    mo_qte:document.getElementById('mo_qte').value,
-    pi_de:document.getElementById('pi_de').value,
-    pi_jusqua:document.getElementById('pi_jusqua').value,
-    pi_qte:document.getElementById('pi_qte').value,
-    moe_de:document.getElementById('moe_de').value,
-    moe_jusqua:document.getElementById('moe_jusqua').value,
-    moe_qte:document.getElementById('moe_qte').value,
-    pe_de:document.getElementById('pe_de').value,
-    pe_jusqua:document.getElementById('pe_jusqua').value,
-    pe_qte:document.getElementById('pe_qte').value,
+    mo_de:document.getElementById('mo_de').value,mo_jusqua:document.getElementById('mo_jusqua').value,mo_qte:document.getElementById('mo_qte').value,
+    pi_de:document.getElementById('pi_de').value,pi_jusqua:document.getElementById('pi_jusqua').value,pi_qte:document.getElementById('pi_qte').value,
+    moe_de:document.getElementById('moe_de').value,moe_jusqua:document.getElementById('moe_jusqua').value,moe_qte:document.getElementById('moe_qte').value,
+    pe_de:document.getElementById('pe_de').value,pe_jusqua:document.getElementById('pe_jusqua').value,pe_qte:document.getElementById('pe_qte').value,
     type_ext:document.getElementById('sp-type-ext').value.trim()
   };
-
   chargerDemandesSync(function(){
     var idx=demandes.findIndex(function(x){return x.id===demandeEnCours;});
     if(idx===-1){fermerPanneau();return;}
     var d=demandes[idx];
     demandes[idx].statut=statut;
     demandes[idx].commentaire_team=commentaire;
-    if(statut==='Validée') demandes[idx].commerce=commerce;
-    sauvegarderDemandes();
-    fermerPanneau();
-    renderHistorique();
-    showToast('✔ Demande mise à jour : '+statut);
-
-    // E-mail à l'usager
-    if(d.email_usager){
-      var ic={'Validée':'✅','Refusée':'❌','Complément requis':'🔄','En attente':'🟡'}[statut]||'🟡';
-      var pecMsg='';
-      if(statut==='Validée'&&commerce){
-        pecMsg='\n\nPrise en charge accordée :\n';
-        if(commerce.mo_de||commerce.mo_jusqua) pecMsg+='• Main d\'œuvre     : de '+(commerce.mo_de||'—')+'% jusqu\'à '+(commerce.mo_jusqua||'—')+'%'+(commerce.mo_qte?' — Qté: '+commerce.mo_qte+'%':'')+'\n';
-        if(commerce.pi_de||commerce.pi_jusqua) pecMsg+='• Pièces           : de '+(commerce.pi_de||'—')+'% jusqu\'à '+(commerce.pi_jusqua||'—')+'%'+(commerce.pi_qte?' — Qté: '+commerce.pi_qte+'%':'')+'\n';
-        if(commerce.moe_de||commerce.moe_jusqua) pecMsg+='• MO extérieure    : de '+(commerce.moe_de||'—')+'% jusqu\'à '+(commerce.moe_jusqua||'—')+'%'+(commerce.moe_qte?' — Qté: '+commerce.moe_qte+'%':'')+'\n';
-        if(commerce.pe_de||commerce.pe_jusqua) pecMsg+='• Pièces ext.      : de '+(commerce.pe_de||'—')+'% jusqu\'à '+(commerce.pe_jusqua||'—')+'%'+(commerce.pe_qte?' — Qté: '+commerce.pe_qte+'%':'')+'\n';
-        if(commerce.type_ext) pecMsg+='• Type ext./Kulanz : '+commerce.type_ext+'\n';
+    if(statut==='Validée')demandes[idx].commerce=commerce;
+    sauvegarderDemandes(function(){
+      fermerPanneau();
+      renderHistorique();
+      showToast('✔ Demande mise à jour : '+statut);
+      if(d.email_usager){
+        var ic={'Validée':'✅','Refusée':'❌','Complément requis':'🔄','En attente':'🟡'}[statut]||'🟡';
+        var pecMsg='';
+        if(statut==='Validée'&&commerce){
+          pecMsg='\n\nPrise en charge accordée :\n';
+          if(commerce.mo_de||commerce.mo_jusqua)pecMsg+='• Main d\'œuvre     : de '+(commerce.mo_de||'—')+'% jusqu\'à '+(commerce.mo_jusqua||'—')+'%'+(commerce.mo_qte?' — Qté: '+commerce.mo_qte+'%':'')+'\n';
+          if(commerce.pi_de||commerce.pi_jusqua)pecMsg+='• Pièces           : de '+(commerce.pi_de||'—')+'% jusqu\'à '+(commerce.pi_jusqua||'—')+'%'+(commerce.pi_qte?' — Qté: '+commerce.pi_qte+'%':'')+'\n';
+          if(commerce.moe_de||commerce.moe_jusqua)pecMsg+='• MO extérieure    : de '+(commerce.moe_de||'—')+'% jusqu\'à '+(commerce.moe_jusqua||'—')+'%'+(commerce.moe_qte?' — Qté: '+commerce.moe_qte+'%':'')+'\n';
+          if(commerce.pe_de||commerce.pe_jusqua)pecMsg+='• Pièces ext.      : de '+(commerce.pe_de||'—')+'% jusqu\'à '+(commerce.pe_jusqua||'—')+'%'+(commerce.pe_qte?' — Qté: '+commerce.pe_qte+'%':'')+'\n';
+          if(commerce.type_ext)pecMsg+='• Type ext./Kulanz : '+commerce.type_ext+'\n';
+        }
+        fetch('https://api.web3forms.com/submit',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            access_key:WEB3_KEY,
+            subject:ic+' Demande '+d.type+' '+statut+' – OR '+d.or,
+            to_email:d.email_usager,
+            from_name:'Team Garantie GEA - VW',
+            replyto:'teamgarantie@geauto.fr',
+            message:'Bonjour'+(d.technicien?' '+d.technicien:'')+',\n\nVotre demande '+d.type+' a été traitée.\n\n'+'━'.repeat(40)+
+              '\nStatut     : '+ic+' '+statut+'\nSite       : '+d.site+
+              '\nN° OR      : '+d.or+'\nN° Châssis : '+d.chassis+
+              (commentaire?'\nCommentaire: '+commentaire:'')+pecMsg+'\n'+'━'.repeat(40)+'\n\n'+
+              (statut==='Validée'?'Vous pouvez procéder à la saisie dans SAGA/2.\n':statut==='Refusée'?'Veuillez contacter la TeamGarantie.\n':'Un complément de dossier est nécessaire.\n')+
+              '\nCordialement,\nTeam Garantie GEA - VW'
+          })
+        })
+        .then(function(){showToast('📧 E-mail envoyé à '+d.email_usager);})
+        .catch(function(){showToast('⚠ Statut OK mais e-mail non envoyé.');});
       }
-      fetch('https://api.web3forms.com/submit',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({access_key:'7bf5b927-e39f-4fc1-9f60-642e4741e445',
-          subject:ic+' Demande '+d.type+' '+statut+' – OR '+d.or,
-          to_email:d.email_usager,from_name:'Team Garantie GEA - VW',
-          message:'Bonjour,\n\nVotre demande '+d.type+' a été traitée.\n\n'+'━'.repeat(40)+
-            '\nStatut     : '+ic+' '+statut+'\nSite       : '+d.site+
-            '\nN° OR      : '+d.or+'\nN° Châssis : '+d.chassis+
-            (commentaire?'\nCommentaire: '+commentaire:'')+pecMsg+
-            '\n'+'━'.repeat(40)+'\n\n'+
-            (statut==='Validée'?'Vous pouvez procéder à la saisie dans SAGA/2.\n':
-             statut==='Refusée'?'Veuillez contacter la TeamGarantie.\n':
-             'Un complément de dossier est nécessaire.\n')+
-            '\nCordialement,\nTeam Garantie GEA - VW'})
-      })
-      .then(function(){showToast('📧 E-mail envoyé à '+d.email_usager);})
-      .catch(function(){showToast('⚠ Statut OK mais e-mail non envoyé.');});
-    }
+    });
   });
 }
 
-document.addEventListener('keydown', function(e){
-  if (e.key==='Escape') fermerPanneau();
-});
 function confirmerSuppression(){
   if(confirm('⚠ Supprimer tout l\'historique partagé ?')){
-    demandes = [];
-    sauvegarderDemandes();
-    renderHistorique();
-    showToast('🗑 Historique supprimé.');
+    demandesRef.remove()
+    .then(function(){demandes=[];renderHistorique();showToast('🗑 Historique supprimé.');})
+    .catch(function(){showToast('❌ Erreur suppression.');});
   }
 }
 
-// Init — précharger les demandes partagées
-chargerDemandesSync(function(){});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')fermerPanneau();});
 </script>
 </body>
 </html>
