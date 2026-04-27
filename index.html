@@ -1012,8 +1012,11 @@
     document.getElementById('site-display-name').textContent = name;
     // Auto-fill KVPS
     const kvps = kvpsMap[name] || '';
-    const kvpsInput = document.querySelector('input[name="kvps"]');
-    if (kvpsInput) kvpsInput.value = kvps;
+    const kvpsInput = document.getElementById('mainForm').querySelector('input[name="kvps"]');
+    if (kvpsInput) {
+      kvpsInput.value = kvps;
+      kvpsInput.dispatchEvent(new Event('input'));
+    }
   }
 
   // ─── Kulanz / CCR toggle ──────────────────────────────────────────
