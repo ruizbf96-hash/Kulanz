@@ -1129,15 +1129,14 @@ function envoyerFormulaire(){
   .then(function(r){return r.json();})
   .then(function(res){
     if(!res.success)throw new Error('Échec');
-    // E-mail 2 : confirmation à l'usager
+    // E-mail 2 : confirmation à l'usager — via champ from pour compatibilité
     return fetch('https://api.web3forms.com/submit',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         access_key:WEB3_KEY,
         subject:'🟡 Demande '+type+' en cours – OR '+getVal('or_number'),
-        to_email:emailUsager,
+        email: emailUsager,
         from_name:'Team Garantie GEA - VW',
-        replyto:'teamgarantie@geauto.fr',
         message:'Bonjour'+(technicien?' '+technicien:'')+',\n\nVotre demande '+type+' a bien été reçue.\n\n'+'━'.repeat(40)+
           '\nStatut     : 🟡 En attente\nSite       : '+site+
           '\nN° OR      : '+getVal('or_number')+'\nN° Châssis : '+getVal('chassis')+'\n'+'━'.repeat(40)+
@@ -1382,9 +1381,8 @@ function confirmerPanneau(){
           body:JSON.stringify({
             access_key:WEB3_KEY,
             subject:ic+' Demande '+d.type+' '+statut+' – OR '+d.or,
-            to_email:d.email_usager,
+            email:d.email_usager,
             from_name:'Team Garantie GEA - VW',
-            replyto:'teamgarantie@geauto.fr',
             message:'Bonjour'+(d.technicien?' '+d.technicien:'')+',\n\nVotre demande '+d.type+' a été traitée.\n\n'+'━'.repeat(40)+
               '\nStatut     : '+ic+' '+statut+'\nSite       : '+d.site+
               '\nN° OR      : '+d.or+'\nN° Châssis : '+d.chassis+
