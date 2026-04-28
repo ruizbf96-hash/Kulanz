@@ -206,6 +206,32 @@ table.histo-table{width:100%;border-collapse:collapse;}
 .sp-btn-cancel{padding:13px 24px;background:none;color:#888;border:1.5px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;}
 #toast{position:fixed;bottom:32px;right:32px;background:var(--charcoal);color:var(--white);padding:14px 24px;border-radius:10px;font-size:13px;box-shadow:0 4px 24px rgba(0,0,0,0.25);border-left:4px solid var(--gold);transform:translateY(80px);opacity:0;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);z-index:9999;pointer-events:none;}
 #toast.show{transform:translateY(0);opacity:1;}
+/* ── DASHBOARD TEAM ── */
+.team-dashboard{background:var(--charcoal);padding:0 40px 28px;display:none;}
+.team-dashboard.visible{display:block;}
+.dashboard-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--silver);padding:20px 0 14px;border-bottom:1px solid rgba(184,151,58,0.15);margin-bottom:18px;}
+.dashboard-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
+.dash-site-card{background:rgba(255,255,255,0.04);border:1.5px solid rgba(184,151,58,0.15);border-radius:10px;padding:12px 10px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.dash-site-card:hover{background:rgba(184,151,58,0.1);border-color:var(--gold);}
+.dash-site-card.has-pending{border-color:rgba(230,126,34,0.6);background:rgba(230,126,34,0.07);}
+.dash-site-card.selected{border-color:var(--gold);background:rgba(184,151,58,0.15);}
+.dash-site-name{font-size:10px;font-weight:600;color:var(--silver);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;line-height:1.3;}
+.dash-site-nums{display:flex;justify-content:center;gap:6px;margin-bottom:6px;}
+.dash-num{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.dash-num-val{font-size:18px;font-weight:700;line-height:1;}
+.dash-num-lbl{font-size:8px;text-transform:uppercase;color:#888;}
+.dash-total{color:var(--gold-light);}
+.dash-attente{color:var(--orange);}
+.dash-validee{color:var(--green);}
+.voyant-wrap{display:flex;justify-content:center;margin-top:4px;}
+.voyant{width:8px;height:8px;border-radius:50%;background:#444;transition:all 0.3s;}
+.voyant.active{background:var(--orange);box-shadow:0 0 6px var(--orange);}
+.voyant.all-ok{background:var(--green);box-shadow:0 0 6px var(--green);}
+/* Voyant global dans le header */
+.global-alert{display:none;align-items:center;gap:8px;padding:6px 14px;background:rgba(230,126,34,0.15);border:1px solid rgba(230,126,34,0.4);border-radius:20px;font-family:'DM Sans',sans-serif;font-size:11px;color:#e67e22;white-space:nowrap;}
+.global-alert.visible{display:flex;}
+.global-alert-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse-dot 1.5s ease-in-out infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);}}
 @media(max-width:680px){
   .header-top,.nav-tabs{padding-left:16px;padding-right:16px;}
   #site-bar-wrap{padding:0 10px!important;}
@@ -286,6 +312,10 @@ table.histo-table{width:100%;border-collapse:collapse;}
         <div id="firebase-indicator" style="width:8px;height:8px;border-radius:50%;background:#888;transition:background 0.3s;"></div>
         <span style="font-size:10px;color:var(--silver);">DB</span>
       </div>
+      <div class="global-alert" id="global-alert">
+        <span class="global-alert-dot"></span>
+        <span id="global-alert-text">Demandes en attente</span>
+      </div>
       <div id="user-info" style="display:none;">
         <div class="user-badge">
           <span id="user-role-badge" class="ub-role"></span>
@@ -306,6 +336,12 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <button class="site-btn" onclick="selectSite(this,'VW Bischheim')">VW Bischheim</button>
     <button class="site-btn" onclick="selectSite(this,'VW Illkirch')">VW Illkirch</button>
     <button class="site-btn" onclick="selectSite(this,'VW Obernai')">VW Obernai</button>
+  </div>
+  <div class="team-dashboard" id="team-dashboard">
+    <div class="dashboard-title">Vue d'ensemble — Demandes par site</div>
+    <div class="dashboard-grid" id="dashboard-grid">
+      <!-- Généré dynamiquement par JS -->
+    </div>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-formulaire" onclick="showPage('formulaire',this)">📝 Formulaire</button>
@@ -630,24 +666,16 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <div class="sp-section" id="sp-commerce" style="display:none;">
       <div class="sp-section-title">Commerce de détail</div>
       <table class="commerce-table">
-        <thead><tr><th></th><th>De %</th><th>Jusqu'à %</th><th>Quantité %</th></tr></thead>
+        <thead><tr><th>Ligne</th><th style="text-align:center;">Prise en charge %</th></tr></thead>
         <tbody>
           <tr><td>Main d'œuvre</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="mo_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="mo_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="mo_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+            <td><div class="pct-wrap"><input class="commerce-input" id="mo_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
           <tr><td>Pièces</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pi_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pi_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pi_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+            <td><div class="pct-wrap"><input class="commerce-input" id="pi_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
           <tr><td>MO extérieure</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="moe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="moe_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="moe_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+            <td><div class="pct-wrap"><input class="commerce-input" id="moe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
           <tr><td>Pièces ext.</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pe_jusqua" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pe_qte" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+            <td><div class="pct-wrap"><input class="commerce-input" id="pe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
         </tbody>
       </table>
       <div class="field" style="margin-top:14px;">
@@ -844,7 +872,8 @@ function activerEcouteTempsReel(){
     snapshot.forEach(function(child){ demandes.push(child.val()); });
     demandes.sort(function(a,b){ return b.id-a.id; });
     try{ localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes)); }catch(e){}
-    if(document.getElementById('page-historique').classList.contains('active')) afficherHistorique();
+    afficherHistorique();
+    if(typeAcces==='team') majDashboard();
   },function(err){
     console.error('Firebase:',err);
     showToast('⚠ Firebase hors ligne — données locales.');
@@ -900,6 +929,7 @@ function ouvrirApp(){
   if(typeAcces==='team'){
     document.getElementById('user-role-badge').textContent='🔐 TeamGarantie';
     document.getElementById('site-bar-wrap').style.display='flex';
+    document.getElementById('team-dashboard').classList.add('visible');
   } else {
     document.getElementById('user-role-badge').textContent='👤 '+siteUsager;
     document.getElementById('site-bar-wrap').style.display='none';
@@ -933,6 +963,8 @@ function deconnecter(){
   document.querySelectorAll('.site-btn').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('f_site').value='';
   document.getElementById('site-display-name').textContent='Aucun site sélectionné';
+  document.getElementById('team-dashboard').classList.remove('visible');
+  document.getElementById('global-alert').classList.remove('visible');
   ssReset('dom'); ssReset('ava');
 }
 
@@ -1322,17 +1354,73 @@ function genererPDF(){
 // ══════════════════════════════════════════════════════
 // HISTORIQUE
 // ══════════════════════════════════════════════════════
+// ── DASHBOARD TEAMGARANTIE
+var SITES_LIST=['Audi Hœnheim','Audi Obernai','SEAT Hœnheim','SKODA Hœnheim','VW Bischheim','VW Illkirch','VW Obernai'];
+
+function majDashboard(){
+  var grid=document.getElementById('dashboard-grid');
+  if(!grid) return;
+  var totalAttente=0;
+  grid.innerHTML=SITES_LIST.map(function(site){
+    var sd=demandes.filter(function(d){ return d.site===site; });
+    var total=sd.length;
+    var attente=sd.filter(function(d){ return d.statut==='En attente'; }).length;
+    var validee=sd.filter(function(d){ return d.statut==='Validée'; }).length;
+    totalAttente+=attente;
+    var hasPending=attente>0;
+    var currentFilter=document.getElementById('filter-site').value;
+    var isSelected=currentFilter===site;
+    return '<div class="dash-site-card'+(hasPending?' has-pending':'')+(isSelected?' selected':'')+'" onclick="clicDashSite(''+escH(site)+'')">'+
+      '<div class="dash-site-name">'+escH(site)+'</div>'+
+      '<div class="dash-site-nums">'+
+        '<div class="dash-num"><span class="dash-num-val dash-total">'+total+'</span><span class="dash-num-lbl">Total</span></div>'+
+        '<div class="dash-num"><span class="dash-num-val dash-attente">'+attente+'</span><span class="dash-num-lbl">Attente</span></div>'+
+        '<div class="dash-num"><span class="dash-num-val dash-validee">'+validee+'</span><span class="dash-num-lbl">Validées</span></div>'+
+      '</div>'+
+      '<div class="voyant-wrap"><div class="voyant'+(hasPending?' active':total>0?' all-ok':'')+'"></div></div>'+
+    '</div>';
+  }).join('');
+  // Voyant global
+  var alertEl=document.getElementById('global-alert');
+  var alertTxt=document.getElementById('global-alert-text');
+  if(alertEl){
+    if(totalAttente>0){
+      alertEl.classList.add('visible');
+      if(alertTxt) alertTxt.textContent=totalAttente+' demande'+(totalAttente>1?'s':'')+' en attente';
+    } else {
+      alertEl.classList.remove('visible');
+    }
+  }
+}
+
+function clicDashSite(site){
+  var sel=document.getElementById('filter-site');
+  if(sel){
+    // Toggle: si déjà sélectionné → désélectionner (tous les sites)
+    sel.value = sel.value===site ? '' : site;
+  }
+  showPage('historique', document.getElementById('tab-historique'));
+  document.getElementById('tab-historique').classList.add('active');
+  document.getElementById('tab-formulaire').classList.remove('active');
+  afficherHistorique();
+}
+
 function afficherHistorique(){
   var fS=typeAcces==='usager'?siteUsager:document.getElementById('filter-site').value;
   var fT=document.getElementById('filter-type').value;
   var fSt=document.getElementById('filter-statut').value;
   document.getElementById('filter-site').style.display=typeAcces==='team'?'block':'none';
   var filtered=demandes.filter(function(d){ return(!fS||d.site===fS)&&(!fT||d.type===fT)&&(!fSt||d.statut===fSt); });
-  var scope=typeAcces==='usager'?demandes.filter(function(d){ return d.site===siteUsager; }):demandes;
+  // Stats : scope = filtré par site si sélectionné, sinon tout
+  var scope=typeAcces==='usager'
+    ? demandes.filter(function(d){ return d.site===siteUsager; })
+    : (fS ? demandes.filter(function(d){ return d.site===fS; }) : demandes);
   document.getElementById('stat-total').textContent=scope.length;
   document.getElementById('stat-attente').textContent=scope.filter(function(d){ return d.statut==='En attente'; }).length;
   document.getElementById('stat-validee').textContent=scope.filter(function(d){ return d.statut==='Validée'; }).length;
   document.getElementById('stat-refusee').textContent=scope.filter(function(d){ return d.statut==='Refusée'; }).length;
+  // Mettre à jour le dashboard et le voyant global
+  if(typeAcces==='team') majDashboard();
   var tbody=document.getElementById('histo-tbody');
   var empty=document.getElementById('histo-empty');
   if(filtered.length===0){ tbody.innerHTML=''; empty.style.display='block'; return; }
@@ -1343,10 +1431,10 @@ function afficherHistorique(){
     var pecHtml='—';
     if(d.statut==='Validée'&&d.commerce){
       var c=d.commerce,parts=[];
-      if(c.mo_de||c.mo_jusqua) parts.push('<span>MO: '+(c.mo_de||'?')+'→'+(c.mo_jusqua||'?')+'%'+(c.mo_qte?' ('+c.mo_qte+'%)':'')+'</span>');
-      if(c.pi_de||c.pi_jusqua) parts.push('<span>Pièces: '+(c.pi_de||'?')+'→'+(c.pi_jusqua||'?')+'%'+(c.pi_qte?' ('+c.pi_qte+'%)':'')+'</span>');
-      if(c.moe_de||c.moe_jusqua) parts.push('<span>MO ext.: '+(c.moe_de||'?')+'→'+(c.moe_jusqua||'?')+'%'+(c.moe_qte?' ('+c.moe_qte+'%)':'')+'</span>');
-      if(c.pe_de||c.pe_jusqua) parts.push('<span>Pièces ext.: '+(c.pe_de||'?')+'→'+(c.pe_jusqua||'?')+'%'+(c.pe_qte?' ('+c.pe_qte+'%)':'')+'</span>');
+      if(c.mo_de) parts.push('<span>MO: '+sanitizeStr(c.mo_de)+'%</span>');
+      if(c.pi_de) parts.push('<span>Pièces: '+sanitizeStr(c.pi_de)+'%</span>');
+      if(c.moe_de) parts.push('<span>MO ext.: '+sanitizeStr(c.moe_de)+'%</span>');
+      if(c.pe_de) parts.push('<span>Pièces ext.: '+sanitizeStr(c.pe_de)+'%</span>');
       if(parts.length) pecHtml='<div class="pec-cell">'+parts.join('')+'</div>';
     }
     var actionBtn=typeAcces==='team'
@@ -1385,7 +1473,7 @@ function ouvrirModal(id){
   document.getElementById('sp-pwd').value='';
   document.getElementById('sp-pwd-error').style.display='none';
   var c=d.commerce||{};
-  ['mo_de','mo_jusqua','mo_qte','pi_de','pi_jusqua','pi_qte','moe_de','moe_jusqua','moe_qte','pe_de','pe_jusqua','pe_qte'].forEach(function(k){ var el=document.getElementById(k); if(el) el.value=c[k]||''; });
+  ['mo_de','pi_de','moe_de','pe_de'].forEach(function(k){ var el=document.getElementById(k); if(el) el.value=c[k]||''; });
   document.getElementById('sp-type-ext').value=c.type_ext||'';
   onStatutChange();
   document.getElementById('sp-overlay').classList.add('open');
@@ -1407,10 +1495,10 @@ function confirmerPanneau(){
   var statut=document.getElementById('sp-statut').value;
   var commentaire=document.getElementById('sp-commentaire').value.trim();
   var commerce={
-    mo_de:document.getElementById('mo_de').value,mo_jusqua:document.getElementById('mo_jusqua').value,mo_qte:document.getElementById('mo_qte').value,
-    pi_de:document.getElementById('pi_de').value,pi_jusqua:document.getElementById('pi_jusqua').value,pi_qte:document.getElementById('pi_qte').value,
-    moe_de:document.getElementById('moe_de').value,moe_jusqua:document.getElementById('moe_jusqua').value,moe_qte:document.getElementById('moe_qte').value,
-    pe_de:document.getElementById('pe_de').value,pe_jusqua:document.getElementById('pe_jusqua').value,pe_qte:document.getElementById('pe_qte').value,
+    mo_de:document.getElementById('mo_de').value,
+    pi_de:document.getElementById('pi_de').value,
+    moe_de:document.getElementById('moe_de').value,
+    pe_de:document.getElementById('pe_de').value,
     type_ext:document.getElementById('sp-type-ext').value.trim()
   };
   var idx=demandes.findIndex(function(x){ return x.id===demandeEnCours; });
@@ -1422,15 +1510,15 @@ function confirmerPanneau(){
   demandesRef.child('d'+d.id).update({statut:statut,commentaire_team:commentaire,commerce:statut==='Validée'?commerce:(d.commerce||null)})
   .then(function(){
     fermerPanneau(); afficherHistorique(); showToast('✔ Demande mise à jour : '+statut);
-    if(d.email_usager){
+    if(d.email_usager && statut!=='En attente'){
       var ic={'Validée':'✅','Refusée':'❌','Complément requis':'🔄','En attente':'🟡'}[statut]||'🟡';
       var pecMsg='';
       if(statut==='Validée'&&commerce){
         pecMsg='\n\nPrise en charge accordée :\n';
-        if(commerce.mo_de||commerce.mo_jusqua) pecMsg+='• Main d\'œuvre  : de '+(commerce.mo_de||'—')+'% jusqu\'à '+(commerce.mo_jusqua||'—')+'%'+(commerce.mo_qte?' — Qté: '+commerce.mo_qte+'%':'')+'\n';
-        if(commerce.pi_de||commerce.pi_jusqua) pecMsg+='• Pièces        : de '+(commerce.pi_de||'—')+'% jusqu\'à '+(commerce.pi_jusqua||'—')+'%'+(commerce.pi_qte?' — Qté: '+commerce.pi_qte+'%':'')+'\n';
-        if(commerce.moe_de||commerce.moe_jusqua) pecMsg+='• MO ext.       : de '+(commerce.moe_de||'—')+'% jusqu\'à '+(commerce.moe_jusqua||'—')+'%'+(commerce.moe_qte?' — Qté: '+commerce.moe_qte+'%':'')+'\n';
-        if(commerce.pe_de||commerce.pe_jusqua) pecMsg+='• Pièces ext.   : de '+(commerce.pe_de||'—')+'% jusqu\'à '+(commerce.pe_jusqua||'—')+'%'+(commerce.pe_qte?' — Qté: '+commerce.pe_qte+'%':'')+'\n';
+        if(commerce.mo_de) pecMsg+='• Main d\'œuvre  : '+commerce.mo_de+'%\n';
+        if(commerce.pi_de) pecMsg+='• Pièces        : '+commerce.pi_de+'%\n';
+        if(commerce.moe_de) pecMsg+='• MO extérieure : '+commerce.moe_de+'%\n';
+        if(commerce.pe_de) pecMsg+='• Pièces ext.   : '+commerce.pe_de+'%\n';
         if(commerce.type_ext) pecMsg+='• Type ext.     : '+commerce.type_ext+'\n';
       }
       fetch('https://api.web3forms.com/submit',{
