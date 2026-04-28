@@ -209,29 +209,30 @@ table.histo-table{width:100%;border-collapse:collapse;}
 /* ── DASHBOARD TEAM ── */
 .team-dashboard{background:var(--charcoal);padding:0 40px 28px;display:none;}
 .team-dashboard.visible{display:block;}
-.dashboard-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--silver);padding:20px 0 14px;border-bottom:1px solid rgba(184,151,58,0.15);margin-bottom:18px;}
+.dash-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--silver);padding:20px 0 14px;border-bottom:1px solid rgba(184,151,58,0.15);margin-bottom:18px;}
 .dashboard-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
-.dash-site-card{background:rgba(255,255,255,0.04);border:1.5px solid rgba(184,151,58,0.15);border-radius:10px;padding:12px 10px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
-.dash-site-card:hover{background:rgba(184,151,58,0.1);border-color:var(--gold);}
-.dash-site-card.has-pending{border-color:rgba(230,126,34,0.6);background:rgba(230,126,34,0.07);}
-.dash-site-card.selected{border-color:var(--gold);background:rgba(184,151,58,0.15);}
-.dash-site-name{font-size:10px;font-weight:600;color:var(--silver);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;line-height:1.3;}
-.dash-site-nums{display:flex;justify-content:center;gap:6px;margin-bottom:6px;}
-.dash-num{display:flex;flex-direction:column;align-items:center;gap:1px;}
-.dash-num-val{font-size:18px;font-weight:700;line-height:1;}
-.dash-num-lbl{font-size:8px;text-transform:uppercase;color:#888;}
-.dash-total{color:var(--gold-light);}
-.dash-attente{color:var(--orange);}
-.dash-validee{color:var(--green);}
-.voyant-wrap{display:flex;justify-content:center;margin-top:4px;}
-.voyant{width:8px;height:8px;border-radius:50%;background:#444;transition:all 0.3s;}
-.voyant.active{background:var(--orange);box-shadow:0 0 6px var(--orange);}
-.voyant.all-ok{background:var(--green);box-shadow:0 0 6px var(--green);}
-/* Voyant global dans le header */
-.global-alert{display:none;align-items:center;gap:8px;padding:6px 14px;background:rgba(230,126,34,0.15);border:1px solid rgba(230,126,34,0.4);border-radius:20px;font-family:'DM Sans',sans-serif;font-size:11px;color:#e67e22;white-space:nowrap;}
-.global-alert.visible{display:flex;}
-.global-alert-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse-dot 1.5s ease-in-out infinite;}
-@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);}}
+.dash-card{background:rgba(255,255,255,0.04);border:1.5px solid rgba(184,151,58,0.15);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.dash-card:hover{background:rgba(184,151,58,0.1);border-color:var(--gold);}
+.dash-card.has-pending{border-color:rgba(230,126,34,0.55);background:rgba(230,126,34,0.06);}
+.dash-card.active{border-color:var(--gold);background:rgba(184,151,58,0.14);}
+.dash-card-name{font-size:9px;font-weight:600;color:var(--silver);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;line-height:1.3;}
+.dash-nums{display:flex;justify-content:center;gap:8px;margin-bottom:6px;}
+.dash-n{display:flex;flex-direction:column;align-items:center;}
+.dash-n-val{font-size:17px;font-weight:700;line-height:1;}
+.dash-n-lbl{font-size:8px;text-transform:uppercase;color:#777;margin-top:1px;}
+.d-total{color:var(--gold-light);}
+.d-wait{color:var(--orange);}
+.d-ok{color:var(--green);}
+.dash-dot{width:8px;height:8px;border-radius:50%;background:#333;margin:0 auto;transition:all 0.3s;}
+.dash-dot.wait{background:var(--orange);box-shadow:0 0 5px var(--orange);}
+.dash-dot.ok{background:var(--green);}
+.global-notif{display:none;align-items:center;gap:7px;padding:5px 12px;background:rgba(230,126,34,0.12);border:1px solid rgba(230,126,34,0.4);border-radius:20px;font-size:11px;color:#e67e22;white-space:nowrap;}
+.global-notif.on{display:flex;}
+.g-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+/* Commerce table simplifiée */
+.commerce-table th:nth-child(n+3),.commerce-table td:nth-child(n+3){display:none;}
+
 @media(max-width:680px){
   .header-top,.nav-tabs{padding-left:16px;padding-right:16px;}
   #site-bar-wrap{padding:0 10px!important;}
@@ -312,9 +313,9 @@ table.histo-table{width:100%;border-collapse:collapse;}
         <div id="firebase-indicator" style="width:8px;height:8px;border-radius:50%;background:#888;transition:background 0.3s;"></div>
         <span style="font-size:10px;color:var(--silver);">DB</span>
       </div>
-      <div class="global-alert" id="global-alert">
-        <span class="global-alert-dot"></span>
-        <span id="global-alert-text">Demandes en attente</span>
+      <div class="global-notif" id="global-notif">
+        <span class="g-dot"></span>
+        <span id="global-notif-txt">Demandes en attente</span>
       </div>
       <div id="user-info" style="display:none;">
         <div class="user-badge">
@@ -338,10 +339,8 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <button class="site-btn" onclick="selectSite(this,'VW Obernai')">VW Obernai</button>
   </div>
   <div class="team-dashboard" id="team-dashboard">
-    <div class="dashboard-title">Vue d'ensemble — Demandes par site</div>
-    <div class="dashboard-grid" id="dashboard-grid">
-      <!-- Généré dynamiquement par JS -->
-    </div>
+    <div class="dash-label">Vue d'ensemble — Demandes par site</div>
+    <div class="dashboard-grid" id="dashboard-grid"></div>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-formulaire" onclick="showPage('formulaire',this)">📝 Formulaire</button>
@@ -666,16 +665,12 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <div class="sp-section" id="sp-commerce" style="display:none;">
       <div class="sp-section-title">Commerce de détail</div>
       <table class="commerce-table">
-        <thead><tr><th>Ligne</th><th style="text-align:center;">Prise en charge %</th></tr></thead>
+        <thead><tr><th>Poste</th><th>Prise en charge %</th></tr></thead>
         <tbody>
-          <tr><td>Main d'œuvre</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="mo_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
-          <tr><td>Pièces</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pi_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
-          <tr><td>MO extérieure</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="moe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
-          <tr><td>Pièces ext.</td>
-            <td><div class="pct-wrap"><input class="commerce-input" id="pe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+          <tr><td>Main d'œuvre</td><td><div class="pct-wrap"><input class="commerce-input" id="mo_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+          <tr><td>Pièces</td><td><div class="pct-wrap"><input class="commerce-input" id="pi_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+          <tr><td>MO extérieure</td><td><div class="pct-wrap"><input class="commerce-input" id="moe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
+          <tr><td>Pièces ext.</td><td><div class="pct-wrap"><input class="commerce-input" id="pe_de" type="number" min="0" max="100" placeholder="0"><span>%</span></div></td></tr>
         </tbody>
       </table>
       <div class="field" style="margin-top:14px;">
@@ -762,8 +757,7 @@ function ssCloseAll(){
 function ssFilter(key,q){ ssRender(key,q); }
 
 function ssSelect(key, code, label){
-  // Décoder les entités HTML potentiellement encodées par l'onclick inline
-  var cleanLabel = label.replace(/&#39;/g,"'").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#96;/g,'`');
+  var cleanLabel=label.replace(/&#39;/g,"'").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"');
   ssState[key].selected = {code:code, label:cleanLabel};
   document.getElementById('ss_'+key+'_val').value = code;
   document.getElementById('ss_'+key+'_label_val').value = cleanLabel;
@@ -772,7 +766,7 @@ function ssSelect(key, code, label){
   var tr = document.getElementById('ss-'+key+'-trigger');
   tr.classList.add('filled');
   var hintEl = document.getElementById('ss-'+key+'-hint');
-  if(hintEl){ hintEl.textContent='✔ '+label; hintEl.className='hint ok'; }
+  if(hintEl){ hintEl.textContent='✔ '+cleanLabel; hintEl.className='hint ok'; }
   ssCloseAll();
   sauvegarderBrouillon();
 }
@@ -818,10 +812,11 @@ function isValidVIN(v){
   return /^[A-HJ-NPR-Z0-9]{17}$/.test(v);
 }
 function vinHint(v){
-  if(!v) return '0 / 17 caractères';
-  if(v.length<17) return v.length+' / 17 — '+( /[IOQ]/.test(v)?'⚠ I, O, Q interdits':'incomplet');
-  if(v.length===17 && !isValidVIN(v)) return '⚠ Caractère interdit (I, O ou Q)';
-  return '✔ Châssis valide';
+  if(!v||v.length===0) return '0 / 17 caractères';
+  if(/[IOQ]/i.test(v)) return v.length+' / 17 — ⚠ I, O, Q interdits';
+  if(v.length<17) return v.length+' / 17 — incomplet';
+  if(isValidVIN(v)) return '✔ Châssis valide';
+  return '⚠ Format invalide';
 }
 // ── SANITIZATION XSS
 function sanitizeStr(s){
@@ -872,8 +867,7 @@ function activerEcouteTempsReel(){
     snapshot.forEach(function(child){ demandes.push(child.val()); });
     demandes.sort(function(a,b){ return b.id-a.id; });
     try{ localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes)); }catch(e){}
-    afficherHistorique();
-    if(typeAcces==='team') majDashboard();
+    if(typeAcces) afficherHistorique();
   },function(err){
     console.error('Firebase:',err);
     showToast('⚠ Firebase hors ligne — données locales.');
@@ -963,8 +957,8 @@ function deconnecter(){
   document.querySelectorAll('.site-btn').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('f_site').value='';
   document.getElementById('site-display-name').textContent='Aucun site sélectionné';
-  document.getElementById('team-dashboard').classList.remove('visible');
-  document.getElementById('global-alert').classList.remove('visible');
+  var td=document.getElementById('team-dashboard'); if(td) td.classList.remove('visible');
+  var gn=document.getElementById('global-notif'); if(gn) gn.classList.remove('on');
   ssReset('dom'); ssReset('ava');
 }
 
@@ -991,11 +985,10 @@ function selectSite(btn,name){
 function switchType(type){
   var isK=type==='kulanz';
   if(!isK) sauvegarderKulanz();
-  else {
-    // Reset les champs CCR au retour en Kulanz
+  if(isK){
     document.querySelectorAll('[name="pieces[]"]').forEach(function(cb){ cb.checked=false; });
     document.querySelectorAll('[name="kulanz_done"],[name="cig"]').forEach(function(r){ r.checked=false; });
-    var cigTaux=document.getElementById('cig_taux_input'); if(cigTaux){ cigTaux.value=''; cigTaux.disabled=true; }
+    var ci=document.getElementById('cig_taux_input'); if(ci){ ci.value=''; ci.disabled=true; }
   }
   document.getElementById('btn-kulanz').classList.toggle('active',isK);
   document.getElementById('btn-ccr').classList.toggle('active',!isK);
@@ -1046,6 +1039,7 @@ function chassisInput(input){
   var v=input.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,17);
   input.value=v;
   var h=document.getElementById('chassis_hint');
+  h.textContent=v.length+' / 17 caractères';
   h.textContent=vinHint(v);
   h.className='hint'+(isValidVIN(v)?' ok':v.length>0?' err':'');
   input.className=isValidVIN(v)?'valid':v.length>0?'invalid':'';
@@ -1058,10 +1052,9 @@ function chassisInput(input){
   }).slice(0,5);
   if(res.length===0){ list.classList.remove('open'); return; }
   list.innerHTML=res.map(function(d){
-    var sc=sanitizeStr(d.chassis||''),ss=sanitizeStr(d.site||''),so=sanitizeStr(d.or||''),sd=sanitizeStr(d.date||'');
-    return '<div class="ac-item" onclick="appliquerChassis(\''+sc+'\')">'+
-      '<div class="ac-chassis">'+sc+'</div>'+
-      '<div class="ac-detail">'+ss+' — OR '+so+' — '+sd+'</div></div>';
+    return '<div class="ac-item" onclick="appliquerChassis(\''+d.chassis+'\')">'+
+      '<div class="ac-chassis">'+d.chassis+'</div>'+
+      '<div class="ac-detail">'+d.site+' — OR '+d.or+' — '+d.date+'</div></div>';
   }).join('');
   list.classList.add('open');
 }
@@ -1128,10 +1121,10 @@ function restaurerBrouillon(){
     var b=JSON.parse(s);
     if(!b.chassis&&!b.or_number) return;
     if(!confirm('📋 Un brouillon non envoyé a été trouvé. Voulez-vous le restaurer ?')){ localStorage.removeItem('ge_auto_brouillon'); return; }
-    var sitesValides=Object.keys(kvpsMap);
-    if(b.site && sitesValides.indexOf(b.site)!==-1){ document.getElementById('f_site').value=b.site; document.getElementById('site-display-name').textContent=b.site; document.querySelectorAll('.site-btn').forEach(function(btn){ btn.classList.toggle('active',btn.textContent.trim()===b.site); }); }
+    var sitesOK=Object.keys(kvpsMap);
+    if(b.site&&sitesOK.indexOf(b.site)!==-1){ document.getElementById('f_site').value=b.site; document.getElementById('site-display-name').textContent=b.site; document.querySelectorAll('.site-btn').forEach(function(btn){ btn.classList.toggle('active',btn.textContent.trim()===b.site); }); }
     ['chassis','kilometrage','or_number','kvps','technicien','email_usager','plainte_client','type_avarie','emplacement','ref_piece','desig_piece','commentaires'].forEach(function(n){ if(b[n]) setVal(n,b[n]); });
-    if(b.date_or && /^\d{4}-\d{2}-\d{2}$/.test(b.date_or)) setVal('date_or',b.date_or);
+    if(b.date_or&&/^\d{4}-\d{2}-\d{2}$/.test(b.date_or)) setVal('date_or',b.date_or);
     ssSetFromSave('dom',b.dom_code,b.dom_label);
     ssSetFromSave('ava',b.ava_code,b.ava_label);
     if(b.type&&b.type!=='Kulanz') switchType('ccr');
@@ -1207,16 +1200,17 @@ function collecterDonnees(){
 function envoyerFormulaire(){
   var d=collecterDonnees();
   if(!d.site){ alert('⚠ Veuillez sélectionner un site.'); return; }
-  if(!getVal('chassis')||!isValidVIN(getVal('chassis'))){ alert('⚠ Numéro de châssis invalide (17 caractères alphanumériques, pas I/O/Q).'); return; }
-  if(!getVal('or_number')||!/^\d{6}$/.test(getVal('or_number'))){ alert("⚠ Le N° d'Ordre de Réparation doit contenir exactement 6 chiffres numériques."); return; }
+  if(!getVal('chassis')||!isValidVIN(getVal('chassis'))){ alert('⚠ Châssis invalide: 17 caractères, pas I/O/Q.'); return; }
+  if(!getVal('or_number')||!/^\d{6}$/.test(getVal('or_number'))){ alert("⚠ N° OR: 6 chiffres requis."); return; }
   if(!getVal('plainte_client')){ alert('⚠ Veuillez remplir la plainte du client.'); return; }
   if(!document.getElementById('ss_dom_val').value){ alert('⚠ Veuillez sélectionner un code dommage.'); return; }
   if(!document.getElementById('ss_ava_val').value){ alert('⚠ Veuillez sélectionner un code avarie.'); return; }
   var emailUsager=getVal('email_usager');
-  if(!emailUsager||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailUsager)){ alert('⚠ Veuillez saisir un e-mail valide (ex: prenom.nom@geauto.fr).'); return; }
-  var btn=document.querySelector('.btn-submit');
-  if(!btn||btn.disabled) return; // protection double-submit
+  if(!emailUsager||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailUsager)){ alert('⚠ E-mail invalide (ex: prenom.nom@geauto.fr).'); return; }
   if(!confirm('📋 Confirmer l\'envoi de la demande ?\n\nSite : '+d.site+'\nType : '+d.type+'\nN° OR : '+getVal('or_number')+'\nChassis : '+getVal('chassis'))) return;
+
+  var btn=document.querySelector('.btn-submit');
+  if(!btn||btn.disabled) return;
   btn.disabled=true; btn.textContent='Envoi en cours…';
 
   var site=d.site,type=d.type,technicien=getVal('technicien');
@@ -1303,7 +1297,7 @@ function nouvelledemande(){
 function genererPDF(){
   var d=collecterDonnees();
   if(!d.site){ alert('⚠ Veuillez sélectionner un site.'); return; }
-  if(!getVal('or_number')||!/^\d{6}$/.test(getVal('or_number'))){ alert("⚠ Veuillez remplir le N° d'Ordre de Réparation (6 chiffres)."); return; }
+  if(!getVal('or_number')){ alert("⚠ Veuillez remplir le N° d'Ordre de Réparation."); return; }
   if(!window.jspdf){ alert('⚠ Bibliothèque PDF non chargée.'); return; }
   var btn=document.querySelector('.btn-print');
   if(!btn||btn.disabled) return;
@@ -1314,7 +1308,7 @@ function genererPDF(){
     var orNum=getVal('or_number');
     var now=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
     var titleDoc='[DEMANDE '+d.type.toUpperCase()+'] '+d.site+(kvps?' — '+kvps:'')+(domCode?' — '+domCode:'');
-    var filename=('['+d.type.toUpperCase()+'] '+d.site.replace(/\s+/g,'_')+(kvps?'_'+kvps:'')+(domCode?'_'+domCode:'')+'_OR'+orNum+'.pdf').replace(/[^a-zA-Z0-9_\-\.\[\]]/g,'_');
+    var filename=('['+d.type.toUpperCase()+'] '+d.site.replace(/\s+/g,'_')+(kvps?'_'+kvps:'')+(domCode?'_'+domCode:'')+'_OR'+orNum+'.pdf').replace(/[^a-zA-Z0-9_\-.\[\]]/g,'_');
     var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
     var W=210,ml=14,usableW=W-ml*2,y=14;
     doc.setFillColor(26,26,46); doc.rect(ml,y,usableW,18,'F');
@@ -1354,52 +1348,46 @@ function genererPDF(){
 // ══════════════════════════════════════════════════════
 // HISTORIQUE
 // ══════════════════════════════════════════════════════
+
 // ── DASHBOARD TEAMGARANTIE
 var SITES_LIST=['Audi Hœnheim','Audi Obernai','SEAT Hœnheim','SKODA Hœnheim','VW Bischheim','VW Illkirch','VW Obernai'];
 
 function majDashboard(){
   var grid=document.getElementById('dashboard-grid');
-  if(!grid) return;
-  var totalAttente=0;
-  grid.innerHTML=SITES_LIST.map(function(site){
+  if(!grid||typeAcces!=='team') return;
+  var totalWait=0, html='';
+  for(var i=0;i<SITES_LIST.length;i++){
+    var site=SITES_LIST[i];
     var sd=demandes.filter(function(d){ return d.site===site; });
     var total=sd.length;
-    var attente=sd.filter(function(d){ return d.statut==='En attente'; }).length;
-    var validee=sd.filter(function(d){ return d.statut==='Validée'; }).length;
-    totalAttente+=attente;
-    var hasPending=attente>0;
-    var currentFilter=document.getElementById('filter-site').value;
-    var isSelected=currentFilter===site;
-    return '<div class="dash-site-card' + (hasPending ? ' has-pending' : '') + (isSelected ? ' selected' : '') + '" onclick="clicDashSite(\'' + escH(site) +
-          '<div class="dash-site-name">'+escH(site)+'</div>'+
-      '<div class="dash-site-nums">'+
-        '<div class="dash-num"><span class="dash-num-val dash-total">'+total+'</span><span class="dash-num-lbl">Total</span></div>'+
-        '<div class="dash-num"><span class="dash-num-val dash-attente">'+attente+'</span><span class="dash-num-lbl">Attente</span></div>'+
-        '<div class="dash-num"><span class="dash-num-val dash-validee">'+validee+'</span><span class="dash-num-lbl">Validées</span></div>'+
+    var wait=sd.filter(function(d){ return d.statut==='En attente'; }).length;
+    var valid=sd.filter(function(d){ return d.statut==='Validée'; }).length;
+    totalWait+=wait;
+    var curF=document.getElementById('filter-site')?document.getElementById('filter-site').value:'';
+    var cls='dash-card'+(wait>0?' has-pending':'')+(curF===site?' active':'');
+    html+='<div class="'+cls+'" onclick="clicDashSite(''+escH(site)+'')">'+
+      '<div class="dash-card-name">'+escH(site)+'</div>'+
+      '<div class="dash-nums">'+
+        '<div class="dash-n"><span class="dash-n-val d-total">'+total+'</span><span class="dash-n-lbl">Total</span></div>'+
+        '<div class="dash-n"><span class="dash-n-val d-wait">'+wait+'</span><span class="dash-n-lbl">Attente</span></div>'+
+        '<div class="dash-n"><span class="dash-n-val d-ok">'+valid+'</span><span class="dash-n-lbl">Validées</span></div>'+
       '</div>'+
-      '<div class="voyant-wrap"><div class="voyant'+(hasPending?' active':total>0?' all-ok':'')+'"></div></div>'+
+      '<div class="dash-dot'+(wait>0?' wait':total>0?' ok':'')+'"></div>'+
     '</div>';
-  }).join('');
-  // Voyant global
-  var alertEl=document.getElementById('global-alert');
-  var alertTxt=document.getElementById('global-alert-text');
-  if(alertEl){
-    if(totalAttente>0){
-      alertEl.classList.add('visible');
-      if(alertTxt) alertTxt.textContent=totalAttente+' demande'+(totalAttente>1?'s':'')+' en attente';
-    } else {
-      alertEl.classList.remove('visible');
-    }
+  }
+  grid.innerHTML=html;
+  var gn=document.getElementById('global-notif');
+  var gt=document.getElementById('global-notif-txt');
+  if(gn){
+    if(totalWait>0){ gn.classList.add('on'); if(gt) gt.textContent=totalWait+' demande'+(totalWait>1?'s':'')+' en attente'; }
+    else { gn.classList.remove('on'); }
   }
 }
 
 function clicDashSite(site){
   var sel=document.getElementById('filter-site');
-  if(sel){
-    // Toggle: si déjà sélectionné → désélectionner (tous les sites)
-    sel.value = sel.value===site ? '' : site;
-  }
-  showPage('historique', document.getElementById('tab-historique'));
+  if(sel) sel.value=(sel.value===site?'':site);
+  showPage('historique',document.getElementById('tab-historique'));
   document.getElementById('tab-historique').classList.add('active');
   document.getElementById('tab-formulaire').classList.remove('active');
   afficherHistorique();
@@ -1411,7 +1399,6 @@ function afficherHistorique(){
   var fSt=document.getElementById('filter-statut').value;
   document.getElementById('filter-site').style.display=typeAcces==='team'?'block':'none';
   var filtered=demandes.filter(function(d){ return(!fS||d.site===fS)&&(!fT||d.type===fT)&&(!fSt||d.statut===fSt); });
-  // Stats : scope = filtré par site si sélectionné, sinon tout
   var scope=typeAcces==='usager'
     ? demandes.filter(function(d){ return d.site===siteUsager; })
     : (fS ? demandes.filter(function(d){ return d.site===fS; }) : demandes);
@@ -1419,7 +1406,6 @@ function afficherHistorique(){
   document.getElementById('stat-attente').textContent=scope.filter(function(d){ return d.statut==='En attente'; }).length;
   document.getElementById('stat-validee').textContent=scope.filter(function(d){ return d.statut==='Validée'; }).length;
   document.getElementById('stat-refusee').textContent=scope.filter(function(d){ return d.statut==='Refusée'; }).length;
-  // Mettre à jour le dashboard et le voyant global
   if(typeAcces==='team') majDashboard();
   var tbody=document.getElementById('histo-tbody');
   var empty=document.getElementById('histo-empty');
@@ -1431,25 +1417,25 @@ function afficherHistorique(){
     var pecHtml='—';
     if(d.statut==='Validée'&&d.commerce){
       var c=d.commerce,parts=[];
-      if(c.mo_de) parts.push('<span>MO: '+sanitizeStr(c.mo_de)+'%</span>');
-      if(c.pi_de) parts.push('<span>Pièces: '+sanitizeStr(c.pi_de)+'%</span>');
+      if(c.mo_de)  parts.push('<span>MO: '+sanitizeStr(c.mo_de)+'%</span>');
+      if(c.pi_de)  parts.push('<span>Pièces: '+sanitizeStr(c.pi_de)+'%</span>');
       if(c.moe_de) parts.push('<span>MO ext.: '+sanitizeStr(c.moe_de)+'%</span>');
-      if(c.pe_de) parts.push('<span>Pièces ext.: '+sanitizeStr(c.pe_de)+'%</span>');
+      if(c.pe_de)  parts.push('<span>Pièces ext.: '+sanitizeStr(c.pe_de)+'%</span>');
       if(parts.length) pecHtml='<div class="pec-cell">'+parts.join('')+'</div>';
     }
     var actionBtn=typeAcces==='team'
       ?'<button class="btn-valider" onclick="ouvrirModal('+d.id+')">Valider</button>'
       :'<span style="font-size:11px;color:#aaa;">—</span>';
     return '<tr>'+
-      '<td>'+sanitizeStr(d.date||'')+'</td>'+
-      '<td style="font-weight:500">'+sanitizeStr(d.site||'')+'</td>'+
-      '<td><span style="font-size:11px;font-weight:600;color:var(--gold)">'+sanitizeStr(d.type||'')+'</span></td>'+
-      '<td style="font-family:monospace">'+sanitizeStr(d.or||'')+'</td>'+
-      '<td style="font-family:monospace;font-size:12px">'+sanitizeStr(d.chassis||'')+'</td>'+
-      '<td style="font-size:12px">'+sanitizeStr(d.code_dommage||'')+'</td>'+
+      '<td>'+d.date+'</td>'+
+      '<td style="font-weight:500">'+d.site+'</td>'+
+      '<td><span style="font-size:11px;font-weight:600;color:var(--gold)">'+d.type+'</span></td>'+
+      '<td style="font-family:monospace">'+d.or+'</td>'+
+      '<td style="font-family:monospace;font-size:12px">'+d.chassis+'</td>'+
+      '<td style="font-size:12px">'+d.code_dommage+'</td>'+
       '<td><span class="badge-statut '+bc+'">'+ic+' '+d.statut+'</span></td>'+
       '<td>'+pecHtml+'</td>'+
-      '<td style="font-size:12px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+sanitizeStr(d.commentaire_team||'')+'">'+sanitizeStr(d.commentaire_team||'—')+'</td>'+
+      '<td style="font-size:12px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(d.commentaire_team||'')+'">'+(d.commentaire_team||'—')+'</td>'+
       '<td>'+actionBtn+'</td></tr>';
   }).join('');
 }
@@ -1486,7 +1472,7 @@ function onStatutChange(){ document.getElementById('sp-commerce').style.display=
 
 function confirmerPanneau(){
   var okBtn=document.getElementById('sp-btn-ok-id');
-  if(okBtn&&okBtn.disabled) return; // protection double-clic
+  if(okBtn&&okBtn.disabled) return;
   if(okBtn) okBtn.disabled=true;
   var pwd=document.getElementById('sp-pwd').value;
   var errEl=document.getElementById('sp-pwd-error');
@@ -1515,10 +1501,10 @@ function confirmerPanneau(){
       var pecMsg='';
       if(statut==='Validée'&&commerce){
         pecMsg='\n\nPrise en charge accordée :\n';
-        if(commerce.mo_de) pecMsg+='• Main d\'œuvre  : '+commerce.mo_de+'%\n';
-        if(commerce.pi_de) pecMsg+='• Pièces        : '+commerce.pi_de+'%\n';
-        if(commerce.moe_de) pecMsg+='• MO extérieure : '+commerce.moe_de+'%\n';
-        if(commerce.pe_de) pecMsg+='• Pièces ext.   : '+commerce.pe_de+'%\n';
+        if(commerce.mo_de)  pecMsg+='• Main d\'œuvre  : '+commerce.mo_de+'%\n';
+        if(commerce.pi_de)  pecMsg+='• Pièces        : '+commerce.pi_de+'%\n';
+        if(commerce.moe_de) pecMsg+='• MO ext.       : '+commerce.moe_de+'%\n';
+        if(commerce.pe_de)  pecMsg+='• Pièces ext.   : '+commerce.pe_de+'%\n';
         if(commerce.type_ext) pecMsg+='• Type ext.     : '+commerce.type_ext+'\n';
       }
       fetch('https://api.web3forms.com/submit',{
@@ -1541,101 +1527,8 @@ function confirmerPanneau(){
       .catch(function(){ showToast('⚠ Statut OK mais e-mail non envoyé.'); });
     }
   })
-  .catch(function(err){ console.error(err); showToast('❌ Erreur Firebase.'); var okBtn=document.getElementById('sp-btn-ok-id'); if(okBtn) okBtn.disabled=false; });
+  .catch(function(err){ console.error(err); showToast('❌ Erreur Firebase.'); var ob=document.getElementById('sp-btn-ok-id'); if(ob) ob.disabled=false; });
 }
-
-// ══════════════════════════════════════════════════════
-// TESTS UNITAIRES (window.location.search contient ?tests)
-// ══════════════════════════════════════════════════════
-function lancerTests(){
-  var results=[];
-  var pass=0,fail=0;
-  function t(name,ok,detail){
-    results.push({name:name,ok:ok,detail:detail||''});
-    if(ok) pass++; else fail++;
-  }
-
-  // ── isValidVIN
-  t('VIN valide WAU', isValidVIN('WAUZZZ8R3LA123456'), true);
-  t('VIN valide VWV', isValidVIN('WVWZZZ1KZAW000001'), true);
-  t('VIN trop court', !isValidVIN('WAUZZ'), true);
-  t('VIN avec I interdit', !isValidVIN('WAUZZZ8R3IA123456'), true);
-  t('VIN avec O interdit', !isValidVIN('WAUZZZ8R3OA123456'), true);
-  t('VIN avec Q interdit', !isValidVIN('WAUZZZ8R3QA123456'), true);
-  t('VIN minuscules refusé', !isValidVIN('wauzzz8r3la123456'), true);
-  t('VIN 18 chars refusé', !isValidVIN('WAUZZZ8R3LA1234567'), true);
-
-  // ── sanitizeStr
-  t('sanitizeStr XSS <script>', sanitizeStr('<script>alert(1)</script>') === '&lt;script&gt;alert(1)&lt;/script&gt;', true);
-  t('sanitizeStr guillemets', sanitizeStr('A\"B') === 'A&quot;B', true);
-  t('sanitizeStr apostrophe', sanitizeStr("A'B") === 'A&#39;B', true);
-  t('sanitizeStr vide', sanitizeStr('') === '', true);
-  t('sanitizeStr null/undefined', sanitizeStr(null) === '' && sanitizeStr(undefined) === '', true);
-
-  // ── vinHint
-  t('vinHint vide', vinHint('') === '0 / 17 caractères', true);
-  t('vinHint 5 chars', vinHint('WAUXX').indexOf('5 /') === 0, true);
-  t('vinHint valide', vinHint('WAUZZZ8R3LA123456').indexOf('✔') === 0, true);
-
-  // ── escH (alias sanitizeStr)
-  t('escH &', escH('A&B') === 'A&amp;B', true);
-  t('escH <>', escH('<b>') === '&lt;b&gt;', true);
-
-  // ── Validation e-mail regex
-  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  t('Email valide geauto', emailRe.test('test@geauto.fr'), true);
-  t('Email sans @', !emailRe.test('testgeauto.fr'), true);
-  t('Email sans domaine', !emailRe.test('test@'), true);
-  t('Email espaces', !emailRe.test('test @geauto.fr'), true);
-
-  // ── ssState initial
-  t('ssState dom initial null', ssState.dom.selected === null, true);
-  t('ssState ava initial null', ssState.ava.selected === null, true);
-
-  // ── CODES_DOM / CODES_AVA intégrité
-  t('CODES_DOM non vide', CODES_DOM.length > 2000, 'length='+CODES_DOM.length);
-  t('CODES_AVA non vide', CODES_AVA.length > 40, 'length='+CODES_AVA.length);
-  t('CODES_DOM item structure', !!CODES_DOM[0].code && !!CODES_DOM[0].label, true);
-  t('CODES_AVA item structure', !!CODES_AVA[0].code && !!CODES_AVA[0].label, true);
-  t('CODES_DOM code 1001 = Moteur', CODES_DOM.find(function(x){return x.code==='1001';}).label==='Moteur', true);
-
-  // ── ssItems routing
-  t('ssItems dom = CODES_DOM', ssItems('dom') === CODES_DOM, true);
-  t('ssItems ava = CODES_AVA', ssItems('ava') === CODES_AVA, true);
-
-  // Affichage
-  var el=document.getElementById('test-results');
-  var html='<div style="margin-bottom:8px;font-size:11px;color:#aaa;">'+
-    '<span style="color:#27ae60">✔ '+pass+' réussis</span>  '+
-    '<span style="color:'+(fail>0?'#c0392b':'#27ae60')+'">'+( fail>0?'✘ '+fail+' échecs':'Tous OK !')+'</span>'+
-  '</div>';
-  results.forEach(function(r){
-    html+='<div style="padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'+
-      '<span style="color:'+(r.ok?'#27ae60':'#e74c3c')+'">'+(r.ok?'✔':'✘')+'</span> '+
-      '<span style="color:#ddd">'+escH(r.name)+'</span>'+
-      (r.detail&&r.detail!==true?'<span style="color:#888"> — '+escH(String(r.detail))+'</span>':'')+
-    '</div>';
-  });
-  el.innerHTML=html;
-}
-
-// Lancer auto si URL contient ?tests
-(function(){
-  if(window.location.search.indexOf('tests')!==-1){
-    document.getElementById('test-panel').style.display='block';
-    window.addEventListener('load', lancerTests);
-  }
-})();
 </script>
-
-<!-- ══ TESTS UNITAIRES (accès via ?tests=1 dans l'URL) ══ -->
-<div id="test-panel" style="display:none;position:fixed;bottom:0;left:0;right:0;max-height:40vh;overflow:auto;background:#1a1a2e;color:#e0e0e0;font-family:monospace;font-size:12px;padding:16px;z-index:9000;border-top:3px solid #d4ae52;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-    <strong style="color:#d4ae52;">🧪 Tests unitaires — Team Garantie GEA - VW</strong>
-    <button onclick="document.getElementById('test-panel').style.display='none'" style="background:none;border:1px solid #d4ae52;color:#d4ae52;padding:2px 10px;cursor:pointer;border-radius:4px;">✕</button>
-  </div>
-  <div id="test-results"></div>
-  <button onclick="lancerTests()" style="margin-top:10px;background:#d4ae52;color:#1a1a2e;border:none;padding:6px 18px;cursor:pointer;border-radius:4px;font-weight:600;font-size:12px;">▶ Relancer tous les tests</button>
-</div>
 </body>
-</html>
+  </html>
