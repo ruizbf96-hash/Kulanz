@@ -1370,8 +1370,8 @@ function majDashboard(){
     var hasPending=attente>0;
     var currentFilter=document.getElementById('filter-site').value;
     var isSelected=currentFilter===site;
-    return '<div class="dash-site-card'+(hasPending?' has-pending':'')+(isSelected?' selected':'')+'" onclick="clicDashSite(''+escH(site)+'')">'+
-      '<div class="dash-site-name">'+escH(site)+'</div>'+
+    return '<div class="dash-site-card' + (hasPending ? ' has-pending' : '') + (isSelected ? ' selected' : '') + '" onclick="clicDashSite(\'' + escH(site) +
+          '<div class="dash-site-name">'+escH(site)+'</div>'+
       '<div class="dash-site-nums">'+
         '<div class="dash-num"><span class="dash-num-val dash-total">'+total+'</span><span class="dash-num-lbl">Total</span></div>'+
         '<div class="dash-num"><span class="dash-num-val dash-attente">'+attente+'</span><span class="dash-num-lbl">Attente</span></div>'+
