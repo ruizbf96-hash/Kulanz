@@ -6,8 +6,8 @@
 <title>Team Garantie GEA - VW</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 :root{
   --charcoal:#1a1a2e;--silver:#c8c8d4;--cream:#f5f3ee;
@@ -30,9 +30,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 .login-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;}
 .login-card{background:rgba(255,255,255,0.05);border:1.5px solid rgba(184,151,58,0.2);border-radius:16px;padding:28px 20px;cursor:pointer;transition:all 0.3s;text-align:center;}
 .login-card:hover{background:rgba(184,151,58,0.1);border-color:var(--gold);transform:translateY(-4px);}
-.login-card .lc-icon{font-size:36px;margin-bottom:12px;}
-.login-card .lc-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--white);margin-bottom:6px;}
-.login-card .lc-desc{font-size:11px;color:var(--silver);line-height:1.5;}
+.lc-icon{font-size:36px;margin-bottom:12px;}
+.lc-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--white);margin-bottom:6px;}
+.lc-desc{font-size:11px;color:var(--silver);line-height:1.5;}
 .login-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:none;align-items:center;justify-content:center;}
 .login-modal.open{display:flex;}
 .login-modal-box{background:var(--white);border-radius:16px;padding:36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
@@ -45,8 +45,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 /* HEADER */
 header{background:var(--charcoal);position:sticky;top:0;z-index:100;box-shadow:0 2px 24px rgba(0,0,0,0.25);}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid rgba(184,151,58,0.3);}
-.site-bar{display:flex;align-items:center;padding:0 40px;overflow-x:auto;}
-.site-bar-label{font-size:10px;color:var(--silver);letter-spacing:2px;text-transform:uppercase;white-space:nowrap;padding:12px 20px 12px 0;border-right:1px solid rgba(184,151,58,0.2);}
 .site-btn{padding:12px 20px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--silver);white-space:nowrap;border-right:1px solid rgba(184,151,58,0.1);transition:all 0.2s;position:relative;}
 .site-btn::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transition:transform 0.2s;}
 .site-btn:hover{color:var(--gold-light);}
@@ -57,17 +55,16 @@ header{background:var(--charcoal);position:sticky;top:0;z-index:100;box-shadow:0
 .nav-tab:hover{color:var(--gold-light);}
 .nav-tab.active{color:var(--gold-light);border-bottom-color:var(--gold);}
 .user-badge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--silver);}
-.user-badge .ub-role{font-weight:600;color:var(--gold-light);}
-.btn-logout{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);border-radius:20px;color:#c0392b;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.2s;}
-.btn-logout:hover{background:rgba(192,57,43,0.2);}
+.ub-role{font-weight:600;color:var(--gold-light);}
+.btn-logout{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);border-radius:20px;color:#c0392b;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;}
 
-/* TYPE TOGGLE */
+/* TOGGLE */
 .type-toggle-wrap{background:var(--charcoal);padding:0 40px 24px;display:flex;justify-content:center;}
 .type-toggle{display:flex;background:rgba(255,255,255,0.05);border:1px solid rgba(184,151,58,0.2);border-radius:50px;padding:5px;gap:4px;}
 .type-btn{padding:10px 32px;border:none;border-radius:40px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--silver);background:none;transition:all 0.3s;}
 .type-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);font-weight:600;}
 .copier-bar{background:var(--charcoal);display:flex;justify-content:center;padding:0 40px 20px;}
-#btn-copier-kulanz{display:none;align-items:center;gap:8px;padding:10px 28px;background:rgba(184,151,58,0.15);border:1.5px solid var(--gold);border-radius:50px;color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+#btn-copier-kulanz{display:none;align-items:center;gap:8px;padding:10px 28px;background:rgba(184,151,58,0.15);border:1.5px solid var(--gold);border-radius:50px;color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
 
 /* PAGES */
 .page{display:none;}
@@ -76,7 +73,7 @@ main{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
 
 /* SECTIONS */
 .form-section{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:24px;overflow:hidden;border:1px solid rgba(184,151,58,0.1);}
-.section-header{display:flex;align-items:center;gap:14px;padding:20px 28px;background:linear-gradient(90deg,rgba(184,151,58,0.08) 0%,transparent 100%);border-bottom:1px solid rgba(184,151,58,0.12);}
+.section-header{display:flex;align-items:center;gap:14px;padding:20px 28px;background:linear-gradient(90deg,rgba(184,151,58,0.08),transparent);border-bottom:1px solid rgba(184,151,58,0.12);}
 .section-number{width:30px;height:30px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--charcoal);flex-shrink:0;}
 .section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--charcoal);}
 .section-body{padding:28px;}
@@ -84,8 +81,8 @@ main{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
 .span-2{grid-column:span 2;}
 .field{display:flex;flex-direction:column;gap:4px;}
 label{font-size:11px;font-weight:500;letter-spacing:0.8px;text-transform:uppercase;color:#666;}
-label .opt{font-size:9px;color:var(--gold);font-weight:400;margin-left:4px;}
-label .req{color:var(--red);margin-left:2px;}
+.opt{font-size:9px;color:var(--gold);font-weight:400;margin-left:4px;}
+.req{color:var(--red);margin-left:2px;}
 .hint{font-size:10px;color:#aaa;margin-top:2px;}
 .hint.ok{color:var(--green);}
 .hint.err{color:var(--red);}
@@ -103,33 +100,29 @@ select{cursor:pointer;appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8973a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
 input[readonly]{background:#f0ede8!important;color:#666!important;cursor:default!important;border-color:#ddd!important;}
-input[readonly]:focus{box-shadow:none!important;border-color:#ddd!important;}
 
 /* AUTOCOMPLETE */
 .autocomplete-wrap{position:relative;}
 .autocomplete-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--white);border:1.5px solid var(--gold);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:50;max-height:200px;overflow-y:auto;display:none;}
 .autocomplete-list.open{display:block;}
-.ac-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0ede8;transition:background 0.15s;}
-.ac-item:last-child{border-bottom:none;}
+.ac-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0ede8;}
 .ac-item:hover{background:rgba(184,151,58,0.08);}
-.ac-chassis{font-weight:600;color:var(--charcoal);}
+.ac-chassis{font-weight:600;}
 .ac-detail{font-size:11px;color:#888;margin-top:2px;}
 
 /* RADIO / CHECK */
 .radio-group{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
 .radio-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;}
-.radio-item input[type="radio"]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
+.radio-item input[type="radio"]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;}
 .checklist{display:flex;flex-direction:column;gap:10px;}
-.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid #e8e5df;border-radius:8px;cursor:pointer;transition:all 0.2s;background:#fafaf8;}
+.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid #e8e5df;border-radius:8px;cursor:pointer;background:#fafaf8;}
 .checklist-item:hover{border-color:var(--gold);}
-.checklist-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
+.checklist-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;}
 .checklist-item-text{font-size:13px;line-height:1.5;color:#444;}
-
-/* INFO / CIG */
 .info-box{background:rgba(184,151,58,0.07);border:1px solid rgba(184,151,58,0.25);border-radius:8px;padding:14px 18px;font-size:12.5px;color:#5a4a1a;line-height:1.6;margin-bottom:20px;}
 .info-box strong{color:var(--gold);}
 .cig-box{border:1.5px solid rgba(184,151,58,0.25);border-radius:8px;padding:18px;background:rgba(184,151,58,0.04);}
-.cig-box .cig-title{font-size:12px;font-weight:500;color:var(--gold);margin-bottom:12px;text-transform:uppercase;}
+.cig-title{font-size:12px;font-weight:500;color:var(--gold);margin-bottom:12px;text-transform:uppercase;}
 .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(184,151,58,0.2),transparent);margin:24px 0;}
 .section-kulanz{display:block;}
 .section-ccr{display:none;}
@@ -144,7 +137,7 @@ input[readonly]:focus{box-shadow:none!important;border-color:#ddd!important;}
 .btn-print{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;background:var(--white);color:var(--charcoal);border:2px solid rgba(184,151,58,0.35);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.3s;}
 .btn-print:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
 
-/* SUCCESS OVERLAY */
+/* SUCCESS */
 .success-overlay{position:fixed;inset:0;background:rgba(26,26,46,0.85);z-index:200;display:none;align-items:center;justify-content:center;}
 .success-overlay.open{display:flex;}
 .success-card{background:var(--white);border-radius:20px;padding:48px 40px;max-width:480px;width:90%;text-align:center;}
@@ -153,8 +146,7 @@ input[readonly]:focus{box-shadow:none!important;border-color:#ddd!important;}
 .success-card p{font-size:14px;color:#666;line-height:1.6;margin-bottom:8px;}
 .success-details{background:var(--cream);border-radius:10px;padding:14px 18px;margin:16px 0;text-align:left;font-size:13px;color:#444;line-height:1.8;}
 .success-details strong{color:var(--charcoal);}
-.btn-nouvelle{display:inline-flex;align-items:center;gap:8px;padding:14px 36px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s;margin-top:8px;}
-.btn-nouvelle:hover{transform:translateY(-2px);}
+.btn-nouvelle{display:inline-flex;align-items:center;gap:8px;padding:14px 36px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;}
 
 /* HISTORIQUE */
 .histo-wrap{max-width:1100px;margin:0 auto;padding:40px 24px 80px;}
@@ -162,16 +154,15 @@ input[readonly]:focus{box-shadow:none!important;border-color:#ddd!important;}
 .histo-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--charcoal);}
 .histo-filters{display:flex;gap:10px;flex-wrap:wrap;}
 .histo-filters select{padding:8px 14px;border:1.5px solid #e0ddd8;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:#fff;outline:none;cursor:pointer;}
-.histo-filters select:focus{border-color:var(--gold);}
 .btn-clear-histo{padding:8px 18px;background:rgba(192,57,43,0.08);border:1.5px solid rgba(192,57,43,0.3);border-radius:8px;color:var(--red);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;}
 .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
 .stat-card{background:var(--card-bg);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);border:1px solid rgba(184,151,58,0.1);text-align:center;}
-.stat-num{font-size:28px;font-weight:700;color:var(--charcoal);}
+.stat-num{font-size:28px;font-weight:700;}
 .stat-num.gold{color:var(--gold);}
 .stat-num.green{color:var(--green);}
 .stat-num.red{color:var(--red);}
 .stat-num.orange{color:var(--orange);}
-.stat-label{font-size:11px;color:#888;letter-spacing:0.5px;text-transform:uppercase;margin-top:4px;}
+.stat-label{font-size:11px;color:#888;text-transform:uppercase;margin-top:4px;}
 .table-wrap{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(184,151,58,0.1);overflow:hidden;}
 .table-scroll{overflow-x:auto;}
 table.histo-table{width:100%;border-collapse:collapse;}
@@ -184,13 +175,13 @@ table.histo-table{width:100%;border-collapse:collapse;}
 .badge-validee{background:rgba(39,174,96,0.12);color:#1e8449;border:1px solid rgba(39,174,96,0.3);}
 .badge-refusee{background:rgba(192,57,43,0.12);color:var(--red);border:1px solid rgba(192,57,43,0.3);}
 .badge-complement{background:rgba(52,152,219,0.12);color:#1a6fa8;border:1px solid rgba(52,152,219,0.3);}
-.btn-valider{padding:5px 12px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-valider{padding:5px 12px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;}
 .btn-valider:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--charcoal);}
 .empty-state{text-align:center;padding:60px 20px;color:#aaa;}
 .pec-cell{font-size:11px;color:#444;line-height:1.6;}
 .pec-cell span{display:block;}
 
-/* PANNEAU LATÉRAL */
+/* PANNEAU */
 .side-panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;display:none;}
 .side-panel-overlay.open{display:block;}
 .side-panel{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:100vw;background:var(--white);box-shadow:-8px 0 40px rgba(0,0,0,0.2);z-index:601;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);display:flex;flex-direction:column;}
@@ -198,14 +189,13 @@ table.histo-table{width:100%;border-collapse:collapse;}
 .sp-header{background:var(--charcoal);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .sp-header h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--white);}
 .sp-header p{font-size:11px;color:var(--silver);margin-top:3px;}
-.sp-close{background:none;border:none;cursor:pointer;color:var(--silver);padding:4px;border-radius:6px;}
-.sp-close:hover{color:var(--white);background:rgba(255,255,255,0.1);}
+.sp-close{background:none;border:none;cursor:pointer;color:var(--silver);padding:4px;}
 .sp-body{flex:1;overflow-y:auto;padding:24px;}
 .sp-section{margin-bottom:24px;}
 .sp-section-title{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(184,151,58,0.2);}
 .sp-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
 .sp-info-item{background:var(--cream);border-radius:8px;padding:10px 12px;}
-.sp-info-label{font-size:9px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:#888;margin-bottom:3px;}
+.sp-info-label{font-size:9px;font-weight:600;text-transform:uppercase;color:#888;margin-bottom:3px;}
 .sp-info-value{font-size:13px;font-weight:500;color:var(--charcoal);}
 .commerce-table{width:100%;border-collapse:collapse;margin-top:8px;}
 .commerce-table th{font-size:10px;font-weight:600;text-transform:uppercase;color:#888;padding:6px 8px;text-align:center;background:#f8f6f2;border:1px solid #e8e5df;}
@@ -219,7 +209,6 @@ table.histo-table{width:100%;border-collapse:collapse;}
 .sp-statut-select{width:100%;padding:11px 14px;border:1.5px solid #e0ddd8;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--charcoal);background:#fafaf8;outline:none;cursor:pointer;appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8973a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
-.sp-statut-select:focus{border-color:var(--gold);}
 .sp-pwd-error{font-size:12px;color:var(--red);margin-top:6px;display:none;}
 .sp-footer{padding:16px 24px;border-top:1px solid #f0ede8;flex-shrink:0;display:flex;gap:10px;}
 .sp-btn-ok{flex:1;padding:13px;background:linear-gradient(135deg,var(--charcoal),#2c2c50);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;}
@@ -230,8 +219,11 @@ table.histo-table{width:100%;border-collapse:collapse;}
 #toast{position:fixed;bottom:32px;right:32px;background:var(--charcoal);color:var(--white);padding:14px 24px;border-radius:10px;font-size:13px;box-shadow:0 4px 24px rgba(0,0,0,0.25);border-left:4px solid var(--gold);transform:translateY(80px);opacity:0;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);z-index:999;pointer-events:none;}
 #toast.show{transform:translateY(0);opacity:1;}
 
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
 @media(max-width:680px){
-  .header-top,.site-bar,.nav-tabs{padding-left:16px;padding-right:16px;}
+  .header-top,.nav-tabs{padding-left:16px;padding-right:16px;}
+  #site-bar-wrap{padding:0 10px!important;}
   main,.histo-wrap{padding:20px 14px 60px;}
   .section-body{padding:20px 16px;}
   .grid-2{grid-template-columns:1fr;}
@@ -245,15 +237,13 @@ table.histo-table{width:100%;border-collapse:collapse;}
 </head>
 <body>
 
-<!-- PAGE CONNEXION -->
+<!-- LOGIN -->
 <div class="login-page" id="login-page">
   <div class="login-wrap">
     <div>
       <div class="login-logo">Team Garantie <span>GEA - VW</span></div>
       <div class="login-subtitle">Gestion des demandes Garantie</div>
     </div>
-
-    <!-- Étape 1 : choix accès -->
     <div id="login-step-1" style="width:100%">
       <div class="login-cards">
         <div class="login-card" onclick="choisirAcces('usager')">
@@ -268,18 +258,16 @@ table.histo-table{width:100%;border-collapse:collapse;}
         </div>
       </div>
     </div>
-
-    <!-- Étape 2 : choix site usager -->
     <div id="login-step-2" style="display:none;width:100%">
       <p style="color:var(--silver);font-size:13px;text-align:center;margin-bottom:16px;">Sélectionnez votre site :</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;">
-        <div onclick="choisirSiteUsager('Audi Hœnheim')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">Audi Hœnheim</div>
-        <div onclick="choisirSiteUsager('Audi Obernai')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">Audi Obernai</div>
-        <div onclick="choisirSiteUsager('SEAT Hœnheim')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">SEAT Hœnheim</div>
-        <div onclick="choisirSiteUsager('SKODA Hœnheim')"   style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">SKODA Hœnheim</div>
-        <div onclick="choisirSiteUsager('VW Bischheim')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">VW Bischheim</div>
-        <div onclick="choisirSiteUsager('VW Illkirch')"     style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">VW Illkirch</div>
-        <div onclick="choisirSiteUsager('VW Obernai')"      style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;grid-column:span 2;">VW Obernai</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div onclick="choisirSiteUsager('Audi Hœnheim')"   style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">Audi Hœnheim</div>
+        <div onclick="choisirSiteUsager('Audi Obernai')"   style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">Audi Obernai</div>
+        <div onclick="choisirSiteUsager('SEAT Hœnheim')"   style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">SEAT Hœnheim</div>
+        <div onclick="choisirSiteUsager('SKODA Hœnheim')"  style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">SKODA Hœnheim</div>
+        <div onclick="choisirSiteUsager('VW Bischheim')"   style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">VW Bischheim</div>
+        <div onclick="choisirSiteUsager('VW Illkirch')"    style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;">VW Illkirch</div>
+        <div onclick="choisirSiteUsager('VW Obernai')"     style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;padding:18px 14px;cursor:pointer;text-align:center;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;grid-column:span 2;">VW Obernai</div>
       </div>
       <button onclick="retourStep1()" style="margin-top:16px;background:none;border:none;color:var(--silver);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline;display:block;text-align:center;width:100%;">← Retour</button>
     </div>
@@ -301,12 +289,12 @@ table.histo-table{width:100%;border-collapse:collapse;}
   </div>
 </div>
 
-<!-- SUCCESS OVERLAY -->
+<!-- SUCCESS -->
 <div class="success-overlay" id="success-overlay">
   <div class="success-card">
     <div class="success-icon">✅</div>
     <h2>Demande envoyée !</h2>
-    <p>Votre demande a bien été transmise à <strong>teamgarantie@geauto.fr</strong><br>et un e-mail de confirmation vous a été envoyé.</p>
+    <p>Votre demande a bien été transmise à <strong>teamgarantie@geauto.fr</strong></p>
     <div class="success-details" id="success-details"></div>
     <p style="font-size:12px;color:#aaa;">Vous recevrez une notification dès validation par la TeamGarantie.</p>
     <button class="btn-nouvelle" onclick="nouvelledemande()">
@@ -321,9 +309,14 @@ table.histo-table{width:100%;border-collapse:collapse;}
   <div class="header-top">
     <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold-light);letter-spacing:1px;">Team Garantie GEA - VW</div>
     <div style="display:flex;align-items:center;gap:16px;">
-      <div style="font-size:13px;color:var(--gold-light);font-weight:500;text-align:right;">
+      <div style="text-align:right;">
         <span style="font-size:10px;color:var(--silver);display:block;letter-spacing:1px;text-transform:uppercase;">Site sélectionné</span>
-        <span id="site-display-name">Aucun site sélectionné</span>
+        <span id="site-display-name" style="font-size:13px;color:var(--gold-light);font-weight:500;">Aucun site sélectionné</span>
+      </div>
+      <!-- Indicateur Firebase -->
+      <div style="display:flex;align-items:center;gap:6px;" title="Statut Firebase">
+        <div id="firebase-indicator" style="width:8px;height:8px;border-radius:50%;background:#888;transition:background 0.3s;"></div>
+        <span style="font-size:10px;color:var(--silver);">DB</span>
       </div>
       <div id="user-info" style="display:none;">
         <div class="user-badge">
@@ -337,7 +330,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
     </div>
   </div>
   <div id="site-bar-wrap" style="display:flex;align-items:center;padding:0 40px;overflow-x:auto;">
-    <div class="site-bar-label">Sélectionner un site</div>
+    <div style="font-size:10px;color:var(--silver);letter-spacing:2px;text-transform:uppercase;white-space:nowrap;padding:12px 20px 12px 0;border-right:1px solid rgba(184,151,58,0.2);">Sélectionner un site</div>
     <button class="site-btn" onclick="selectSite(this,'Audi Hœnheim')">Audi Hœnheim</button>
     <button class="site-btn" onclick="selectSite(this,'Audi Obernai')">Audi Obernai</button>
     <button class="site-btn" onclick="selectSite(this,'SEAT Hœnheim')">SEAT Hœnheim</button>
@@ -449,19 +442,13 @@ table.histo-table{width:100%;border-collapse:collapse;}
         </div>
         <div class="divider"></div>
         <div class="grid-2">
-          <div class="field">
-            <label>Référence pièce <span class="opt">(optionnel)</span></label>
-            <input type="text" name="ref_piece" placeholder="Ex : 8V0 123 456 A">
-          </div>
-          <div class="field">
-            <label>Désignation pièce <span class="opt">(optionnel)</span></label>
-            <input type="text" name="desig_piece" placeholder="Ex : Pompe à eau">
-          </div>
+          <div class="field"><label>Référence pièce <span class="opt">(optionnel)</span></label><input type="text" name="ref_piece" placeholder="Ex : 8V0 123 456 A"></div>
+          <div class="field"><label>Désignation pièce <span class="opt">(optionnel)</span></label><input type="text" name="desig_piece" placeholder="Ex : Pompe à eau"></div>
           <div class="field">
             <label>Code dommage <span class="req">*</span></label>
             <select name="code_dommage" id="code_dom_input" onchange="updateCodeDesc('dommage')">
               <option value="">— Sélectionner —</option>
-              <option value="1001">1001 — Moteur</option><option value="1002">1002 — Moteur nu</option><option value="1009">1009 — Bloc-cylindres</option><option value="1030">1030 — Support de moteur</option><option value="1045">1045 — Amortisseur de vibrations</option><option value="1050">1050 — Reniflard</option><option value="1055">1055 — Séparateur d'huile</option><option value="1310">1310 — Piston</option><option value="1319">1319 — Jeu de segments de piston</option><option value="1340">1340 — Bielle</option><option value="1348">1348 — Vilebrequin</option><option value="1360">1360 — Volant-moteur</option><option value="1362">1362 — Volant moteur bimasse</option><option value="1370">1370 — Pignon entraînement arbre à cames</option><option value="1505">1505 — Arbre à cames</option><option value="1524">1524 — Courroie crantée</option><option value="1535">1535 — Chaîne de distribution</option><option value="1536">1536 — Tendeur de chaîne</option><option value="1540">1540 — Poussoir</option><option value="1560">1560 — Soupape d'admission</option><option value="1562">1562 — Soupape d'échappement</option><option value="1570">1570 — Culasse</option><option value="1571">1571 — Joint de culasse</option><option value="1580">1580 — Joint de couvre-culasse</option><option value="1582">1582 — Couvre-culasse</option><option value="1584">1584 — Variateur calage arbre à cames</option><option value="1701">1701 — Huile-moteur</option><option value="1720">1720 — Pompe à huile</option><option value="1730">1730 — Filtre à huile</option><option value="1740">1740 — Radiateur d'huile</option><option value="1750">1750 — Carter d'huile</option><option value="1901">1901 — Système de refroidissement</option><option value="1950">1950 — Pompe liquide refroidissement</option><option value="1958">1958 — Régulateur liquide refroidissement</option><option value="1970">1970 — Radiateur</option><option value="2003">2003 — Carburant</option><option value="2010">2010 — Réservoir à carburant</option><option value="2031">2031 — Filtre à carburant</option><option value="2045">2045 — Pompe à carburant</option><option value="2130">2130 — Turbocompresseur</option><option value="2143">2143 — Radiateur air de suralimentation</option><option value="2225">2225 — Filtre à air</option><option value="2280">2280 — Tubulure d'admission</option><option value="2287">2287 — Sonde lambda</option><option value="2301">2301 — Système d'injection</option><option value="2329">2329 — Pompe d'injection</option><option value="2340">2340 — Injecteur</option><option value="2360">2360 — App. commande EDC</option><option value="2373">2373 — Rampe de distribution</option><option value="2463">2463 — Pompe haute pression</option><option value="2610">2610 — Collecteur d'échappement</option><option value="2625">2625 — Silencieux de détente</option><option value="2633">2633 — Silencieux de sortie</option><option value="2639">2639 — Soupape recyclage des gaz</option><option value="2673">2673 — Catalyseur</option><option value="2674">2674 — Filtre à particules</option><option value="2706">2706 — Batterie</option><option value="2722">2722 — Alternateur</option><option value="2760">2760 — Démarreur</option><option value="2820">2820 — Bobine d'allumage</option><option value="2870">2870 — Bougie d'allumage</option><option value="2884">2884 — Bougie de préchauffage</option><option value="3020">3020 — Cylindre-émetteur d'embrayage</option><option value="3045">3045 — Butée de débrayage</option><option value="3052">3052 — Mécanisme d'embrayage</option><option value="3056">3056 — Disque d'embrayage</option><option value="3250">3250 — Convertisseur de couple</option><option value="3401">3401 — Huile de BV</option><option value="3435">3435 — Boîte de vitesses</option><option value="3511">3511 — Mécatronique</option><option value="3735">3735 — Boîte de vitesses automatique</option><option value="3901">3901 — Transmission</option><option value="3965">3965 — Boîte-transfert</option><option value="4001">4001 — Essieu AV</option><option value="4044">4044 — Joint homocinétique int.</option><option value="4045">4045 — Joint homocinétique ext.</option><option value="4067">4067 — Moyeu de roue avec roulement</option><option value="4075">4075 — Ressort hélicoïdal AV</option><option value="4077">4077 — Barre stabilisatrice AV</option><option value="4085">4085 — Jambe de force</option><option value="4090">4090 — Amortisseur AV</option><option value="4201">4201 — Train AR</option><option value="4258">4258 — Roulement de roue</option><option value="4272">4272 — Ressort hélicoïdal AR</option><option value="4290">4290 — Barre stabilisatrice AR</option><option value="4405">4405 — Roue</option><option value="4440">4440 — Pneus</option><option value="4530">4530 — Unité hydraulique ABS</option><option value="4545">4545 — App. commande ABS+EDS</option><option value="4636">4636 — Plaquettes frein à disque AV</option><option value="4638">4638 — Plaquettes frein à disque AR</option><option value="4650">4650 — Disque de frein AV</option><option value="4653">4653 — Disque de frein AR</option><option value="4661">4661 — Levier de frein à main</option><option value="4708">4708 — Liquide de frein</option><option value="4715">4715 — Maître-cylindre</option><option value="4739">4739 — Etrier de frein AV</option><option value="4741">4741 — Etrier de frein AR</option><option value="4770">4770 — Servofrein</option><option value="4810">4810 — Volant de direction</option><option value="4840">4840 — Mécanisme de direction</option><option value="4879">4879 — Barre de direction</option><option value="4881">4881 — Rotule de barre de direction</option><option value="4890">4890 — Direction assistée</option><option value="5002">5002 — Avant de carrosserie</option><option value="5055">5055 — Aile AV</option><option value="5101">5101 — Carrosserie</option><option value="5302">5302 — Arrière de carrosserie</option><option value="5354">5354 — Aile AR</option><option value="5522">5522 — Capot AV</option><option value="5559">5559 — Hayon</option><option value="5717">5717 — Serrure de porte</option><option value="5751">5751 — Porte AV</option><option value="5851">5851 — Porte AR</option><option value="6005">6005 — Toit coulissant</option><option value="6310">6310 — Pare-chocs AV</option><option value="6350">6350 — Pare-chocs AR</option><option value="6410">6410 — Pare-brise</option><option value="6440">6440 — Glace de porte AV</option><option value="6460">6460 — Glace de porte AR</option><option value="6486">6486 — Glace AR</option><option value="6605">6605 — Calandre</option><option value="6689">6689 — Rétroviseur</option><option value="7018">7018 — Tableau de bord</option><option value="7201">7201 — Siège AV</option><option value="7249">7249 — Banquette AR</option><option value="8023">8023 — Echangeur de chaleur</option><option value="8530">8530 — Soufflante</option><option value="8701">8701 — Climatiseur</option><option value="8734">8734 — Compresseur clim.</option><option value="8750">8750 — Condenseur</option><option value="8760">8760 — Evaporateur</option><option value="9005">9005 — Tachymètre</option><option value="9130">9130 — Autoradio</option><option value="9215">9215 — Moteur d'essuie-glace</option><option value="9303">9303 — Batterie haute tension</option><option value="9415">9415 — Phare</option><option value="9431">9431 — Feu AR</option><option value="9709">9709 — Câblage central</option><option value="9794">9794 — Centrale électrique</option>
+              <option value="1001">1001 — Moteur</option><option value="1009">1009 — Bloc-cylindres</option><option value="1030">1030 — Support de moteur</option><option value="1045">1045 — Amortisseur de vibrations</option><option value="1050">1050 — Reniflard</option><option value="1310">1310 — Piston</option><option value="1340">1340 — Bielle</option><option value="1348">1348 — Vilebrequin</option><option value="1360">1360 — Volant-moteur</option><option value="1362">1362 — Volant moteur bimasse</option><option value="1370">1370 — Pignon entraînement arbre à cames</option><option value="1505">1505 — Arbre à cames</option><option value="1524">1524 — Courroie crantée</option><option value="1535">1535 — Chaîne de distribution</option><option value="1536">1536 — Tendeur de chaîne</option><option value="1560">1560 — Soupape d'admission</option><option value="1562">1562 — Soupape d'échappement</option><option value="1570">1570 — Culasse</option><option value="1571">1571 — Joint de culasse</option><option value="1580">1580 — Joint de couvre-culasse</option><option value="1582">1582 — Couvre-culasse</option><option value="1584">1584 — Variateur calage arbre à cames</option><option value="1701">1701 — Huile-moteur</option><option value="1720">1720 — Pompe à huile</option><option value="1730">1730 — Filtre à huile</option><option value="1740">1740 — Radiateur d'huile</option><option value="1750">1750 — Carter d'huile</option><option value="1901">1901 — Système de refroidissement</option><option value="1950">1950 — Pompe liquide refroidissement</option><option value="1970">1970 — Radiateur</option><option value="2003">2003 — Carburant</option><option value="2010">2010 — Réservoir à carburant</option><option value="2031">2031 — Filtre à carburant</option><option value="2045">2045 — Pompe à carburant</option><option value="2130">2130 — Turbocompresseur</option><option value="2143">2143 — Radiateur air de suralimentation</option><option value="2225">2225 — Filtre à air</option><option value="2280">2280 — Tubulure d'admission</option><option value="2287">2287 — Sonde lambda</option><option value="2301">2301 — Système d'injection</option><option value="2329">2329 — Pompe d'injection</option><option value="2340">2340 — Injecteur</option><option value="2360">2360 — App. commande EDC</option><option value="2373">2373 — Rampe de distribution</option><option value="2463">2463 — Pompe haute pression</option><option value="2610">2610 — Collecteur d'échappement</option><option value="2625">2625 — Silencieux de détente</option><option value="2633">2633 — Silencieux de sortie</option><option value="2639">2639 — Soupape recyclage des gaz</option><option value="2673">2673 — Catalyseur</option><option value="2674">2674 — Filtre à particules</option><option value="2706">2706 — Batterie</option><option value="2722">2722 — Alternateur</option><option value="2760">2760 — Démarreur</option><option value="2820">2820 — Bobine d'allumage</option><option value="2870">2870 — Bougie d'allumage</option><option value="2884">2884 — Bougie de préchauffage</option><option value="3020">3020 — Cylindre-émetteur d'embrayage</option><option value="3045">3045 — Butée de débrayage</option><option value="3052">3052 — Mécanisme d'embrayage</option><option value="3056">3056 — Disque d'embrayage</option><option value="3250">3250 — Convertisseur de couple</option><option value="3401">3401 — Huile de BV</option><option value="3435">3435 — Boîte de vitesses</option><option value="3511">3511 — Mécatronique</option><option value="3735">3735 — Boîte de vitesses automatique</option><option value="3901">3901 — Transmission</option><option value="3965">3965 — Boîte-transfert</option><option value="4001">4001 — Essieu AV</option><option value="4044">4044 — Joint homocinétique int.</option><option value="4045">4045 — Joint homocinétique ext.</option><option value="4067">4067 — Moyeu de roue avec roulement</option><option value="4075">4075 — Ressort hélicoïdal AV</option><option value="4085">4085 — Jambe de force</option><option value="4090">4090 — Amortisseur AV</option><option value="4201">4201 — Train AR</option><option value="4258">4258 — Roulement de roue</option><option value="4272">4272 — Ressort hélicoïdal AR</option><option value="4290">4290 — Barre stabilisatrice AR</option><option value="4405">4405 — Roue</option><option value="4440">4440 — Pneus</option><option value="4530">4530 — Unité hydraulique ABS</option><option value="4636">4636 — Plaquettes frein à disque AV</option><option value="4638">4638 — Plaquettes frein à disque AR</option><option value="4650">4650 — Disque de frein AV</option><option value="4653">4653 — Disque de frein AR</option><option value="4661">4661 — Levier de frein à main</option><option value="4708">4708 — Liquide de frein</option><option value="4715">4715 — Maître-cylindre</option><option value="4739">4739 — Etrier de frein AV</option><option value="4741">4741 — Etrier de frein AR</option><option value="4770">4770 — Servofrein</option><option value="4810">4810 — Volant de direction</option><option value="4840">4840 — Mécanisme de direction</option><option value="4879">4879 — Barre de direction</option><option value="4890">4890 — Direction assistée</option><option value="5002">5002 — Avant de carrosserie</option><option value="5055">5055 — Aile AV</option><option value="5101">5101 — Carrosserie</option><option value="5302">5302 — Arrière de carrosserie</option><option value="5354">5354 — Aile AR</option><option value="5522">5522 — Capot AV</option><option value="5559">5559 — Hayon</option><option value="5717">5717 — Serrure de porte</option><option value="5751">5751 — Porte AV</option><option value="5851">5851 — Porte AR</option><option value="6005">6005 — Toit coulissant</option><option value="6310">6310 — Pare-chocs AV</option><option value="6350">6350 — Pare-chocs AR</option><option value="6410">6410 — Pare-brise</option><option value="6440">6440 — Glace de porte AV</option><option value="6460">6460 — Glace de porte AR</option><option value="6486">6486 — Glace AR</option><option value="6605">6605 — Calandre</option><option value="6689">6689 — Rétroviseur</option><option value="7018">7018 — Tableau de bord</option><option value="7201">7201 — Siège AV</option><option value="7249">7249 — Banquette AR</option><option value="8023">8023 — Echangeur de chaleur</option><option value="8530">8530 — Soufflante</option><option value="8701">8701 — Climatiseur</option><option value="8734">8734 — Compresseur clim.</option><option value="8750">8750 — Condenseur</option><option value="8760">8760 — Evaporateur</option><option value="9005">9005 — Tachymètre</option><option value="9130">9130 — Autoradio</option><option value="9215">9215 — Moteur d'essuie-glace</option><option value="9303">9303 — Batterie haute tension</option><option value="9415">9415 — Phare</option><option value="9431">9431 — Feu AR</option><option value="9709">9709 — Câblage central</option><option value="9794">9794 — Centrale électrique</option>
             </select>
             <span class="hint" id="code_dom_hint"></span>
           </div>
@@ -494,56 +481,32 @@ table.histo-table{width:100%;border-collapse:collapse;}
             <input type="text" name="num_tpi" placeholder="Ex : TPI-2025-0042">
           </div>
           <div class="divider"></div>
-          <div class="field">
-            <label>Garantie OPTEVEN visible dans les données véhicule ELSA ?</label>
-            <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="opteven" value="OUI"> Oui</label>
-              <label class="radio-item"><input type="radio" name="opteven" value="NON"> Non</label>
-            </div>
+          <div class="field"><label>Garantie OPTEVEN visible dans les données véhicule ELSA ?</label>
+            <div class="radio-group"><label class="radio-item"><input type="radio" name="opteven" value="OUI"> Oui</label><label class="radio-item"><input type="radio" name="opteven" value="NON"> Non</label></div>
           </div>
-          <div class="field">
-            <label>Code "tuning" enregistré dans SAGA/2 ou ODIS ?</label>
-            <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="tuning" value="OUI"> Oui <small style="color:var(--red);margin-left:4px;">→ NOK</small></label>
-              <label class="radio-item"><input type="radio" name="tuning" value="NON"> Non</label>
-            </div>
+          <div class="field"><label>Code "tuning" enregistré dans SAGA/2 ou ODIS ?</label>
+            <div class="radio-group"><label class="radio-item"><input type="radio" name="tuning" value="OUI"> Oui <small style="color:var(--red);">→ NOK</small></label><label class="radio-item"><input type="radio" name="tuning" value="NON"> Non</label></div>
           </div>
-          <div class="field">
-            <label>Préconisations constructeur respectées ?</label>
-            <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="preconisations" value="OUI"> Oui</label>
-              <label class="radio-item"><input type="radio" name="preconisations" value="NON"> Non</label>
-            </div>
+          <div class="field"><label>Préconisations constructeur respectées ?</label>
+            <div class="radio-group"><label class="radio-item"><input type="radio" name="preconisations" value="OUI"> Oui</label><label class="radio-item"><input type="radio" name="preconisations" value="NON"> Non</label></div>
           </div>
-          <div class="field">
-            <label>Dernier entretien fait chez le site ou vendu lors de la réparation ?</label>
-            <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="dernier_entretien" value="OUI"> Oui</label>
-              <label class="radio-item"><input type="radio" name="dernier_entretien" value="NON"> Non <small style="color:var(--red);margin-left:4px;">→ NOK</small></label>
-            </div>
+          <div class="field"><label>Dernier entretien fait chez le site ou vendu lors de la réparation ?</label>
+            <div class="radio-group"><label class="radio-item"><input type="radio" name="dernier_entretien" value="OUI"> Oui</label><label class="radio-item"><input type="radio" name="dernier_entretien" value="NON"> Non <small style="color:var(--red);">→ NOK</small></label></div>
           </div>
-          <div class="field">
-            <label>Lien entre la cause du dommage et l'entretien ?</label>
-            <div class="radio-group">
-              <label class="radio-item"><input type="radio" name="lien_entretien" value="OUI"> Oui <small style="color:var(--red);margin-left:4px;">→ NOK sauf entretiens OK</small></label>
-              <label class="radio-item"><input type="radio" name="lien_entretien" value="NON"> Non</label>
-            </div>
+          <div class="field"><label>Lien entre la cause du dommage et l'entretien ?</label>
+            <div class="radio-group"><label class="radio-item"><input type="radio" name="lien_entretien" value="OUI"> Oui <small style="color:var(--red);">→ NOK sauf entretiens OK</small></label><label class="radio-item"><input type="radio" name="lien_entretien" value="NON"> Non</label></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 3. CCR PRÉREQUIS -->
+    <!-- 3. CCR -->
     <div class="form-section section-ccr">
       <div class="section-header"><div class="section-number">3</div><div class="section-title">Prérequis CCR</div></div>
       <div class="section-body">
         <div class="info-box">Une demande <strong>KULANZ</strong> doit obligatoirement avoir été effectuée avant toute demande CCR.</div>
-        <div class="field">
-          <label>Demande KULANZ effectuée ?</label>
-          <div class="radio-group">
-            <label class="radio-item"><input type="radio" name="kulanz_done" value="OUI"> Oui – joindre la KULANZ à la demande</label>
-            <label class="radio-item"><input type="radio" name="kulanz_done" value="NON"> Non – effectuer la demande KULANZ d'abord</label>
-          </div>
+        <div class="field"><label>Demande KULANZ effectuée ?</label>
+          <div class="radio-group"><label class="radio-item"><input type="radio" name="kulanz_done" value="OUI"> Oui – joindre la KULANZ</label><label class="radio-item"><input type="radio" name="kulanz_done" value="NON"> Non – effectuer d'abord</label></div>
         </div>
       </div>
     </div>
@@ -552,18 +515,17 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <div class="form-section section-ccr">
       <div class="section-header"><div class="section-number">4</div><div class="section-title">Pièces à fournir</div></div>
       <div class="section-body">
-        <p style="font-size:12px;color:#888;margin-bottom:16px;">Cochez les documents joints à cette demande.</p>
         <div class="checklist">
-          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Devis établi au taux garantie"><span class="checklist-item-text"><strong>Devis établi au taux garantie</strong> – sans forfait, sans diagnostic, sans essai</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Devis établi au taux garantie"><span class="checklist-item-text"><strong>Devis établi au taux garantie</strong> – sans forfait, sans diagnostic</span></label>
           <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Accord Technique Préalable"><span class="checklist-item-text"><strong>Accord Technique Préalable</strong> – si nécessaire</span></label>
-          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Photo ou vidéo avec châssis"><span class="checklist-item-text"><strong>Photo ou vidéo</strong> avec numéro de châssis visible</span></label>
-          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Plan d'entretien numérique ELSA"><span class="checklist-item-text"><strong>Plan d'entretien numérique ELSA</strong></span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Photo ou vidéo avec châssis"><span class="checklist-item-text"><strong>Photo ou vidéo</strong> avec châssis visible (ServiceCam)</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Plan entretien ELSA"><span class="checklist-item-text"><strong>Plan d'entretien numérique ELSA</strong></span></label>
           <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Factures entretien réseau"><span class="checklist-item-text"><strong>Factures d'entretien – réseau</strong></span></label>
           <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Factures entretien hors réseau"><span class="checklist-item-text"><strong>Factures d'entretien – hors réseau</strong></span></label>
-          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="IQ avec plainte client"><span class="checklist-item-text"><strong>IQ</strong> avec plainte client et codage correspondant</span></label>
-          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Feuille Commentaire Technicien"><span class="checklist-item-text"><strong>Feuille Commentaire Technicien</strong> avec diagnostic précis</span></label>
-          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Protocole en ligne"><span class="checklist-item-text"><strong>Protocole en ligne</strong> avec plan de contrôle lancé</span></label>
-          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Contrôle des codes de garantie"><span class="checklist-item-text"><strong>Contrôle des codes de garantie</strong> (TD1, …)</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="IQ avec plainte client"><span class="checklist-item-text"><strong>IQ</strong> avec plainte client et codage</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Feuille Commentaire Technicien"><span class="checklist-item-text"><strong>Feuille Commentaire Technicien</strong> avec diagnostic</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Protocole en ligne"><span class="checklist-item-text"><strong>Protocole en ligne</strong> avec plan de contrôle</span></label>
+          <label class="checklist-item"><input type="checkbox" name="pieces[]" value="Contrôle codes de garantie"><span class="checklist-item-text"><strong>Contrôle des codes de garantie</strong> (TD1, …)</span></label>
         </div>
       </div>
     </div>
@@ -572,14 +534,14 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <div class="form-section section-ccr">
       <div class="section-header"><div class="section-number">5</div><div class="section-title">Règles CIG</div></div>
       <div class="section-body">
-        <div class="info-box">Un CIG 70/30 de <strong>16 %</strong> est obligatoire — 11 % à la charge du constructeur, 5 % à la charge de la concession.</div>
+        <div class="info-box">Un CIG 70/30 de <strong>16 %</strong> est obligatoire.</div>
         <div class="cig-box">
           <div class="cig-title">CIG appliqué</div>
           <div class="radio-group" style="flex-direction:column;gap:10px;">
             <label class="radio-item"><input type="radio" name="cig" value="standard_16"> CIG standard 16 %</label>
             <label class="radio-item" style="align-items:center;gap:10px;">
               <input type="radio" name="cig" value="superieur"> CIG supérieur à 16 % →
-              <input type="number" name="cig_taux" id="cig_taux_input" placeholder="…%" min="0" max="100" step="0.5" style="width:90px;padding:6px 10px;font-size:13px;" disabled>
+              <input type="number" name="cig_taux" id="cig_taux_input" placeholder="…%" min="0" max="100" step="0.5" style="width:90px;padding:6px 10px;" disabled>
             </label>
           </div>
         </div>
@@ -588,7 +550,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
 
     <!-- COMMENTAIRES -->
     <div class="form-section">
-      <div class="section-header"><div class="section-number" id="comm-num">4</div><div class="section-title">Commentaires & informations complémentaires</div></div>
+      <div class="section-header"><div class="section-number" id="comm-num">4</div><div class="section-title">Commentaires</div></div>
       <div class="section-body">
         <div class="field">
           <label>Commentaires <span class="opt">(optionnel)</span></label>
@@ -597,9 +559,8 @@ table.histo-table{width:100%;border-collapse:collapse;}
       </div>
     </div>
 
-    <!-- BOUTONS -->
     <div class="submit-area">
-      <p class="submit-hint">En soumettant, le formulaire sera envoyé par e-mail à <strong>teamgarantie@geauto.fr</strong></p>
+      <p class="submit-hint">En soumettant, le formulaire sera envoyé à <strong>teamgarantie@geauto.fr</strong></p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
         <button type="button" onclick="envoyerFormulaire()" class="btn-submit">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
@@ -627,8 +588,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
           <option>SKODA Hœnheim</option><option>VW Bischheim</option><option>VW Illkirch</option><option>VW Obernai</option>
         </select>
         <select id="filter-type" onchange="renderHistorique()">
-          <option value="">Tous les types</option>
-          <option>Kulanz</option><option>CCR</option>
+          <option value="">Tous les types</option><option>Kulanz</option><option>CCR</option>
         </select>
         <select id="filter-statut" onchange="renderHistorique()">
           <option value="">Tous les statuts</option>
@@ -646,38 +606,30 @@ table.histo-table{width:100%;border-collapse:collapse;}
     <div class="table-wrap">
       <div class="table-scroll">
         <table class="histo-table">
-          <thead>
-            <tr>
-              <th>Date</th><th>Site</th><th>Type</th><th>N° OR</th><th>Châssis</th>
-              <th>Code dom.</th><th>Statut</th><th>Prise en charge</th><th>Commentaire</th><th>Action</th>
-            </tr>
-          </thead>
+          <thead><tr>
+            <th>Date</th><th>Site</th><th>Type</th><th>N° OR</th><th>Châssis</th>
+            <th>Code dom.</th><th>Statut</th><th>Prise en charge</th><th>Commentaire</th><th>Action</th>
+          </tr></thead>
           <tbody id="histo-tbody"></tbody>
         </table>
       </div>
-      <div id="histo-empty" class="empty-state" style="display:none;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:0.3;margin-bottom:12px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        <p>Aucune demande trouvée</p>
-      </div>
+      <div id="histo-empty" class="empty-state" style="display:none;"><p style="font-size:14px;">Aucune demande trouvée</p></div>
     </div>
   </div>
 </div>
 
-<!-- PANNEAU LATÉRAL VALIDATION -->
+<!-- PANNEAU VALIDATION -->
 <div class="side-panel-overlay" id="sp-overlay" onclick="fermerPanneau()"></div>
 <div class="side-panel" id="side-panel">
   <div class="sp-header">
-    <div>
-      <h3>Validation de la demande</h3>
-      <p id="sp-subtitle">—</p>
-    </div>
+    <div><h3>Validation de la demande</h3><p id="sp-subtitle">—</p></div>
     <button class="sp-close" onclick="fermerPanneau()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
   <div class="sp-body">
     <div class="sp-section">
-      <div class="sp-section-title">Informations de la demande</div>
+      <div class="sp-section-title">Informations</div>
       <div class="sp-info-grid">
         <div class="sp-info-item"><div class="sp-info-label">Site</div><div class="sp-info-value" id="sp-site">—</div></div>
         <div class="sp-info-item"><div class="sp-info-label">Type</div><div class="sp-info-value" id="sp-type">—</div></div>
@@ -688,7 +640,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
       </div>
     </div>
     <div class="sp-section">
-      <div class="sp-section-title">Statut de validation</div>
+      <div class="sp-section-title">Statut</div>
       <div class="field">
         <label>Nouveau statut</label>
         <select class="sp-statut-select" id="sp-statut" onchange="onStatutChange()">
@@ -749,7 +701,7 @@ table.histo-table{width:100%;border-collapse:collapse;}
 <div id="toast"></div>
 
 <script>
-// ── FIREBASE STORAGE ──────────────────────────────────────────
+// ── FIREBASE TEMPS RÉEL ───────────────────────────────────────
 var firebaseConfig = {
   apiKey: "AIzaSyDPsep7yTE-UAjGGSioZfVAozGEo_lSmSQ",
   authDomain: "demande-kulanzccr.firebaseapp.com",
@@ -759,656 +711,817 @@ var firebaseConfig = {
   messagingSenderId: "128572691256",
   appId: "1:128572691256:web:43cd3e057b5287199967cd"
 };
-
-if(!firebase.apps.length){ firebase.initializeApp(firebaseConfig); }
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 var db = firebase.database();
 var demandesRef = db.ref('demandes');
+var firebaseConnected = false;
+var listenerActif = false;
 
-function chargerDemandes(){ chargerDemandesSync(function(){}); }
+// Surveiller la connexion Firebase
+db.ref('.info/connected').on('value', function(snap) {
+  firebaseConnected = snap.val() === true;
+  var ind = document.getElementById('firebase-indicator');
+  if (ind) {
+    ind.style.background = firebaseConnected ? '#27ae60' : '#c0392b';
+    ind.title = firebaseConnected ? 'Firebase connecté' : 'Firebase hors ligne — données locales';
+  }
+});
 
-function chargerDemandesSync(callback){
-  var tbody = document.getElementById('histo-tbody');
-  if(tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
-  demandesRef.once('value')
-  .then(function(snapshot){
+// Écoute temps réel — se déclenche automatiquement à chaque changement
+function activerEcouteTempsReel() {
+  if (listenerActif) return;
+  listenerActif = true;
+  demandesRef.on('value', function(snapshot) {
     demandes = [];
-    snapshot.forEach(function(child){ demandes.push(child.val()); });
-    demandes.sort(function(a,b){ return b.id - a.id; });
-    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
-    if(callback) callback();
-  })
-  .catch(function(err){
-    console.error('Firebase erreur:', err);
-    try{ var s=localStorage.getItem('ge_auto_demandes'); demandes=s?JSON.parse(s):[]; }catch(e){ demandes=[]; }
-    if(callback) callback();
+    snapshot.forEach(function(child) { demandes.push(child.val()); });
+    demandes.sort(function(a,b) { return b.id - a.id; });
+    try { localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); } catch(e) {}
+    // Rafraîchir l'historique si ouvert
+    if (document.getElementById('page-historique').classList.contains('active')) {
+      afficherHistorique();
+    }
+  }, function(err) {
+    console.error('Firebase listener erreur:', err);
+    showToast('⚠ Connexion Firebase perdue — données locales utilisées.');
+    try { var s = localStorage.getItem('ge_auto_demandes'); demandes = s ? JSON.parse(s) : []; } catch(e) { demandes = []; }
   });
 }
 
-function sauvegarderDemandes(callback){
+function chargerDemandesSync(callback) {
+  if (demandes.length > 0) {
+    // Données déjà en mémoire — pas de requête réseau
+    if (callback) callback();
+    return;
+  }
+  var tbody = document.getElementById('histo-tbody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
+  demandesRef.once('value')
+    .then(function(snapshot) {
+      demandes = [];
+      snapshot.forEach(function(child) { demandes.push(child.val()); });
+      demandes.sort(function(a,b) { return b.id - a.id; });
+      try { localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); } catch(e) {}
+      if (callback) callback();
+    })
+    .catch(function() {
+      try { var s = localStorage.getItem('ge_auto_demandes'); demandes = s ? JSON.parse(s) : []; } catch(e) { demandes = []; }
+      if (callback) callback();
+    });
+}
+
+function sauvegarderDemandes(callback) {
   var obj = {};
-  demandes.forEach(function(d){ obj['d'+d.id] = d; });
+  demandes.forEach(function(d) { obj['d' + d.id] = d; });
   demandesRef.set(obj)
-  .then(function(){
-    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
-    if(callback) callback();
-  })
-  .catch(function(err){
-    console.error('Erreur sauvegarde Firebase:', err);
-    try{ localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); }catch(e){}
-    if(callback) callback();
-  });
+    .then(function() {
+      try { localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); } catch(e) {}
+      if (callback) callback();
+    })
+    .catch(function(err) {
+      console.error('Erreur Firebase:', err);
+      try { localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); } catch(e) {}
+      if (callback) callback();
+    });
 }
 
-function confirmerSuppression(){
-  if(confirm('⚠ Supprimer tout l\'historique partagé ?')){
+function confirmerSuppression() {
+  if (confirm('⚠ Supprimer tout l\'historique partagé ?')) {
     demandesRef.remove()
-    .then(function(){ demandes=[]; renderHistorique(); showToast('🗑 Historique supprimé.'); })
-    .catch(function(){ showToast('❌ Erreur suppression.'); });
+      .then(function() { demandes = []; afficherHistorique(); showToast('🗑 Historique supprimé.'); })
+      .catch(function() { showToast('❌ Erreur suppression.'); });
   }
 }
+
+// ── CONSTANTES ────────────────────────────────────────────────
+var MOT_DE_PASSE = 'Garantie2026';
+var WEB3_KEY = '7bf5b927-e39f-4fc1-9f60-642e4741e445';
+var kvpsMap = {
   'Audi Hœnheim':'02155','Audi Obernai':'02486',
   'SEAT Hœnheim':'63930','SKODA Hœnheim':'02376',
   'VW Bischheim':'02154','VW Illkirch':'02153','VW Obernai':'02485'
 };
 
+// ── ÉTAT ──────────────────────────────────────────────────────
 var typeAcces = '';
 var siteUsager = '';
 var donneesKulanz = {};
 var demandes = [];
 var demandeEnCours = null;
+var brouillon = {}; // sauvegarde auto du formulaire
 
 // ── HELPERS ───────────────────────────────────────────────────
-function getVal(n){var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]');return el?el.value.trim():'';}
-function setVal(n,v){var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]');if(el&&v!==undefined)el.value=v;}
-function getRadio(n){var el=document.getElementById('mainForm').querySelector('[name="'+n+'"]:checked');return el?el.value:'';}
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500);}
-
-// ── JSONBIN STORAGE ───────────────────────────────────────────
-function chargerDemandes(){chargerDemandesSync(function(){});}
-
-function chargerDemandesSync(callback){
-  var tbody=document.getElementById('histo-tbody');
-  if(tbody)tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
-  fetch(JSONBIN_URL+'/latest',{method:'GET',headers:{'X-Master-Key':JSONBIN_KEY,'X-Bin-Meta':'false'}})
-  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-  .then(function(data){
-    demandes=(data&&Array.isArray(data.demandes))?data.demandes:[];
-    try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}
-    if(callback)callback();
-  })
-  .catch(function(err){
-    console.error('JSONBin erreur:',err);
-    try{var s=localStorage.getItem('ge_auto_demandes');demandes=s?JSON.parse(s):[];}catch(e){demandes=[];}
-    if(callback)callback();
-  });
+function getVal(n) {
+  var el = document.getElementById('mainForm').querySelector('[name="'+n+'"]');
+  return el ? el.value.trim() : '';
+}
+function setVal(n, v) {
+  var el = document.getElementById('mainForm').querySelector('[name="'+n+'"]');
+  if (el && v !== undefined) el.value = v;
+}
+function getRadio(n) {
+  var el = document.getElementById('mainForm').querySelector('[name="'+n+'"]:checked');
+  return el ? el.value : '';
+}
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
 }
 
-function sauvegarderDemandes(callback){
-  fetch(JSONBIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},body:JSON.stringify({demandes:demandes})})
-  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(e){}if(callback)callback();})
-  .catch(function(e){console.error('Erreur sauvegarde:',e);try{localStorage.setItem('ge_auto_demandes',JSON.stringify(demandes));}catch(ex){}if(callback)callback();});
+// ── FIREBASE STORAGE ──────────────────────────────────────────
+function chargerDemandesSync(callback) {
+  var tbody = document.getElementById('histo-tbody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#888;">⏳ Chargement…</td></tr>';
+  demandesRef.once('value')
+    .then(function(snapshot) {
+      demandes = [];
+      snapshot.forEach(function(child) { demandes.push(child.val()); });
+      demandes.sort(function(a,b) { return b.id - a.id; });
+      try { localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); } catch(e) {}
+      if (callback) callback();
+    })
+    .catch(function(err) {
+      console.error('Firebase erreur:', err);
+      try { var s = localStorage.getItem('ge_auto_demandes'); demandes = s ? JSON.parse(s) : []; } catch(e) { demandes = []; }
+      if (callback) callback();
+    });
+}
+
+function sauvegarderDemandes(callback) {
+  var obj = {};
+  demandes.forEach(function(d) { obj['d' + d.id] = d; });
+  demandesRef.set(obj)
+    .then(function() {
+      try { localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); } catch(e) {}
+      if (callback) callback();
+    })
+    .catch(function(err) {
+      console.error('Erreur Firebase:', err);
+      try { localStorage.setItem('ge_auto_demandes', JSON.stringify(demandes)); } catch(e) {}
+      if (callback) callback();
+    });
+}
+
+function confirmerSuppression() {
+  if (confirm('⚠ Supprimer tout l\'historique partagé ?')) {
+    demandesRef.remove()
+      .then(function() { demandes = []; renderHistorique(); showToast('🗑 Historique supprimé.'); })
+      .catch(function() { showToast('❌ Erreur suppression.'); });
+  }
 }
 
 // ── ACCÈS ─────────────────────────────────────────────────────
-function choisirAcces(type){
-  if(type==='usager'){document.getElementById('login-step-1').style.display='none';document.getElementById('login-step-2').style.display='block';}
-  else{document.getElementById('login-modal').classList.add('open');setTimeout(function(){document.getElementById('login-pwd').focus();},150);}
-}
-function retourStep1(){document.getElementById('login-step-2').style.display='none';document.getElementById('login-step-1').style.display='block';}
-
-function choisirSiteUsager(site){
-  siteUsager=site; typeAcces='usager'; ouvrirApp();
-}
-
-function validerLogin(){
-  var pwd=document.getElementById('login-pwd').value;
-  var err=document.getElementById('login-error');
-  if(pwd!==MOT_DE_PASSE){err.style.display='block';document.getElementById('login-pwd').focus();return;}
-  err.style.display='none'; typeAcces='team'; siteUsager=''; fermerLoginModal(); ouvrirApp();
-}
-
-function fermerLoginModal(){
-  document.getElementById('login-modal').classList.remove('open');
-  document.getElementById('login-pwd').value='';
-  document.getElementById('login-error').style.display='none';
-}
-
-function ouvrirApp(){
-  document.getElementById('login-page').classList.add('hidden');
-  document.getElementById('user-info').style.display='flex';
-  if(typeAcces==='team'){
-    document.getElementById('user-role-badge').textContent='🔐 TeamGarantie';
-    document.getElementById('tab-historique').style.display='block';
-    document.getElementById('site-bar-wrap').style.display='flex';
+function choisirAcces(type) {
+  if (type === 'usager') {
+    document.getElementById('login-step-1').style.display = 'none';
+    document.getElementById('login-step-2').style.display = 'block';
   } else {
-    document.getElementById('user-role-badge').textContent='👤 '+siteUsager;
-    document.getElementById('tab-historique').style.display='block';
-    document.getElementById('site-bar-wrap').style.display='none';
-    // Pré-sélectionner le site
-    document.getElementById('f_site').value=siteUsager;
-    document.getElementById('site-display-name').textContent=siteUsager;
-    document.getElementById('kvps_input').value=kvpsMap[siteUsager]||'';
-    document.getElementById('kvps_input').readOnly=true;
-    document.getElementById('f_site_display').value=siteUsager;
-    document.getElementById('site_display_field').style.display='flex';
-    document.querySelectorAll('.site-btn').forEach(function(b){b.classList.toggle('active',b.textContent.trim()===siteUsager);});
+    document.getElementById('login-modal').classList.add('open');
+    setTimeout(function(){ document.getElementById('login-pwd').focus(); }, 150);
   }
 }
 
-function deconnecter(){
-  typeAcces=''; siteUsager='';
+function retourStep1() {
+  document.getElementById('login-step-2').style.display = 'none';
+  document.getElementById('login-step-1').style.display = 'block';
+}
+
+function choisirSiteUsager(site) {
+  siteUsager = site;
+  typeAcces = 'usager';
+  ouvrirApp();
+}
+
+function validerLogin() {
+  var pwd = document.getElementById('login-pwd').value;
+  var err = document.getElementById('login-error');
+  if (pwd !== MOT_DE_PASSE) { err.style.display = 'block'; document.getElementById('login-pwd').focus(); return; }
+  err.style.display = 'none';
+  typeAcces = 'team';
+  siteUsager = '';
+  fermerLoginModal();
+  ouvrirApp();
+}
+
+function fermerLoginModal() {
+  document.getElementById('login-modal').classList.remove('open');
+  document.getElementById('login-pwd').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+function ouvrirApp() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('user-info').style.display = 'flex';
+  if (typeAcces === 'team') {
+    document.getElementById('user-role-badge').textContent = '🔐 TeamGarantie';
+    document.getElementById('tab-historique').style.display = 'block';
+    document.getElementById('site-bar-wrap').style.display = 'flex';
+  } else {
+    document.getElementById('user-role-badge').textContent = '👤 ' + siteUsager;
+    document.getElementById('tab-historique').style.display = 'block';
+    document.getElementById('site-bar-wrap').style.display = 'none';
+    // Pré-sélectionner le site
+    document.getElementById('f_site').value = siteUsager;
+    document.getElementById('site-display-name').textContent = siteUsager;
+    document.getElementById('kvps_input').value = kvpsMap[siteUsager] || '';
+    document.getElementById('kvps_input').readOnly = true;
+    document.getElementById('f_site_display').value = siteUsager;
+    document.getElementById('site_display_field').style.display = 'flex';
+    document.querySelectorAll('.site-btn').forEach(function(b) {
+      b.classList.toggle('active', b.textContent.trim() === siteUsager);
+    });
+  }
+}
+
+function deconnecter() {
+  typeAcces = ''; siteUsager = '';
   document.getElementById('login-page').classList.remove('hidden');
-  document.getElementById('login-step-1').style.display='block';
-  document.getElementById('login-step-2').style.display='none';
-  document.getElementById('user-info').style.display='none';
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('login-step-1').style.display = 'block';
+  document.getElementById('login-step-2').style.display = 'none';
+  document.getElementById('user-info').style.display = 'none';
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-formulaire').classList.add('active');
   document.getElementById('tab-formulaire').classList.add('active');
   document.getElementById('tab-historique').classList.remove('active');
-  document.getElementById('tab-historique').style.display='none';
-  document.getElementById('toggle-bar').style.display='block';
-  document.getElementById('kvps_input').readOnly=false;
-  document.getElementById('site_display_field').style.display='none';
-  document.getElementById('site-bar-wrap').style.display='flex';
+  document.getElementById('tab-historique').style.display = 'none';
+  document.getElementById('toggle-bar').style.display = 'block';
+  document.getElementById('kvps_input').readOnly = false;
+  document.getElementById('site_display_field').style.display = 'none';
+  document.getElementById('site-bar-wrap').style.display = 'flex';
+  document.querySelectorAll('.site-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('f_site').value = '';
+  document.getElementById('site-display-name').textContent = 'Aucun site sélectionné';
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
-function showPage(page,tabEl){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
-  document.getElementById('page-'+page).classList.add('active');
-  if(tabEl)tabEl.classList.add('active');
-  document.getElementById('toggle-bar').style.display=page==='formulaire'?'block':'none';
-  if(page==='historique'){renderHistorique();}
+function showPage(page, tabEl) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('page-' + page).classList.add('active');
+  if (tabEl) tabEl.classList.add('active');
+  document.getElementById('toggle-bar').style.display = page === 'formulaire' ? 'block' : 'none';
+  // Historique : afficher depuis mémoire (temps réel Firebase s'en charge)
+  if (page === 'historique') afficherHistorique();
 }
 
 // ── SITE ──────────────────────────────────────────────────────
-function selectSite(btn,name){
-  document.querySelectorAll('.site-btn').forEach(function(b){b.classList.remove('active');});
+function selectSite(btn, name) {
+  document.querySelectorAll('.site-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  document.getElementById('f_site').value=name;
-  document.getElementById('site-display-name').textContent=name;
-  document.getElementById('kvps_input').value=kvpsMap[name]||'';
+  document.getElementById('f_site').value = name;
+  document.getElementById('site-display-name').textContent = name;
+  document.getElementById('kvps_input').value = kvpsMap[name] || '';
 }
 
 // ── TYPE TOGGLE ───────────────────────────────────────────────
-function switchType(type){
-  var isK=type==='kulanz';
-  if(!isK)sauvegarderKulanz();
-  document.getElementById('btn-kulanz').classList.toggle('active',isK);
-  document.getElementById('btn-ccr').classList.toggle('active',!isK);
-  document.getElementById('f_type').value=isK?'Kulanz':'CCR';
-  document.querySelectorAll('.section-kulanz').forEach(function(el){el.style.display=isK?'block':'none';});
-  document.querySelectorAll('.section-ccr').forEach(function(el){el.style.display=!isK?'block':'none';});
-  document.getElementById('comm-num').textContent=isK?'4':'6';
-  document.getElementById('btn-copier-kulanz').style.display=isK?'none':'flex';
+function switchType(type) {
+  var isK = type === 'kulanz';
+  if (!isK) sauvegarderKulanz();
+  document.getElementById('btn-kulanz').classList.toggle('active', isK);
+  document.getElementById('btn-ccr').classList.toggle('active', !isK);
+  document.getElementById('f_type').value = isK ? 'Kulanz' : 'CCR';
+  document.querySelectorAll('.section-kulanz').forEach(function(el){ el.style.display = isK ? 'block' : 'none'; });
+  document.querySelectorAll('.section-ccr').forEach(function(el){ el.style.display = !isK ? 'block' : 'none'; });
+  document.getElementById('comm-num').textContent = isK ? '4' : '6';
+  document.getElementById('btn-copier-kulanz').style.display = isK ? 'none' : 'flex';
 }
 
 // ── KULANZ SAVE/COPY ──────────────────────────────────────────
-function sauvegarderKulanz(){
-  donneesKulanz={
-    site:document.getElementById('f_site').value,
-    chassis:getVal('chassis'),kilometrage:getVal('kilometrage'),
-    or_number:getVal('or_number'),date_or:getVal('date_or'),
-    kvps:getVal('kvps'),technicien:getVal('technicien'),
-    email_usager:getVal('email_usager'),
-    plainte_client:getVal('plainte_client'),type_avarie:getVal('type_avarie'),
-    emplacement:getVal('emplacement'),ref_piece:getVal('ref_piece'),
-    desig_piece:getVal('desig_piece'),code_dommage:getVal('code_dommage'),
-    code_avarie:getVal('code_avarie')
+function sauvegarderKulanz() {
+  donneesKulanz = {
+    site: document.getElementById('f_site').value,
+    chassis: getVal('chassis'), kilometrage: getVal('kilometrage'),
+    or_number: getVal('or_number'), date_or: getVal('date_or'),
+    kvps: getVal('kvps'), technicien: getVal('technicien'),
+    email_usager: getVal('email_usager'),
+    plainte_client: getVal('plainte_client'), type_avarie: getVal('type_avarie'),
+    emplacement: getVal('emplacement'), ref_piece: getVal('ref_piece'),
+    desig_piece: getVal('desig_piece'), code_dommage: getVal('code_dommage'),
+    code_avarie: getVal('code_avarie')
   };
 }
-function copierDepuisKulanz(){
-  if(!donneesKulanz.chassis&&!donneesKulanz.or_number){alert('⚠ Aucune donnée Kulanz trouvée.');return;}
+
+function copierDepuisKulanz() {
+  if (!donneesKulanz.chassis && !donneesKulanz.or_number) { alert('⚠ Aucune donnée Kulanz trouvée.'); return; }
   ['chassis','kilometrage','or_number','date_or','kvps','technicien','email_usager',
    'plainte_client','type_avarie','emplacement','ref_piece','desig_piece','code_dommage','code_avarie']
-  .forEach(function(n){setVal(n,donneesKulanz[n]);});
-  if(donneesKulanz.site){
-    document.getElementById('f_site').value=donneesKulanz.site;
-    document.getElementById('site-display-name').textContent=donneesKulanz.site;
-    document.querySelectorAll('.site-btn').forEach(function(b){b.classList.toggle('active',b.textContent.trim()===donneesKulanz.site);});
+  .forEach(function(n){ setVal(n, donneesKulanz[n]); });
+  if (donneesKulanz.site) {
+    document.getElementById('f_site').value = donneesKulanz.site;
+    document.getElementById('site-display-name').textContent = donneesKulanz.site;
+    document.querySelectorAll('.site-btn').forEach(function(b){
+      b.classList.toggle('active', b.textContent.trim() === donneesKulanz.site);
+    });
   }
-  updateCodeDesc('dommage');updateCodeDesc('avarie');
-  var ci=document.getElementById('chassis_input');
-  if(ci){var h=document.getElementById('chassis_hint');var v=ci.value;h.textContent=v.length+' / 17 caractères';h.className='hint'+(v.length===17?' ok':v.length>0?' err':'');}
+  updateCodeDesc('dommage');
+  updateCodeDesc('avarie');
+  var ci = document.getElementById('chassis_input');
+  if (ci && ci.value) {
+    var h = document.getElementById('chassis_hint');
+    h.textContent = ci.value.length + ' / 17 caractères';
+    h.className = 'hint' + (ci.value.length === 17 ? ' ok' : ' err');
+  }
   showToast('✔ Données Kulanz copiées !');
 }
 
-// ── AUTOCOMPLETE CHÂSSIS ──────────────────────────────────────
-function chassisInput(input){
-  var v=input.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,17);
-  input.value=v;
-  var h=document.getElementById('chassis_hint');
-  h.textContent=v.length+' / 17 caractères';
-  h.className='hint'+(v.length===17?' ok':v.length>0?' err':'');
-  input.className=v.length===17?'valid':v.length>0?'invalid':'';
-  var list=document.getElementById('chassis-ac-list');
-  if(v.length<5){list.classList.remove('open');return;}
-  chargerDemandesSync(function(){
-    var vus={};
-    var res=demandes.filter(function(d){
-      if(d.chassis&&d.chassis.toUpperCase().indexOf(v)===0&&!vus[d.chassis]){vus[d.chassis]=true;return true;}
-      return false;
-    }).slice(0,5);
-    if(res.length===0){list.classList.remove('open');return;}
-    list.innerHTML=res.map(function(d){
-      return '<div class="ac-item" onclick="appliquerChassis(\''+d.chassis+'\')">'+
-        '<div class="ac-chassis">'+d.chassis+'</div>'+
-        '<div class="ac-detail">'+d.site+' — OR '+d.or+' — '+d.date+'</div></div>';
-    }).join('');
-    list.classList.add('open');
-  });
-}
-function appliquerChassis(chassis){
-  chargerDemandesSync(function(){
-    var d=demandes.find(function(x){return x.chassis===chassis;});
-    if(!d)return;
-    document.getElementById('chassis-ac-list').classList.remove('open');
-    document.getElementById('chassis_input').value=chassis;
-    document.getElementById('chassis_hint').textContent='17 / 17 caractères';
-    document.getElementById('chassis_hint').className='hint ok';
-    document.getElementById('chassis_input').className='valid';
-    if(d.kilometrage)setVal('kilometrage',d.kilometrage);
-    if(d.date_or)setVal('date_or',d.date_or);
-    if(d.kvps&&!document.getElementById('kvps_input').readOnly)setVal('kvps',d.kvps);
-    if(d.technicien)setVal('technicien',d.technicien);
-    if(d.email_usager)setVal('email_usager',d.email_usager);
-    if(d.site&&typeAcces==='team'){
-      document.getElementById('f_site').value=d.site;
-      document.getElementById('site-display-name').textContent=d.site;
-      document.querySelectorAll('.site-btn').forEach(function(b){b.classList.toggle('active',b.textContent.trim()===d.site);});
+// ── AUTOCOMPLETE ──────────────────────────────────────────────
+function chassisInput(input) {
+  var v = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 17);
+  input.value = v;
+  var h = document.getElementById('chassis_hint');
+  h.textContent = v.length + ' / 17 caractères';
+  h.className = 'hint' + (v.length === 17 ? ' ok' : v.length > 0 ? ' err' : '');
+  input.className = v.length === 17 ? 'valid' : v.length > 0 ? 'invalid' : '';
+  var list = document.getElementById('chassis-ac-list');
+  if (v.length < 5) { list.classList.remove('open'); return; }
+  // Utiliser les demandes déjà chargées en mémoire
+  var vus = {};
+  var res = demandes.filter(function(d) {
+    if (d.chassis && d.chassis.toUpperCase().indexOf(v) === 0 && !vus[d.chassis]) {
+      vus[d.chassis] = true; return true;
     }
-    showToast('✔ Véhicule reconnu — informations pré-remplies !');
-  });
+    return false;
+  }).slice(0, 5);
+  if (res.length === 0) { list.classList.remove('open'); return; }
+  list.innerHTML = res.map(function(d) {
+    return '<div class="ac-item" onclick="appliquerChassis(\'' + d.chassis + '\')">' +
+      '<div class="ac-chassis">' + d.chassis + '</div>' +
+      '<div class="ac-detail">' + d.site + ' — OR ' + d.or + ' — ' + d.date + '</div></div>';
+  }).join('');
+  list.classList.add('open');
 }
-document.addEventListener('click',function(e){if(!e.target.closest('.autocomplete-wrap'))document.getElementById('chassis-ac-list').classList.remove('open');});
+
+function appliquerChassis(chassis) {
+  var d = demandes.find(function(x){ return x.chassis === chassis; });
+  if (!d) return;
+  document.getElementById('chassis-ac-list').classList.remove('open');
+  document.getElementById('chassis_input').value = chassis;
+  document.getElementById('chassis_hint').textContent = '17 / 17 caractères';
+  document.getElementById('chassis_hint').className = 'hint ok';
+  document.getElementById('chassis_input').className = 'valid';
+  if (d.kilometrage) setVal('kilometrage', d.kilometrage);
+  if (d.date_or) setVal('date_or', d.date_or);
+  if (d.kvps && !document.getElementById('kvps_input').readOnly) setVal('kvps', d.kvps);
+  if (d.technicien) setVal('technicien', d.technicien);
+  if (d.email_usager) setVal('email_usager', d.email_usager);
+  if (d.site && typeAcces === 'team') {
+    document.getElementById('f_site').value = d.site;
+    document.getElementById('site-display-name').textContent = d.site;
+    document.querySelectorAll('.site-btn').forEach(function(b){
+      b.classList.toggle('active', b.textContent.trim() === d.site);
+    });
+  }
+  showToast('✔ Véhicule reconnu — informations pré-remplies !');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.autocomplete-wrap')) document.getElementById('chassis-ac-list').classList.remove('open');
+});
 
 // ── VALIDATION ────────────────────────────────────────────────
-function orInput(input){
-  var v=input.value.replace(/\D/g,'').slice(0,6);
-  input.value=v;
-  var h=document.getElementById('or_hint');
-  h.textContent=v.length+' / 6 chiffres';
-  h.className='hint'+(v.length===6?' ok':v.length>0?' err':'');
-  input.className=v.length===6?'valid':v.length>0?'invalid':'';
+function orInput(input) {
+  var v = input.value.replace(/\D/g, '').slice(0, 6);
+  input.value = v;
+  var h = document.getElementById('or_hint');
+  h.textContent = v.length + ' / 6 chiffres';
+  h.className = 'hint' + (v.length === 6 ? ' ok' : v.length > 0 ? ' err' : '');
+  input.className = v.length === 6 ? 'valid' : v.length > 0 ? 'invalid' : '';
 }
-function updateCodeDesc(type){
-  if(type==='dommage'){var s=document.getElementById('code_dom_input');var h=document.getElementById('code_dom_hint');h.textContent=s.value?'✔ '+s.options[s.selectedIndex].text:'';h.className=s.value?'hint ok':'hint';}
-  if(type==='avarie'){var s=document.getElementById('code_ava_input');var h=document.getElementById('code_ava_hint');h.textContent=s.value?'✔ '+s.options[s.selectedIndex].text:'';h.className=s.value?'hint ok':'hint';}
+
+function updateCodeDesc(type) {
+  if (type === 'dommage') {
+    var s = document.getElementById('code_dom_input');
+    var h = document.getElementById('code_dom_hint');
+    h.textContent = s.value ? '✔ ' + s.options[s.selectedIndex].text : '';
+    h.className = s.value ? 'hint ok' : 'hint';
+  }
+  if (type === 'avarie') {
+    var s = document.getElementById('code_ava_input');
+    var h = document.getElementById('code_ava_hint');
+    h.textContent = s.value ? '✔ ' + s.options[s.selectedIndex].text : '';
+    h.className = s.value ? 'hint ok' : 'hint';
+  }
 }
-document.addEventListener('change',function(e){
-  if(e.target.name==='tpi')document.getElementById('tpi_num_field').style.display=e.target.value==='OUI'?'flex':'none';
-  if(e.target.name==='cig'){var i=document.getElementById('cig_taux_input');i.disabled=e.target.value!=='superieur';if(!i.disabled)i.focus();}
+
+// ── SAUVEGARDE AUTO BROUILLON ─────────────────────────────────
+var brouillonTimer = null;
+function sauvegarderBrouillon() {
+  clearTimeout(brouillonTimer);
+  brouillonTimer = setTimeout(function() {
+    var b = {
+      site: document.getElementById('f_site').value,
+      type: document.getElementById('f_type').value,
+      chassis: getVal('chassis'), kilometrage: getVal('kilometrage'),
+      or_number: getVal('or_number'), date_or: getVal('date_or'),
+      kvps: getVal('kvps'), technicien: getVal('technicien'),
+      email_usager: getVal('email_usager'),
+      plainte_client: getVal('plainte_client'), type_avarie: getVal('type_avarie'),
+      emplacement: getVal('emplacement'), ref_piece: getVal('ref_piece'),
+      desig_piece: getVal('desig_piece'), code_dommage: getVal('code_dommage'),
+      code_avarie: getVal('code_avarie'), commentaires: getVal('commentaires')
+    };
+    try { localStorage.setItem('ge_auto_brouillon', JSON.stringify(b)); } catch(e) {}
+  }, 800);
+}
+
+function restaurerBrouillon() {
+  try {
+    var s = localStorage.getItem('ge_auto_brouillon');
+    if (!s) return;
+    var b = JSON.parse(s);
+    if (!b.chassis && !b.or_number) return;
+    if (!confirm('📋 Un brouillon non envoyé a été trouvé. Voulez-vous le restaurer ?')) {
+      localStorage.removeItem('ge_auto_brouillon'); return;
+    }
+    if (b.site) { document.getElementById('f_site').value = b.site; document.getElementById('site-display-name').textContent = b.site; document.querySelectorAll('.site-btn').forEach(function(btn){ btn.classList.toggle('active', btn.textContent.trim() === b.site); }); }
+    ['chassis','kilometrage','or_number','date_or','kvps','technicien','email_usager','plainte_client','type_avarie','emplacement','ref_piece','desig_piece','code_dommage','code_avarie','commentaires'].forEach(function(n){ if (b[n]) setVal(n, b[n]); });
+    if (b.type && b.type !== 'Kulanz') switchType('ccr');
+    updateCodeDesc('dommage'); updateCodeDesc('avarie');
+    var ci = document.getElementById('chassis_input');
+    if (ci && ci.value) { var h = document.getElementById('chassis_hint'); h.textContent = ci.value.length + ' / 17 caractères'; h.className = 'hint' + (ci.value.length === 17 ? ' ok' : ' err'); }
+    showToast('✔ Brouillon restauré !');
+  } catch(e) {}
+}
+
+// Écouter les changements du formulaire pour sauvegarder le brouillon
+document.addEventListener('input', function(e) {
+  if (e.target.closest('#mainForm')) sauvegarderBrouillon();
+});
+document.addEventListener('change', function(e) {
+  if (e.target.closest('#mainForm')) {
+    sauvegarderBrouillon();
+    if (e.target.name === 'tpi')
+      document.getElementById('tpi_num_field').style.display = e.target.value === 'OUI' ? 'flex' : 'none';
+    if (e.target.name === 'cig') {
+      var i = document.getElementById('cig_taux_input');
+      i.disabled = e.target.value !== 'superieur';
+      if (!i.disabled) i.focus();
+    }
+  }
 });
 
 // ── COLLECTE ─────────────────────────────────────────────────
-function collecterDonnees(){
-  var site=document.getElementById('f_site').value;
-  var type=document.getElementById('f_type').value||'Kulanz';
-  var selDom=document.getElementById('code_dom_input');
-  var selAva=document.getElementById('code_ava_input');
-  var domLabel=selDom&&selDom.value?selDom.options[selDom.selectedIndex].text:'';
-  var avaLabel=selAva&&selAva.value?selAva.options[selAva.selectedIndex].text:'';
-  var fields=[
-    {label:'Numéro identification véhicule (Châssis)',value:getVal('chassis')},
-    {label:'Kilométrage',value:getVal('kilometrage')?getVal('kilometrage')+' km':''},
-    {label:'Code dommage',value:domLabel},
-    {label:'Code avarie',value:avaLabel},
-    {label:'Emplacement du dommage',value:getVal('emplacement')},
-    {label:'Référence pièce',value:getVal('ref_piece')},
-    {label:'Désignation pièce',value:getVal('desig_piece')},
-    {label:"Description de l'avarie (Plainte client)",value:getVal('plainte_client')},
-    {label:"Type d'avarie",value:getVal('type_avarie')},
-    {label:"N° d'Ordre de Réparation",value:getVal('or_number')},
-    {label:"Date de l'OR",value:getVal('date_or')},
-    {label:'KVPS',value:getVal('kvps')},
-    {label:'Technicien',value:getVal('technicien')},
-    {label:'E-mail usager',value:getVal('email_usager')},
+function collecterDonnees() {
+  var site = document.getElementById('f_site').value;
+  var type = document.getElementById('f_type').value || 'Kulanz';
+  var selDom = document.getElementById('code_dom_input');
+  var selAva = document.getElementById('code_ava_input');
+  var domLabel = selDom && selDom.value ? selDom.options[selDom.selectedIndex].text : '';
+  var avaLabel = selAva && selAva.value ? selAva.options[selAva.selectedIndex].text : '';
+  var fields = [
+    {label:'Numéro identification véhicule (Châssis)', value:getVal('chassis')},
+    {label:'Kilométrage', value:getVal('kilometrage') ? getVal('kilometrage') + ' km' : ''},
+    {label:'Code dommage', value:domLabel},
+    {label:'Code avarie', value:avaLabel},
+    {label:'Emplacement du dommage', value:getVal('emplacement')},
+    {label:'Référence pièce', value:getVal('ref_piece')},
+    {label:'Désignation pièce', value:getVal('desig_piece')},
+    {label:"Description de l'avarie (Plainte client)", value:getVal('plainte_client')},
+    {label:"Type d'avarie", value:getVal('type_avarie')},
+    {label:"N° d'Ordre de Réparation", value:getVal('or_number')},
+    {label:"Date de l'OR", value:getVal('date_or')},
+    {label:'KVPS', value:getVal('kvps')},
+    {label:'Technicien', value:getVal('technicien')},
+    {label:'E-mail usager', value:getVal('email_usager')},
   ];
-  if(type==='Kulanz'){
-    fields=fields.concat([
-      {label:'TPI présente',value:getRadio('tpi')},
-      {label:'N° TPI',value:getVal('num_tpi')},
-      {label:'Garantie OPTEVEN visible',value:getRadio('opteven')},
-      {label:'Code tuning détecté',value:getRadio('tuning')},
-      {label:'Préconisations respectées',value:getRadio('preconisations')},
-      {label:'Dernier entretien OK',value:getRadio('dernier_entretien')},
-      {label:'Lien dommage / entretien',value:getRadio('lien_entretien')},
+  if (type === 'Kulanz') {
+    fields = fields.concat([
+      {label:'TPI présente', value:getRadio('tpi')},
+      {label:'N° TPI', value:getVal('num_tpi')},
+      {label:'Garantie OPTEVEN visible', value:getRadio('opteven')},
+      {label:'Code tuning détecté', value:getRadio('tuning')},
+      {label:'Préconisations respectées', value:getRadio('preconisations')},
+      {label:'Dernier entretien OK', value:getRadio('dernier_entretien')},
+      {label:'Lien dommage / entretien', value:getRadio('lien_entretien')},
     ]);
   } else {
-    var pieces=Array.from(document.getElementById('mainForm').querySelectorAll('[name="pieces[]"]:checked')).map(function(el){return el.value;});
-    fields=fields.concat([
-      {label:'Demande KULANZ effectuée',value:getRadio('kulanz_done')},
-      {label:'CIG appliqué',value:getRadio('cig')},
-      {label:'Taux CIG (%)',value:getVal('cig_taux')},
-      {label:'Pièces jointes',value:pieces.length?pieces.join(' | '):''},
+    var pieces = Array.from(document.getElementById('mainForm').querySelectorAll('[name="pieces[]"]:checked')).map(function(el){ return el.value; });
+    fields = fields.concat([
+      {label:'Demande KULANZ effectuée', value:getRadio('kulanz_done')},
+      {label:'CIG appliqué', value:getRadio('cig')},
+      {label:'Taux CIG (%)', value:getVal('cig_taux')},
+      {label:'Pièces jointes', value:pieces.length ? pieces.join(' | ') : ''},
     ]);
   }
-  fields.push({label:'Commentaires',value:getVal('commentaires')});
-  return{site:site,type:type,fields:fields};
+  fields.push({label:'Commentaires', value:getVal('commentaires')});
+  return {site:site, type:type, fields:fields};
 }
 
 // ── ENVOYER ───────────────────────────────────────────────────
-function envoyerFormulaire(){
-  var d=collecterDonnees();
-  if(!d.site){alert('⚠ Veuillez sélectionner un site.');return;}
-  if(!getVal('chassis')||getVal('chassis').length!==17){alert('⚠ Le numéro de châssis doit contenir exactement 17 caractères.');return;}
-  if(!getVal('or_number')||getVal('or_number').length!==6){alert('⚠ Le N° d\'Ordre de Réparation doit contenir exactement 6 chiffres.');return;}
-  if(!getVal('plainte_client')){alert('⚠ Veuillez remplir la plainte du client.');return;}
-  if(!getVal('code_dommage')){alert('⚠ Veuillez sélectionner un code dommage.');return;}
-  if(!getVal('code_avarie')){alert('⚠ Veuillez sélectionner un code avarie.');return;}
-  var emailUsager=getVal('email_usager');
-  if(!emailUsager||emailUsager.indexOf('@')===-1){alert('⚠ Veuillez saisir un e-mail valide.');return;}
+function envoyerFormulaire() {
+  var d = collecterDonnees();
+  if (!d.site) { alert('⚠ Veuillez sélectionner un site.'); return; }
+  if (!getVal('chassis') || getVal('chassis').length !== 17) { alert('⚠ Le numéro de châssis doit contenir exactement 17 caractères.'); return; }
+  if (!getVal('or_number') || getVal('or_number').length !== 6) { alert('⚠ Le N° d\'Ordre de Réparation doit contenir exactement 6 chiffres.'); return; }
+  if (!getVal('plainte_client')) { alert('⚠ Veuillez remplir la plainte du client.'); return; }
+  if (!getVal('code_dommage')) { alert('⚠ Veuillez sélectionner un code dommage.'); return; }
+  if (!getVal('code_avarie')) { alert('⚠ Veuillez sélectionner un code avarie.'); return; }
+  var emailUsager = getVal('email_usager');
+  if (!emailUsager || emailUsager.indexOf('@') === -1) { alert('⚠ Veuillez saisir un e-mail valide.'); return; }
 
-  var btn=document.querySelector('.btn-submit');
-  btn.disabled=true;btn.textContent='Envoi en cours…';
+  // ✅ Confirmation avant envoi
+  if (!confirm('📋 Confirmer l\'envoi de la demande ?\n\nSite : ' + d.site + '\nType : ' + d.type + '\nN° OR : ' + getVal('or_number') + '\nChassis : ' + getVal('chassis'))) return;
 
-  var site=d.site,type=d.type;
-  var maxLen=0;
-  d.fields.forEach(function(f){if(f.value&&f.label.length>maxLen)maxLen=f.label.length;});
-  var message='═'.repeat(50)+'\n';
-  message+='DEMANDE '+type.toUpperCase()+' — '+site+' — KVPS : '+(getVal('kvps')||'—')+'\n';
-  message+='═'.repeat(50)+'\n\n';
-  d.fields.filter(function(f){return f.value;}).forEach(function(f){
-    var pad=Array(maxLen-f.label.length+2).join(' ');
-    message+=f.label+pad+': '+f.value+'\n';
+  var btn = document.querySelector('.btn-submit');
+  btn.disabled = true; btn.textContent = 'Envoi en cours…';
+
+  var site = d.site, type = d.type;
+  var technicien = getVal('technicien');
+  var maxLen = 0;
+  d.fields.forEach(function(f){ if (f.value && f.label.length > maxLen) maxLen = f.label.length; });
+  var message = '═'.repeat(50) + '\n';
+  message += 'DEMANDE ' + type.toUpperCase() + ' — ' + site + ' — KVPS : ' + (getVal('kvps') || '—') + '\n';
+  message += '═'.repeat(50) + '\n\n';
+  d.fields.filter(function(f){ return f.value; }).forEach(function(f) {
+    var pad = Array(maxLen - f.label.length + 2).join(' ');
+    message += f.label + pad + ': ' + f.value + '\n';
   });
-  message+='\n'+'─'.repeat(50)+'\nEnvoyé depuis le formulaire Team Garantie GEA - VW';
+  message += '\n' + '─'.repeat(50) + '\nEnvoyé depuis Team Garantie GEA - VW';
 
-  var technicien=getVal('technicien');
-
-  // E-mail 1 : teamgarantie
-  fetch('https://api.web3forms.com/submit',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      access_key:WEB3_KEY,
-      subject:'['+type+'] Nouvelle demande à valider – '+site+' – OR '+getVal('or_number'),
-      message:message,
-      from_name:technicien||site,
-      replyto:emailUsager
+  // E-mail vers teamgarantie
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      access_key: WEB3_KEY,
+      subject: '[' + type + '] Nouvelle demande à valider – ' + site + ' – OR ' + getVal('or_number'),
+      message: message,
+      from_name: technicien || site,
+      replyto: emailUsager
     })
   })
-  .then(function(r){return r.json();})
-  .then(function(res){
-    if(!res.success)throw new Error('Échec');
-    // E-mail 2 : confirmation à l'usager — via champ from pour compatibilité
-    return fetch('https://api.web3forms.com/submit',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        access_key:WEB3_KEY,
-        subject:'🟡 Demande '+type+' en cours – OR '+getVal('or_number'),
-        email: emailUsager,
-        from_name:'Team Garantie GEA - VW',
-        message:'Bonjour'+(technicien?' '+technicien:'')+',\n\nVotre demande '+type+' a bien été reçue.\n\n'+'━'.repeat(40)+
-          '\nStatut     : 🟡 En attente\nSite       : '+site+
-          '\nN° OR      : '+getVal('or_number')+'\nN° Châssis : '+getVal('chassis')+'\n'+'━'.repeat(40)+
-          '\n\nVous recevrez une notification dès validation.\n\nCordialement,\nTeam Garantie GEA - VW'
-      })
-    });
+  .then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (!res.success) throw new Error('Échec Web3Forms');
+    // Sauvegarder dans Firebase
+    var selDom = document.getElementById('code_dom_input');
+    var domLabel = selDom && selDom.value ? selDom.options[selDom.selectedIndex].text : getVal('code_dommage');
+    var newDemande = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('fr-FR'),
+      site: site, type: type,
+      or: getVal('or_number'),
+      chassis: getVal('chassis'),
+      code_dommage: domLabel,
+      email_usager: emailUsager,
+      technicien: technicien,
+      statut: 'En attente',
+      commentaire_team: '',
+      commerce: null
+    };
+    return demandesRef.child('d' + newDemande.id).set(newDemande).then(function(){ return newDemande; });
   })
-  .then(function(){
-    // Sauvegarder dans JSONBin
-    chargerDemandesSync(function(){
-      var selDom=document.getElementById('code_dom_input');
-      var domLabel=selDom&&selDom.value?selDom.options[selDom.selectedIndex].text:getVal('code_dommage');
-      demandes.unshift({
-        id:Date.now(),
-        date:new Date().toLocaleDateString('fr-FR'),
-        site:site,type:type,
-        or:getVal('or_number'),
-        chassis:getVal('chassis'),
-        code_dommage:domLabel,
-        email_usager:emailUsager,
-        technicien:technicien,
-        statut:'En attente',
-        commentaire_team:'',
-        commerce:null
-      });
-      sauvegarderDemandes(function(){
-        document.getElementById('success-details').innerHTML=
-          '<strong>Site :</strong> '+site+'<br>'+
-          '<strong>Type :</strong> '+type+'<br>'+
-          '<strong>N° OR :</strong> '+getVal('or_number')+'<br>'+
-          '<strong>Châssis :</strong> '+getVal('chassis')+'<br>'+
-          '<strong>E-mail :</strong> '+emailUsager;
-        document.getElementById('success-overlay').classList.add('open');
-      });
-    });
+  .then(function(newDemande) {
+    demandes.unshift(newDemande);
+    // Supprimer le brouillon après envoi réussi
+    try { localStorage.removeItem('ge_auto_brouillon'); } catch(e) {}
+    document.getElementById('success-details').innerHTML =
+      '<strong>Site :</strong> ' + site + '<br>' +
+      '<strong>Type :</strong> ' + type + '<br>' +
+      '<strong>N° OR :</strong> ' + getVal('or_number') + '<br>' +
+      '<strong>Châssis :</strong> ' + getVal('chassis') + '<br>' +
+      '<strong>E-mail :</strong> ' + emailUsager;
+    document.getElementById('success-overlay').classList.add('open');
   })
-  .catch(function(){showToast('❌ Erreur réseau — réessayez.');})
-  .finally(function(){
-    btn.disabled=false;
-    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande';
+  .catch(function(err) { console.error(err); showToast('❌ Erreur — réessayez.'); })
+  .finally(function() {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg> Envoyer la demande';
   });
 }
 
 // ── NOUVELLE DEMANDE ──────────────────────────────────────────
-function nouvelledemande(){
+function nouvelledemande() {
   document.getElementById('success-overlay').classList.remove('open');
   document.getElementById('mainForm').reset();
-  document.getElementById('f_type').value='Kulanz';
-  document.getElementById('chassis_hint').className='hint';
-  document.getElementById('chassis_hint').textContent='0 / 17 caractères';
-  document.getElementById('or_hint').className='hint';
-  document.getElementById('or_hint').textContent='0 / 6 chiffres';
-  document.getElementById('code_dom_hint').textContent='';
-  document.getElementById('code_ava_hint').textContent='';
-  document.querySelectorAll('.section-kulanz').forEach(function(el){el.style.display='block';});
-  document.querySelectorAll('.section-ccr').forEach(function(el){el.style.display='none';});
+  document.getElementById('f_type').value = 'Kulanz';
+  document.getElementById('chassis_hint').className = 'hint';
+  document.getElementById('chassis_hint').textContent = '0 / 17 caractères';
+  document.getElementById('or_hint').className = 'hint';
+  document.getElementById('or_hint').textContent = '0 / 6 chiffres';
+  document.getElementById('code_dom_hint').textContent = '';
+  document.getElementById('code_ava_hint').textContent = '';
+  document.querySelectorAll('.section-kulanz').forEach(function(el){ el.style.display = 'block'; });
+  document.querySelectorAll('.section-ccr').forEach(function(el){ el.style.display = 'none'; });
   document.getElementById('btn-kulanz').classList.add('active');
   document.getElementById('btn-ccr').classList.remove('active');
-  document.getElementById('comm-num').textContent='4';
-  document.getElementById('btn-copier-kulanz').style.display='none';
-  // Restaurer site pour usager
-  if(typeAcces==='usager'){
-    document.getElementById('f_site').value=siteUsager;
-    document.getElementById('kvps_input').value=kvpsMap[siteUsager]||'';
-    document.getElementById('kvps_input').readOnly=true;
-    document.getElementById('f_site_display').value=siteUsager;
+  document.getElementById('comm-num').textContent = '4';
+  document.getElementById('btn-copier-kulanz').style.display = 'none';
+  if (typeAcces === 'usager') {
+    document.getElementById('f_site').value = siteUsager;
+    document.getElementById('kvps_input').value = kvpsMap[siteUsager] || '';
+    document.getElementById('kvps_input').readOnly = true;
+    document.getElementById('f_site_display').value = siteUsager;
   } else {
-    document.querySelectorAll('.site-btn').forEach(function(b){b.classList.remove('active');});
-    document.getElementById('f_site').value='';
-    document.getElementById('site-display-name').textContent='Aucun site sélectionné';
+    document.querySelectorAll('.site-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('f_site').value = '';
+    document.getElementById('site-display-name').textContent = 'Aucun site sélectionné';
   }
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 // ── PDF ───────────────────────────────────────────────────────
-function genererPDF(){
-  var d=collecterDonnees();
-  if(!d.site){alert('⚠ Veuillez sélectionner un site.');return;}
-  if(!getVal('or_number')){alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.');return;}
-  if(!window.jspdf){alert('⚠ Bibliothèque PDF non chargée.');return;}
-  var btn=document.querySelector('.btn-print');
-  btn.disabled=true;btn.textContent='Génération PDF…';
-  try{
-    var kvps=getVal('kvps'),codeDom=getVal('code_dommage'),orNum=getVal('or_number');
-    var now=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-    var titleDoc='[DEMANDE '+d.type.toUpperCase()+'] '+d.site+(kvps?' — '+kvps:'')+(codeDom?' — '+codeDom:'');
-    var filename='['+d.type.toUpperCase()+'] '+d.site.replace(/\s+/g,'_')+(kvps?'_'+kvps:'')+(codeDom?'_'+codeDom:'')+'_OR'+orNum+'.pdf';
-    var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
-    var W=210,ml=14,usableW=W-ml*2,y=14;
-    doc.setFillColor(26,26,46);doc.rect(ml,y,usableW,18,'F');
-    doc.setTextColor(212,174,82);doc.setFontSize(10);doc.setFont('helvetica','bold');
-    var tL=doc.splitTextToSize(titleDoc,usableW-8);doc.text(tL,ml+4,y+6);
-    doc.setTextColor(180,180,180);doc.setFontSize(7.5);doc.setFont('helvetica','normal');
-    doc.text('OR : '+orNum+'   |   Date : '+now+'   |   teamgarantie@geauto.fr',ml+4,y+15);
-    y+=24;
-    doc.setFillColor(240,237,232);doc.rect(ml,y,usableW,7,'F');
-    doc.setTextColor(26,26,46);doc.setFontSize(9);doc.setFont('helvetica','bold');
-    doc.text('Détails de la demande',ml+3,y+5);y+=9;
-    var colL=70,colV=usableW-colL;
-    d.fields.filter(function(fi){return fi.value&&fi.value.trim();}).forEach(function(fi,i){
-      var lines=doc.splitTextToSize(fi.value,colV-4);
-      var rowH=Math.max(7,lines.length*5+2);
-      if(y+rowH>282){doc.addPage();y=14;}
-      if(i%2===0)doc.setFillColor(255,255,255);else doc.setFillColor(247,246,242);
+function genererPDF() {
+  var d = collecterDonnees();
+  if (!d.site) { alert('⚠ Veuillez sélectionner un site.'); return; }
+  if (!getVal('or_number')) { alert('⚠ Veuillez remplir le N° d\'Ordre de Réparation.'); return; }
+  if (!window.jspdf) { alert('⚠ Bibliothèque PDF non chargée.'); return; }
+  var btn = document.querySelector('.btn-print');
+  btn.disabled = true; btn.textContent = 'Génération PDF…';
+  try {
+    var kvps = getVal('kvps'), codeDom = getVal('code_dommage'), orNum = getVal('or_number');
+    var now = new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
+    var titleDoc = '[DEMANDE ' + d.type.toUpperCase() + '] ' + d.site + (kvps ? ' — ' + kvps : '') + (codeDom ? ' — ' + codeDom : '');
+    var filename = '[' + d.type.toUpperCase() + '] ' + d.site.replace(/\s+/g,'_') + (kvps ? '_' + kvps : '') + (codeDom ? '_' + codeDom : '') + '_OR' + orNum + '.pdf';
+    var doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
+    var W = 210, ml = 14, usableW = W - ml * 2, y = 14;
+    doc.setFillColor(26,26,46); doc.rect(ml,y,usableW,18,'F');
+    doc.setTextColor(212,174,82); doc.setFontSize(10); doc.setFont('helvetica','bold');
+    var tL = doc.splitTextToSize(titleDoc, usableW-8); doc.text(tL, ml+4, y+6);
+    doc.setTextColor(180,180,180); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+    doc.text('OR : ' + orNum + '   |   Date : ' + now + '   |   teamgarantie@geauto.fr', ml+4, y+15);
+    y += 24;
+    doc.setFillColor(240,237,232); doc.rect(ml,y,usableW,7,'F');
+    doc.setTextColor(26,26,46); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('Détails de la demande', ml+3, y+5); y += 9;
+    var colL = 70, colV = usableW - colL;
+    d.fields.filter(function(fi){ return fi.value && fi.value.trim(); }).forEach(function(fi, i) {
+      var lines = doc.splitTextToSize(fi.value, colV-4);
+      var rowH = Math.max(7, lines.length*5+2);
+      if (y + rowH > 282) { doc.addPage(); y = 14; }
+      if (i%2===0) doc.setFillColor(255,255,255); else doc.setFillColor(247,246,242);
       doc.rect(ml,y,usableW,rowH,'F');
-      doc.setDrawColor(221,221,221);doc.rect(ml,y,colL,rowH,'S');doc.rect(ml+colL,y,colV,rowH,'S');
-      doc.setFont('helvetica','bold');doc.setTextColor(80,80,80);doc.setFontSize(9);
-      doc.text(fi.label,ml+3,y+5);
-      doc.setFont('helvetica','normal');doc.setTextColor(26,26,46);
-      doc.text(lines,ml+colL+3,y+5);y+=rowH;
+      doc.setDrawColor(221,221,221); doc.rect(ml,y,colL,rowH,'S'); doc.rect(ml+colL,y,colV,rowH,'S');
+      doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80); doc.setFontSize(9);
+      doc.text(fi.label, ml+3, y+5);
+      doc.setFont('helvetica','normal'); doc.setTextColor(26,26,46);
+      doc.text(lines, ml+colL+3, y+5); y += rowH;
     });
-    y+=5;doc.setDrawColor(200,200,200);doc.line(ml,y,ml+usableW,y);
-    doc.setFontSize(7.5);doc.setTextColor(170,170,170);doc.setFont('helvetica','normal');
-    doc.text('Document généré — Team Garantie GEA - VW — '+now,W/2,y+4,{align:'center'});
+    y += 5; doc.setDrawColor(200,200,200); doc.line(ml,y,ml+usableW,y);
+    doc.setFontSize(7.5); doc.setTextColor(170,170,170); doc.setFont('helvetica','normal');
+    doc.text('Document généré — Team Garantie GEA - VW — ' + now, W/2, y+4, {align:'center'});
     doc.save(filename);
-    showToast('✔ PDF enregistré : '+filename);
-  }catch(err){showToast('❌ Erreur : '+err.message);console.error(err);}
-  finally{btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Enregistrer en PDF';}
-}
-
-// ── HISTORIQUE ────────────────────────────────────────────────
-function renderHistorique(){
-  chargerDemandesSync(function(){
-    var fS=typeAcces==='usager'?siteUsager:document.getElementById('filter-site').value;
-    var fT=document.getElementById('filter-type').value;
-    var fSt=document.getElementById('filter-statut').value;
-    document.getElementById('filter-site').style.display=typeAcces==='team'?'block':'none';
-    var filtered=demandes.filter(function(d){return(!fS||d.site===fS)&&(!fT||d.type===fT)&&(!fSt||d.statut===fSt);});
-    var scope=typeAcces==='usager'?demandes.filter(function(d){return d.site===siteUsager;}):demandes;
-    document.getElementById('stat-total').textContent=scope.length;
-    document.getElementById('stat-attente').textContent=scope.filter(function(d){return d.statut==='En attente';}).length;
-    document.getElementById('stat-validee').textContent=scope.filter(function(d){return d.statut==='Validée';}).length;
-    document.getElementById('stat-refusee').textContent=scope.filter(function(d){return d.statut==='Refusée';}).length;
-    var tbody=document.getElementById('histo-tbody');
-    var empty=document.getElementById('histo-empty');
-    if(filtered.length===0){tbody.innerHTML='';empty.style.display='block';return;}
-    empty.style.display='none';
-    tbody.innerHTML=filtered.map(function(d){
-      var bc={'En attente':'badge-attente','Validée':'badge-validee','Refusée':'badge-refusee','Complément requis':'badge-complement'}[d.statut]||'badge-attente';
-      var ic={'En attente':'🟡','Validée':'✅','Refusée':'❌','Complément requis':'🔄'}[d.statut]||'🟡';
-      var pecHtml='—';
-      if(d.statut==='Validée'&&d.commerce){
-        var c=d.commerce;var parts=[];
-        if(c.mo_de||c.mo_jusqua)parts.push('<span>MO: '+(c.mo_de||'?')+'→'+(c.mo_jusqua||'?')+'%'+(c.mo_qte?' ('+c.mo_qte+'%)':'')+'</span>');
-        if(c.pi_de||c.pi_jusqua)parts.push('<span>Pièces: '+(c.pi_de||'?')+'→'+(c.pi_jusqua||'?')+'%'+(c.pi_qte?' ('+c.pi_qte+'%)':'')+'</span>');
-        if(c.moe_de||c.moe_jusqua)parts.push('<span>MO ext.: '+(c.moe_de||'?')+'→'+(c.moe_jusqua||'?')+'%'+(c.moe_qte?' ('+c.moe_qte+'%)':'')+'</span>');
-        if(c.pe_de||c.pe_jusqua)parts.push('<span>Pièces ext.: '+(c.pe_de||'?')+'→'+(c.pe_jusqua||'?')+'%'+(c.pe_qte?' ('+c.pe_qte+'%)':'')+'</span>');
-        if(parts.length)pecHtml='<div class="pec-cell">'+parts.join('')+'</div>';
-      }
-      var actionBtn=typeAcces==='team'?'<button class="btn-valider" onclick="ouvrirModal('+d.id+')">Valider</button>':'<span style="font-size:11px;color:#aaa;">—</span>';
-      return '<tr>'+
-        '<td>'+d.date+'</td><td style="font-weight:500">'+d.site+'</td>'+
-        '<td><span style="font-size:11px;font-weight:600;color:var(--gold)">'+d.type+'</span></td>'+
-        '<td style="font-family:monospace">'+d.or+'</td>'+
-        '<td style="font-family:monospace;font-size:12px">'+d.chassis+'</td>'+
-        '<td style="font-size:12px">'+d.code_dommage+'</td>'+
-        '<td><span class="badge-statut '+bc+'">'+ic+' '+d.statut+'</span></td>'+
-        '<td>'+pecHtml+'</td>'+
-        '<td style="font-size:12px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(d.commentaire_team||'')+'">'+(d.commentaire_team||'—')+'</td>'+
-        '<td>'+actionBtn+'</td></tr>';
-    }).join('');
-  });
-}
-
-// ── PANNEAU LATÉRAL ───────────────────────────────────────────
-function ouvrirModal(id){
-  demandeEnCours=id;
-  chargerDemandesSync(function(){
-    var d=demandes.find(function(x){return x.id===id;});
-    if(!d)return;
-    document.getElementById('sp-subtitle').textContent=d.type+' — OR '+d.or+' — '+d.date;
-    document.getElementById('sp-site').textContent=d.site;
-    document.getElementById('sp-type').textContent=d.type;
-    document.getElementById('sp-or').textContent=d.or;
-    document.getElementById('sp-chassis').textContent=d.chassis;
-    document.getElementById('sp-coddom').textContent=d.code_dommage||'—';
-    document.getElementById('sp-date').textContent=d.date;
-    document.getElementById('sp-statut').value=d.statut||'En attente';
-    document.getElementById('sp-commentaire').value=d.commentaire_team||'';
-    document.getElementById('sp-pwd').value='';
-    document.getElementById('sp-pwd-error').style.display='none';
-    var c=d.commerce||{};
-    ['mo_de','mo_jusqua','mo_qte','pi_de','pi_jusqua','pi_qte','moe_de','moe_jusqua','moe_qte','pe_de','pe_jusqua','pe_qte'].forEach(function(k){
-      var el=document.getElementById(k);if(el)el.value=c[k]||'';
-    });
-    document.getElementById('sp-type-ext').value=c.type_ext||'';
-    onStatutChange();
-    document.getElementById('sp-overlay').classList.add('open');
-    document.getElementById('side-panel').classList.add('open');
-    setTimeout(function(){document.getElementById('sp-pwd').focus();},400);
-  });
-}
-
-function fermerPanneau(){
-  document.getElementById('sp-overlay').classList.remove('open');
-  document.getElementById('side-panel').classList.remove('open');
-  demandeEnCours=null;
-}
-
-function onStatutChange(){
-  document.getElementById('sp-commerce').style.display=document.getElementById('sp-statut').value==='Validée'?'block':'none';
-}
-
-function confirmerPanneau(){
-  var pwd=document.getElementById('sp-pwd').value;
-  var errEl=document.getElementById('sp-pwd-error');
-  if(pwd!==MOT_DE_PASSE){errEl.style.display='block';document.getElementById('sp-pwd').focus();return;}
-  errEl.style.display='none';
-  var statut=document.getElementById('sp-statut').value;
-  var commentaire=document.getElementById('sp-commentaire').value.trim();
-  var commerce={
-    mo_de:document.getElementById('mo_de').value,mo_jusqua:document.getElementById('mo_jusqua').value,mo_qte:document.getElementById('mo_qte').value,
-    pi_de:document.getElementById('pi_de').value,pi_jusqua:document.getElementById('pi_jusqua').value,pi_qte:document.getElementById('pi_qte').value,
-    moe_de:document.getElementById('moe_de').value,moe_jusqua:document.getElementById('moe_jusqua').value,moe_qte:document.getElementById('moe_qte').value,
-    pe_de:document.getElementById('pe_de').value,pe_jusqua:document.getElementById('pe_jusqua').value,pe_qte:document.getElementById('pe_qte').value,
-    type_ext:document.getElementById('sp-type-ext').value.trim()
-  };
-  chargerDemandesSync(function(){
-    var idx=demandes.findIndex(function(x){return x.id===demandeEnCours;});
-    if(idx===-1){fermerPanneau();return;}
-    var d=demandes[idx];
-    demandes[idx].statut=statut;
-    demandes[idx].commentaire_team=commentaire;
-    if(statut==='Validée')demandes[idx].commerce=commerce;
-    sauvegarderDemandes(function(){
-      fermerPanneau();
-      renderHistorique();
-      showToast('✔ Demande mise à jour : '+statut);
-      if(d.email_usager){
-        var ic={'Validée':'✅','Refusée':'❌','Complément requis':'🔄','En attente':'🟡'}[statut]||'🟡';
-        var pecMsg='';
-        if(statut==='Validée'&&commerce){
-          pecMsg='\n\nPrise en charge accordée :\n';
-          if(commerce.mo_de||commerce.mo_jusqua)pecMsg+='• Main d\'œuvre     : de '+(commerce.mo_de||'—')+'% jusqu\'à '+(commerce.mo_jusqua||'—')+'%'+(commerce.mo_qte?' — Qté: '+commerce.mo_qte+'%':'')+'\n';
-          if(commerce.pi_de||commerce.pi_jusqua)pecMsg+='• Pièces           : de '+(commerce.pi_de||'—')+'% jusqu\'à '+(commerce.pi_jusqua||'—')+'%'+(commerce.pi_qte?' — Qté: '+commerce.pi_qte+'%':'')+'\n';
-          if(commerce.moe_de||commerce.moe_jusqua)pecMsg+='• MO extérieure    : de '+(commerce.moe_de||'—')+'% jusqu\'à '+(commerce.moe_jusqua||'—')+'%'+(commerce.moe_qte?' — Qté: '+commerce.moe_qte+'%':'')+'\n';
-          if(commerce.pe_de||commerce.pe_jusqua)pecMsg+='• Pièces ext.      : de '+(commerce.pe_de||'—')+'% jusqu\'à '+(commerce.pe_jusqua||'—')+'%'+(commerce.pe_qte?' — Qté: '+commerce.pe_qte+'%':'')+'\n';
-          if(commerce.type_ext)pecMsg+='• Type ext./Kulanz : '+commerce.type_ext+'\n';
-        }
-        fetch('https://api.web3forms.com/submit',{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            access_key:WEB3_KEY,
-            subject:ic+' Demande '+d.type+' '+statut+' – OR '+d.or,
-            email:d.email_usager,
-            from_name:'Team Garantie GEA - VW',
-            message:'Bonjour'+(d.technicien?' '+d.technicien:'')+',\n\nVotre demande '+d.type+' a été traitée.\n\n'+'━'.repeat(40)+
-              '\nStatut     : '+ic+' '+statut+'\nSite       : '+d.site+
-              '\nN° OR      : '+d.or+'\nN° Châssis : '+d.chassis+
-              (commentaire?'\nCommentaire: '+commentaire:'')+pecMsg+'\n'+'━'.repeat(40)+'\n\n'+
-              (statut==='Validée'?'Vous pouvez procéder à la saisie dans SAGA/2.\n':statut==='Refusée'?'Veuillez contacter la TeamGarantie.\n':'Un complément de dossier est nécessaire.\n')+
-              '\nCordialement,\nTeam Garantie GEA - VW'
-          })
-        })
-        .then(function(){showToast('📧 E-mail envoyé à '+d.email_usager);})
-        .catch(function(){showToast('⚠ Statut OK mais e-mail non envoyé.');});
-      }
-    });
-  });
-}
-
-function confirmerSuppression(){
-  if(confirm('⚠ Supprimer tout l\'historique partagé ?')){
-    demandesRef.remove()
-    .then(function(){demandes=[];renderHistorique();showToast('🗑 Historique supprimé.');})
-    .catch(function(){showToast('❌ Erreur suppression.');});
+    showToast('✔ PDF enregistré : ' + filename);
+  } catch(err) { showToast('❌ Erreur PDF : ' + err.message); console.error(err); }
+  finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Enregistrer en PDF';
   }
 }
 
-document.addEventListener('keydown',function(e){if(e.key==='Escape')fermerPanneau();});
+// ── HISTORIQUE ────────────────────────────────────────────────
+function renderHistorique() { afficherHistorique(); }
+function afficherHistorique() {
+  var fS = typeAcces === 'usager' ? siteUsager : document.getElementById('filter-site').value;
+  var fT = document.getElementById('filter-type').value;
+  var fSt = document.getElementById('filter-statut').value;
+  document.getElementById('filter-site').style.display = typeAcces === 'team' ? 'block' : 'none';
+  var filtered = demandes.filter(function(d){
+    return (!fS || d.site === fS) && (!fT || d.type === fT) && (!fSt || d.statut === fSt);
+  });
+  var scope = typeAcces === 'usager' ? demandes.filter(function(d){ return d.site === siteUsager; }) : demandes;
+  document.getElementById('stat-total').textContent = scope.length;
+  document.getElementById('stat-attente').textContent = scope.filter(function(d){ return d.statut === 'En attente'; }).length;
+  document.getElementById('stat-validee').textContent = scope.filter(function(d){ return d.statut === 'Validée'; }).length;
+  document.getElementById('stat-refusee').textContent = scope.filter(function(d){ return d.statut === 'Refusée'; }).length;
+  var tbody = document.getElementById('histo-tbody');
+  var empty = document.getElementById('histo-empty');
+  if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map(function(d) {
+    var bc = {'En attente':'badge-attente','Validée':'badge-validee','Refusée':'badge-refusee','Complément requis':'badge-complement'}[d.statut] || 'badge-attente';
+    var ic = {'En attente':'🟡','Validée':'✅','Refusée':'❌','Complément requis':'🔄'}[d.statut] || '🟡';
+    var pecHtml = '—';
+    if (d.statut === 'Validée' && d.commerce) {
+      var c = d.commerce; var parts = [];
+      if (c.mo_de||c.mo_jusqua) parts.push('<span>MO: '+(c.mo_de||'?')+'→'+(c.mo_jusqua||'?')+'%'+(c.mo_qte?' ('+c.mo_qte+'%)':'')+'</span>');
+      if (c.pi_de||c.pi_jusqua) parts.push('<span>Pièces: '+(c.pi_de||'?')+'→'+(c.pi_jusqua||'?')+'%'+(c.pi_qte?' ('+c.pi_qte+'%)':'')+'</span>');
+      if (c.moe_de||c.moe_jusqua) parts.push('<span>MO ext.: '+(c.moe_de||'?')+'→'+(c.moe_jusqua||'?')+'%'+(c.moe_qte?' ('+c.moe_qte+'%)':'')+'</span>');
+      if (c.pe_de||c.pe_jusqua) parts.push('<span>Pièces ext.: '+(c.pe_de||'?')+'→'+(c.pe_jusqua||'?')+'%'+(c.pe_qte?' ('+c.pe_qte+'%)':'')+'</span>');
+      if (parts.length) pecHtml = '<div class="pec-cell">' + parts.join('') + '</div>';
+    }
+    var actionBtn = typeAcces === 'team'
+      ? '<button class="btn-valider" onclick="ouvrirModal(' + d.id + ')">Valider</button>'
+      : '<span style="font-size:11px;color:#aaa;">—</span>';
+    return '<tr>' +
+      '<td>' + d.date + '</td>' +
+      '<td style="font-weight:500">' + d.site + '</td>' +
+      '<td><span style="font-size:11px;font-weight:600;color:var(--gold)">' + d.type + '</span></td>' +
+      '<td style="font-family:monospace">' + d.or + '</td>' +
+      '<td style="font-family:monospace;font-size:12px">' + d.chassis + '</td>' +
+      '<td style="font-size:12px">' + d.code_dommage + '</td>' +
+      '<td><span class="badge-statut ' + bc + '">' + ic + ' ' + d.statut + '</span></td>' +
+      '<td>' + pecHtml + '</td>' +
+      '<td style="font-size:12px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (d.commentaire_team||'') + '">' + (d.commentaire_team || '—') + '</td>' +
+      '<td>' + actionBtn + '</td></tr>';
+  }).join('');
+}
+
+// ── PANNEAU VALIDATION ────────────────────────────────────────
+function ouvrirModal(id) {
+  demandeEnCours = id;
+  var d = demandes.find(function(x){ return x.id === id; });
+  if (!d) return;
+  document.getElementById('sp-subtitle').textContent = d.type + ' — OR ' + d.or + ' — ' + d.date;
+  document.getElementById('sp-site').textContent = d.site;
+  document.getElementById('sp-type').textContent = d.type;
+  document.getElementById('sp-or').textContent = d.or;
+  document.getElementById('sp-chassis').textContent = d.chassis;
+  document.getElementById('sp-coddom').textContent = d.code_dommage || '—';
+  document.getElementById('sp-date').textContent = d.date;
+  document.getElementById('sp-statut').value = d.statut || 'En attente';
+  document.getElementById('sp-commentaire').value = d.commentaire_team || '';
+  document.getElementById('sp-pwd').value = '';
+  document.getElementById('sp-pwd-error').style.display = 'none';
+  var c = d.commerce || {};
+  ['mo_de','mo_jusqua','mo_qte','pi_de','pi_jusqua','pi_qte','moe_de','moe_jusqua','moe_qte','pe_de','pe_jusqua','pe_qte'].forEach(function(k) {
+    var el = document.getElementById(k); if (el) el.value = c[k] || '';
+  });
+  document.getElementById('sp-type-ext').value = c.type_ext || '';
+  onStatutChange();
+  document.getElementById('sp-overlay').classList.add('open');
+  document.getElementById('side-panel').classList.add('open');
+  setTimeout(function(){ document.getElementById('sp-pwd').focus(); }, 400);
+}
+
+function fermerPanneau() {
+  document.getElementById('sp-overlay').classList.remove('open');
+  document.getElementById('side-panel').classList.remove('open');
+  demandeEnCours = null;
+}
+
+function onStatutChange() {
+  document.getElementById('sp-commerce').style.display = document.getElementById('sp-statut').value === 'Validée' ? 'block' : 'none';
+}
+
+function confirmerPanneau() {
+  var pwd = document.getElementById('sp-pwd').value;
+  var errEl = document.getElementById('sp-pwd-error');
+  if (pwd !== MOT_DE_PASSE) { errEl.style.display = 'block'; document.getElementById('sp-pwd').focus(); return; }
+  errEl.style.display = 'none';
+  var statut = document.getElementById('sp-statut').value;
+  var commentaire = document.getElementById('sp-commentaire').value.trim();
+  var commerce = {
+    mo_de:document.getElementById('mo_de').value, mo_jusqua:document.getElementById('mo_jusqua').value, mo_qte:document.getElementById('mo_qte').value,
+    pi_de:document.getElementById('pi_de').value, pi_jusqua:document.getElementById('pi_jusqua').value, pi_qte:document.getElementById('pi_qte').value,
+    moe_de:document.getElementById('moe_de').value, moe_jusqua:document.getElementById('moe_jusqua').value, moe_qte:document.getElementById('moe_qte').value,
+    pe_de:document.getElementById('pe_de').value, pe_jusqua:document.getElementById('pe_jusqua').value, pe_qte:document.getElementById('pe_qte').value,
+    type_ext:document.getElementById('sp-type-ext').value.trim()
+  };
+  // Trouver la demande directement en mémoire
+  var idx = demandes.findIndex(function(x){ return x.id === demandeEnCours; });
+  if (idx === -1) { fermerPanneau(); return; }
+  var d = demandes[idx];
+  demandes[idx].statut = statut;
+  demandes[idx].commentaire_team = commentaire;
+  if (statut === 'Validée') demandes[idx].commerce = commerce;
+  // Mettre à jour uniquement cette demande dans Firebase
+  demandesRef.child('d' + d.id).update({
+    statut: statut,
+    commentaire_team: commentaire,
+    commerce: statut === 'Validée' ? commerce : (d.commerce || null)
+  })
+  .then(function() {
+    fermerPanneau();
+    renderHistorique();
+    showToast('✔ Demande mise à jour : ' + statut);
+    // E-mail à l'usager
+    if (d.email_usager) {
+      var ic = {'Validée':'✅','Refusée':'❌','Complément requis':'🔄','En attente':'🟡'}[statut] || '🟡';
+      var pecMsg = '';
+      if (statut === 'Validée' && commerce) {
+        pecMsg = '\n\nPrise en charge accordée :\n';
+        if (commerce.mo_de||commerce.mo_jusqua) pecMsg += '• Main d\'œuvre  : de ' + (commerce.mo_de||'—') + '% jusqu\'à ' + (commerce.mo_jusqua||'—') + '%' + (commerce.mo_qte ? ' — Qté: ' + commerce.mo_qte + '%' : '') + '\n';
+        if (commerce.pi_de||commerce.pi_jusqua) pecMsg += '• Pièces        : de ' + (commerce.pi_de||'—') + '% jusqu\'à ' + (commerce.pi_jusqua||'—') + '%' + (commerce.pi_qte ? ' — Qté: ' + commerce.pi_qte + '%' : '') + '\n';
+        if (commerce.moe_de||commerce.moe_jusqua) pecMsg += '• MO ext.       : de ' + (commerce.moe_de||'—') + '% jusqu\'à ' + (commerce.moe_jusqua||'—') + '%' + (commerce.moe_qte ? ' — Qté: ' + commerce.moe_qte + '%' : '') + '\n';
+        if (commerce.pe_de||commerce.pe_jusqua) pecMsg += '• Pièces ext.   : de ' + (commerce.pe_de||'—') + '% jusqu\'à ' + (commerce.pe_jusqua||'—') + '%' + (commerce.pe_qte ? ' — Qté: ' + commerce.pe_qte + '%' : '') + '\n';
+        if (commerce.type_ext) pecMsg += '• Type ext.     : ' + commerce.type_ext + '\n';
+      }
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          access_key: WEB3_KEY,
+          subject: ic + ' Demande ' + d.type + ' ' + statut + ' – OR ' + d.or,
+          message: 'Bonjour' + (d.technicien ? ' ' + d.technicien : '') + ',\n\nVotre demande ' + d.type + ' a été traitée.\n\n' + '━'.repeat(40) +
+            '\nStatut     : ' + ic + ' ' + statut + '\nSite       : ' + d.site +
+            '\nN° OR      : ' + d.or + '\nN° Châssis : ' + d.chassis +
+            (commentaire ? '\nCommentaire: ' + commentaire : '') + pecMsg + '\n' + '━'.repeat(40) + '\n\n' +
+            (statut === 'Validée' ? 'Vous pouvez procéder à la saisie dans SAGA/2.\n' :
+             statut === 'Refusée' ? 'Veuillez contacter la TeamGarantie.\n' :
+             'Un complément de dossier est nécessaire.\n') +
+            '\nCordialement,\nTeam Garantie GEA - VW',
+          from_name: 'Team Garantie GEA - VW',
+          replyto: 'teamgarantie@geauto.fr'
+        })
+      })
+      .then(function(){ showToast('📧 E-mail envoyé.'); })
+      .catch(function(){ showToast('⚠ Statut OK mais e-mail non envoyé.'); });
+    }
+  })
+  .catch(function(err){ console.error(err); showToast('❌ Erreur Firebase.'); });
+}
+
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fermerPanneau(); });
 </script>
 </body>
 </html>
