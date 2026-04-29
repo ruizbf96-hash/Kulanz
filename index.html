@@ -263,6 +263,29 @@ tr:hover td{background:rgba(184,151,58,.03)}
 .btn-std{padding:8px 18px;background:linear-gradient(135deg,var(--dark),#2c2c50);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:500;transition:all .2s}
 .btn-std:hover{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark)}
 
+
+/* ── SAISIE MANUELLE SS ── */
+.ss-manual-row{display:flex;align-items:center;gap:7px;padding:8px 11px;border-top:1px solid #f0ede8;background:#fafaf8}
+.ss-manual-row span{font-size:10px;color:#888;white-space:nowrap}
+.ss-manual-inp{flex:1;border:1.5px solid #e0ddd8;border-radius:5px;padding:5px 8px;font-size:12px;font-family:var(--font-body);outline:none}
+.ss-manual-inp:focus{border-color:var(--gold)}
+.ss-manual-ok{padding:5px 12px;background:var(--dark);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer}
+.ss-manual-ok:hover{background:var(--gold);color:var(--dark)}
+
+/* ── ALERTE KULANZ NOK ── */
+#kulanz-nok-alert{display:none;margin-top:10px}
+#kulanz-nok-alert.show{display:block}
+.knok-box{background:#fff8e1;border:2px solid #f39c12;border-radius:9px;padding:16px 18px}
+.knok-title{font-size:13px;font-weight:700;color:#c0392b;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.knok-body{font-size:12px;color:#333;line-height:1.7}
+.knok-body p{margin-bottom:8px;padding-left:14px;position:relative}
+.knok-body p::before{content:"•";position:absolute;left:0;color:#f39c12;font-weight:700}
+.knok-body p strong{color:#c0392b}
+.knok-body p mark{background:#ffe066;padding:1px 3px;border-radius:2px}
+.knok-brand{margin-top:12px;padding:12px 14px;background:rgba(184,151,58,.08);border-left:3px solid var(--gold);border-radius:0 7px 7px 0}
+.knok-brand-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);margin-bottom:6px}
+.knok-brand-txt{font-size:11px;color:#444;line-height:1.65}
+
 /* ── RESPONSIVE ── */
 @media(max-width:660px){
   .h-top,.site-bar,.nav-tabs,.type-bar{padding-left:14px;padding-right:14px}
@@ -449,7 +472,7 @@ tr:hover td{background:rgba(184,151,58,.03)}
             <input type="text" id="kvps" name="kvps" placeholder="Ex : 02155">
           </div>
           <div class="field">
-            <label>Nom du demandeur <span class="opt">(optionnel)</span></label>
+            <label>Nom du demandeur <span class="req">*</span></label>
             <input type="text" name="technicien" placeholder="Prénom Nom">
           </div>
           <div class="field col2">
@@ -506,6 +529,7 @@ tr:hover td{background:rgba(184,151,58,.03)}
                 <div class="ss-search-row"><span>🔍</span><input class="ss-inp" id="ss-dom-inp" placeholder="Code ou libellé…" oninput="ssFilter('dom',this.value)"></div>
                 <div class="ss-meta"><span id="ss-dom-cnt"></span><button class="ss-clr" onclick="ssClear('dom')">✕ Effacer</button></div>
                 <div class="ss-opts" id="ss-dom-opts"></div>
+                <div class="ss-manual-row"><span>✏ Saisie manuelle :</span><input class="ss-manual-inp" id="ss-dom-manual" placeholder="Ex: A001 ou 1234" oninput="ssManualInput('dom',this.value)"><button class="ss-manual-ok" onclick="ssManualConfirm('dom')">OK</button></div>
               </div>
             </div>
             <span class="hint" id="ss-dom-hint"></span>
@@ -524,6 +548,7 @@ tr:hover td{background:rgba(184,151,58,.03)}
                 <div class="ss-search-row"><span>🔍</span><input class="ss-inp" id="ss-ava-inp" placeholder="Code ou libellé…" oninput="ssFilter('ava',this.value)"></div>
                 <div class="ss-meta"><span id="ss-ava-cnt"></span><button class="ss-clr" onclick="ssClear('ava')">✕ Effacer</button></div>
                 <div class="ss-opts" id="ss-ava-opts"></div>
+                <div class="ss-manual-row"><span>✏ Saisie manuelle :</span><input class="ss-manual-inp" id="ss-ava-manual" placeholder="Ex: A001 ou 0010" oninput="ssManualInput('ava',this.value)"><button class="ss-manual-ok" onclick="ssManualConfirm('ava')">OK</button></div>
               </div>
             </div>
             <span class="hint" id="ss-ava-hint"></span>
@@ -545,17 +570,28 @@ tr:hover td{background:rgba(184,151,58,.03)}
           <div class="radio-g"><label class="r-item"><input type="radio" name="opteven" value="OUI"> Oui</label><label class="r-item"><input type="radio" name="opteven" value="NON"> Non</label></div>
         </div>
         <div class="field"><label>Code tuning dans SAGA/2 ou ODIS ?</label>
-          <div class="radio-g"><label class="r-item"><input type="radio" name="tuning" value="OUI"> Oui <small style="color:var(--red)">→ NOK</small></label><label class="r-item"><input type="radio" name="tuning" value="NON"> Non</label></div>
+          <div class="radio-g">
+            <label class="r-item"><input type="radio" name="tuning" value="OUI" onchange="checkKulanzNok()"> Oui <small style="color:var(--red)">→ NOK</small></label>
+            <label class="r-item"><input type="radio" name="tuning" value="NON" onchange="checkKulanzNok()"> Non</label>
+          </div>
         </div>
         <div class="field"><label>Préconisations constructeur respectées ?</label>
           <div class="radio-g"><label class="r-item"><input type="radio" name="preconisations" value="OUI"> Oui</label><label class="r-item"><input type="radio" name="preconisations" value="NON"> Non</label></div>
         </div>
         <div class="field"><label>Dernier entretien chez le site ou vendu lors de la réparation ?</label>
-          <div class="radio-g"><label class="r-item"><input type="radio" name="dernier_entretien" value="OUI"> Oui</label><label class="r-item"><input type="radio" name="dernier_entretien" value="NON"> Non <small style="color:var(--red)">→ NOK</small></label></div>
+          <div class="radio-g">
+            <label class="r-item"><input type="radio" name="dernier_entretien" value="OUI" onchange="checkKulanzNok()"> Oui</label>
+            <label class="r-item"><input type="radio" name="dernier_entretien" value="NON" onchange="checkKulanzNok()"> Non <small style="color:var(--red)">→ NOK</small></label>
+          </div>
         </div>
         <div class="field"><label>Lien entre le dommage et l'entretien ?</label>
-          <div class="radio-g"><label class="r-item"><input type="radio" name="lien_entretien" value="OUI"> Oui <small style="color:var(--red)">→ NOK sauf entretiens OK</small></label><label class="r-item"><input type="radio" name="lien_entretien" value="NON"> Non</label></div>
+          <div class="radio-g">
+            <label class="r-item"><input type="radio" name="lien_entretien" value="OUI" onchange="checkKulanzNok()"> Oui <small style="color:var(--red)">→ NOK sauf entretiens OK</small></label>
+            <label class="r-item"><input type="radio" name="lien_entretien" value="NON" onchange="checkKulanzNok()"> Non</label>
+          </div>
         </div>
+        <!-- Zone alerte NOK + règles par marque -->
+        <div id="kulanz-nok-alert"></div>
       </div>
     </div>
 
@@ -972,6 +1008,7 @@ function setType(t) {
     var ct = ge('cig-taux'); if (ct) { ct.value = ''; ct.disabled = true; }
   }
   ge('btn-k').classList.toggle('active', isK);
+  if (isK) { setTimeout(checkKulanzNok, 50); }
   ge('btn-c').classList.toggle('active', !isK);
   ge('f-type').value = isK ? 'Kulanz' : 'CCR';
   document.querySelectorAll('.k-section').forEach(function(el) { el.style.display = isK ? 'block' : 'none'; });
@@ -1243,6 +1280,7 @@ document.addEventListener('change', function(e) {
   saveDraft();
   if (e.target.name === 'tpi')  ge('tpi-num-field').style.display = e.target.value==='OUI' ? 'flex' : 'none';
   if (e.target.name === 'cig')  { var ct=ge('cig-taux'); ct.disabled=e.target.value!=='superieur'; if(!ct.disabled) ct.focus(); }
+  if (['tuning','dernier_entretien','lien_entretien'].indexOf(e.target.name) >= 0) checkKulanzNok();
 });
 
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
@@ -1739,6 +1777,143 @@ function sendStatusMail(d, statut, commentaire, commerce) {
   .catch(function() { toast('Statut OK mais email non envoye.'); });
 }
 
+
+
+// ═══════════════════════════════════════════════════════════
+// SAISIE MANUELLE CODES DOM/AVA
+// ═══════════════════════════════════════════════════════════
+function ssManualInput(key, val) {
+  // Mettre à jour le champ visible pour feedback immédiat
+  var btn = ge('ss-'+key+'-btn');
+  if (btn && val.trim()) {
+    btn.classList.add('filled');
+  }
+}
+
+function ssManualConfirm(key) {
+  var inp = ge('ss-'+key+'-manual');
+  if (!inp) return;
+  var raw = inp.value.trim();
+  if (!raw) { toast('Saisissez un code.'); return; }
+  // Valider: au moins 1 char, commence par lettre ou chiffre
+  if (!/^[A-Za-z0-9].{0,19}$/.test(raw)) {
+    toast('Code invalide — commencez par une lettre ou un chiffre.');
+    return;
+  }
+  // Chercher un libellé dans la liste si code connu
+  var items = ssData(key);
+  var found = items.find(function(it) {
+    return it.code.toLowerCase() === raw.toLowerCase();
+  });
+  var label = found ? found.label : '(saisie manuelle)';
+  ssPick(key, raw.toUpperCase(), label);
+  inp.value = '';
+  toast('✔ Code ' + raw.toUpperCase() + ' enregistré.');
+}
+
+// ═══════════════════════════════════════════════════════════
+// KULANZ NOK — alerte + règles par marque
+// ═══════════════════════════════════════════════════════════
+var BRAND_RULES = {
+  'Audi Hoenheim': 'audi',
+  'Audi Obernai': 'audi',
+  'SEAT Hoenheim': 'seat',
+  'SKODA Hoenheim': 'skoda',
+  'VW Bischheim': 'vw',
+  'VW Illkirch': 'vw',
+  'VW Obernai': 'vw'
+};
+
+var BRAND_TEXTS = {
+  audi: {
+    title: 'Règles Audi',
+    text: 'Le dernier entretien doit avoir été réalisé chez Audi. S\'il est dû au moment de la réclamation, il devra être réalisé chez Audi pour pouvoir bénéficier des participations commerciales du constructeur.'
+  },
+  vw: {
+    title: 'Règles VW VP / VW Véhicules Utilitaires',
+    text: 'Le dernier entretien doit avoir été réalisé selon les préconisations constructeur. S\'il est dû au moment de la réclamation, il devra être réalisé chez VW ou VW VUL pour bénéficier des participations commerciales.'
+  },
+  skoda: {
+    title: 'Règles Skoda',
+    text: 'Le dernier entretien doit avoir été réalisé selon les préconisations constructeur. Il est nécessaire de fournir l\'avant-dernier entretien pour vérifier le respect des échéances (max 30 000 km / max 24 mois). En cas d\'entretien "à faire" au moment de la réclamation, les deux entretiens précédents devront être fournis.<br><br><strong>Simplification Skoda (oct. 2024) :</strong> En cas d\'utilisation admise du CIG, le Kulanz devient possible dès lors qu\'il est combiné avec un CIG dans une même participation commerciale.'
+  },
+  seat: {
+    title: 'Règles SEAT / CUPRA',
+    text: 'Le dernier entretien doit avoir été réalisé selon les préconisations constructeur. S\'il est dû au moment de la réclamation, il devra être réalisé chez SEAT ou CUPRA pour bénéficier des participations commerciales du constructeur.'
+  }
+};
+
+function checkKulanzNok() {
+  var zone = ge('kulanz-nok-alert');
+  if (!zone) return;
+
+  var tuning    = gr('tuning');
+  var dernEnt   = gr('dernier_entretien');
+  var lienEnt   = gr('lien_entretien');
+
+  // Déterminer si NOK
+  var isNok = (tuning === 'OUI') || (dernEnt === 'NON') || (lien_entretien_nok());
+
+  function lien_entretien_nok() {
+    // "lien_entretien OUI" = NOK sauf si entretiens OK
+    return lienEnt === 'OUI';
+  }
+
+  if (!isNok) {
+    zone.classList.remove('show');
+    zone.innerHTML = '';
+    return;
+  }
+
+  // Construire le message
+  var reasons = [];
+  if (tuning === 'OUI')    reasons.push('Code tuning détecté dans SAGA/2 ou ODIS');
+  if (dernEnt === 'NON')   reasons.push('Dernier entretien non réalisé chez le site / non vendu lors de la réparation');
+  if (lienEnt === 'OUI')   reasons.push('Lien entre le dommage et l\'entretien (sauf si tous les entretiens sont conformes)');
+
+  // Règles par marque
+  var site = ge('f-site') ? ge('f-site').value : '';
+  // Normaliser le nom du site pour la map (enlever les caractères spéciaux)
+  var siteKey = site.replace(/\u0153/g,'oe').replace(/\u00e9/g,'e').replace(/\u00e8/g,'e').replace(/\u00ea/g,'e');
+  var brandKey = BRAND_RULES[site] || BRAND_RULES[siteKey] || null;
+  // Tentative par préfixe
+  if (!brandKey) {
+    var sl = site.toLowerCase();
+    if (sl.indexOf('audi') >= 0)  brandKey = 'audi';
+    else if (sl.indexOf('skoda') >= 0) brandKey = 'skoda';
+    else if (sl.indexOf('seat') >= 0)  brandKey = 'seat';
+    else if (sl.indexOf('vw') >= 0)    brandKey = 'vw';
+  }
+
+  var reasonsHtml = reasons.map(function(r) {
+    return '<p>' + esc(r) + '</p>';
+  }).join('');
+
+  var brandHtml = '';
+  if (brandKey && BRAND_TEXTS[brandKey]) {
+    var b = BRAND_TEXTS[brandKey];
+    brandHtml = '<div class="knok-brand">'
+      + '<div class="knok-brand-title">' + b.title + '</div>'
+      + '<div class="knok-brand-txt">' + b.text + '</div>'
+      + '</div>';
+  }
+
+  zone.innerHTML = '<div class="knok-box">'
+    + '<div class="knok-title">⚠ Kulanz non applicable dans l\'état actuel</div>'
+    + '<div class="knok-body">'
+    + '<p>L\'application des participations commerciales nécessite le contrôle de tous les services et entretiens conformément aux préconisations du constructeur.</p>'
+    + '<p>Une participation commerciale peut être accordée avec un historique de service incomplet s\'il n\'y a pas de lien de causalité possible entre la réclamation client et le service manquant ou réalisé en retard. Le Réparateur Agréé doit vérifier toute connexion possible entre les deux.</p>'
+    + '<p><mark>Si un entretien est <strong>"à faire"</strong> au moment de la réclamation</mark>, la participation commerciale ne peut être proposée qu\'après l\'achèvement préalable de l\'entretien conformément aux préconisations constructeur.</p>'
+    + '<p>S\'il n\'est pas disponible dans Elsa, l\'historique complet d\'entretien du véhicule doit être demandé au client et intégré à l\'Information Qualité DISS.</p>'
+    + '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(230,126,34,.3)">'
+    + '<strong style="font-size:11px;color:#c0392b">Motif(s) de non-éligibilité détecté(s) :</strong>'
+    + '<div style="margin-top:6px">' + reasonsHtml + '</div>'
+    + '</div>'
+    + brandHtml
+    + '</div></div>';
+
+  zone.classList.add('show');
+}
 
 </script>
 </body>
