@@ -62,7 +62,8 @@ header{background:var(--dark);position:sticky;top:0;z-index:100;box-shadow:0 2px
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 .h-user{display:none;align-items:center;gap:8px}
 .h-role{font-size:12px;font-weight:600;color:var(--gold2)}
-.btn-logout{display:flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);border-radius:16px;color:var(--red);font-size:11px}
+.btn-logout{display:flex;align-items:center;gap:5px;padding:6px 14px;background:rgba(192,57,43,.25);border:1.5px solid rgba(192,57,43,.7);border-radius:16px;color:#ff8a80;font-size:11px;font-weight:600;transition:all .2s}
+.btn-logout:hover{background:var(--red);color:#fff;border-color:var(--red)}
 /* Site bar */
 .site-bar{display:flex;align-items:center;padding:0 36px;overflow-x:auto;border-top:1px solid rgba(184,151,58,.1)}
 .site-bar-label{font-size:9px;color:var(--silver);letter-spacing:2px;text-transform:uppercase;white-space:nowrap;padding:10px 16px 10px 0;border-right:1px solid rgba(184,151,58,.15);flex-shrink:0}
@@ -264,6 +265,24 @@ tr:hover td{background:rgba(184,151,58,.03)}
 .btn-std:hover{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark)}
 
 
+
+/* ── MODAL VIDER HISTORIQUE ── */
+#vider-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:800;display:none;align-items:center;justify-content:center}
+#vider-modal.open{display:flex}
+.vm-box{background:#fff;border-radius:14px;padding:32px 28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.vm-icon{font-size:44px;text-align:center;margin-bottom:10px}
+.vm-title{font-family:var(--font-title);font-size:21px;font-weight:600;text-align:center;color:var(--dark);margin-bottom:6px}
+.vm-sub{font-size:13px;color:#666;text-align:center;line-height:1.6;margin-bottom:20px}
+.vm-warn{background:rgba(192,57,43,.07);border:1.5px solid rgba(192,57,43,.25);border-radius:8px;padding:11px 14px;font-size:12px;color:#8b1a1a;text-align:center;margin-bottom:20px;font-weight:500}
+.vm-step{display:none}.vm-step.active{display:block}
+.vm-pwd-err{font-size:11px;color:var(--red);margin-top:5px;display:none}
+.vm-btns{display:flex;gap:9px;margin-top:16px}
+.vm-btn-cancel{flex:1;padding:12px;background:none;color:#888;border:1.5px solid #ddd;border-radius:7px;font-size:13px;cursor:pointer}
+.vm-btn-cancel:hover{border-color:#bbb;color:#555}
+.vm-btn-confirm{flex:1;padding:12px;background:linear-gradient(135deg,var(--red),#e74c3c);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.vm-btn-confirm:hover{background:linear-gradient(135deg,#a93226,var(--red));transform:translateY(-1px)}
+.vm-btn-confirm:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
 /* ── SAISIE MANUELLE SS ── */
 .ss-manual-row{display:flex;align-items:center;gap:7px;padding:8px 11px;border-top:1px solid #f0ede8;background:#fafaf8}
 .ss-manual-row span{font-size:10px;color:#888;white-space:nowrap}
@@ -401,7 +420,7 @@ tr:hover td{background:rgba(184,151,58,.03)}
       </div>
     </div>
   </div>
-  <div class="site-bar" id="site-bar">
+  <div class="site-bar" id="site-bar" style="display:none">
     <span class="site-bar-label">Sélectionner un site</span>
     <button class="s-btn" onclick="selectSite(this,'Audi Hœnheim')">Audi Hœnheim</button>
     <button class="s-btn" onclick="selectSite(this,'Audi Obernai')">Audi Obernai</button>
@@ -773,6 +792,37 @@ tr:hover td{background:rgba(184,151,58,.03)}
   </div>
 </div>
 
+
+<!-- ══ MODAL VIDER HISTORIQUE ══ -->
+<div id="vider-modal">
+  <div class="vm-box">
+    <div class="vm-icon">🗑️</div>
+    <div class="vm-title">Vider l'historique</div>
+    <!-- Étape 1 : confirmation -->
+    <div class="vm-step active" id="vm-step1">
+      <div class="vm-sub">Vous êtes sur le point de <strong>supprimer définitivement</strong> toutes les demandes enregistrées.</div>
+      <div class="vm-warn">⚠ Cette action est irréversible. Toutes les données seront effacées de la base Firebase.</div>
+      <div class="vm-btns">
+        <button class="vm-btn-cancel" onclick="closeViderModal()">Annuler</button>
+        <button class="vm-btn-confirm" onclick="viderStep2()">Oui, je veux tout effacer</button>
+      </div>
+    </div>
+    <!-- Étape 2 : mot de passe -->
+    <div class="vm-step" id="vm-step2">
+      <div class="vm-sub">Confirmez votre identité pour autoriser la suppression.</div>
+      <div class="field">
+        <label>Mot de passe TeamGarantie <span class="req">*</span></label>
+        <input type="password" id="vider-pwd" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')viderConfirm()">
+        <div class="vm-pwd-err" id="vider-pwd-err">Mot de passe incorrect.</div>
+      </div>
+      <div class="vm-btns" style="margin-top:14px">
+        <button class="vm-btn-cancel" onclick="closeViderModal()">Annuler</button>
+        <button class="vm-btn-confirm" id="vider-ok-btn" onclick="viderConfirm()">🗑 Supprimer définitivement</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 
@@ -835,7 +885,7 @@ function initFirebase() {
 }
 
 function startListener() {
-  if (G.fbListening || !demandesRef) return;
+  if (G.fbListening || !demandesRef || !db) return;
   G.fbListening = true;
   demandesRef.on('value', function(snap) {
     G.demandes = [];
@@ -878,10 +928,10 @@ function gr(name) {
 }
 function toast(msg) {
   var t = ge('toast');
-  if (!t) return;
+  if (!t) { console.log('[toast]', msg); return; }
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 3200);
+  setTimeout(function() { if(ge('toast')) ge('toast').classList.remove('show'); }, 3200);
 }
 function isValidVIN(v) { return /^[A-HJ-NPR-Z0-9]{17}$/.test(v); }
 function vinHint(v) {
@@ -936,7 +986,7 @@ function ouvrirApp() {
 
   if (G.role === 'team') {
     ge('h-role').textContent = '🔐 TeamGarantie';
-    ge('site-bar').style.display = 'flex';
+    ge('site-bar').style.display = 'none';
     ge('dash-wrap').classList.add('on');
     ge('h-site-name').textContent = 'Tous les sites';
   } else {
@@ -967,8 +1017,9 @@ function deconnecter() {
   ge('tab-histo').style.display = 'none';
   ge('dash-wrap').classList.remove('on');
   ge('h-alert').classList.remove('on');
-  ge('site-bar').style.display = 'flex';
+  ge('site-bar').style.display = 'none';
   ge('site-field').style.display = 'none';
+  ge('type-bar').style.display = 'flex';
   ge('kvps').readOnly = false;
   document.querySelectorAll('.s-btn').forEach(function(b) { b.classList.remove('active'); });
   ge('f-site').value = '';
@@ -991,10 +1042,10 @@ function showPage(page, tabEl) {
 
 function selectSite(btn, name) {
   document.querySelectorAll('.s-btn').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  ge('f-site').value = name;
-  ge('h-site-name').textContent = name;
-  ge('kvps').value = KVPS_MAP[name] || '';
+  if (btn) btn.classList.add('active');
+  var fsite = ge('f-site'); if(fsite) fsite.value = name;
+  var hn = ge('h-site-name'); if(hn) hn.textContent = name || 'Tous les sites';
+  var kvps = ge('kvps'); if(kvps && !kvps.readOnly) kvps.value = KVPS_MAP[name] || '';
 }
 
 function setType(t) {
@@ -1122,6 +1173,7 @@ function ssFilter(key, q) { ssRender(key, q); }
 
 // Fermer sur clic extérieur
 document.addEventListener('click', function(e) {
+  if (e.target && e.target.id === 'vider-modal') closeViderModal();
   if (!e.target.closest('.ss-wrap')) ssClose();
   if (!e.target.closest('.ac-wrap')) {
     var ac = ge('chassis-ac');
@@ -1129,7 +1181,7 @@ document.addEventListener('click', function(e) {
   }
 });
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { ssClose(); closeSP(); }
+  if (e.key === 'Escape') { ssClose(); closeSP(); closeViderModal(); }
 });
 
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
@@ -1161,7 +1213,7 @@ function onChassis(input) {
 function acPick(el) {
   var vin = el.getAttribute('data-vin');
   var d = G.demandes.find(function(x) { return x.chassis === vin; });
-  ge('chassis-ac').classList.remove('open');
+  var acEl = ge('chassis-ac'); if(acEl) acEl.classList.remove('open');
   if (!d) return;
   ge('chassis').value = vin;
   var hint = ge('chassis-hint');
@@ -1346,7 +1398,8 @@ function envoyerFormulaire() {
   if (!ge('dom-val').value) { alert('⚠ Veuillez sélectionner un code dommage.'); return; }
   if (!ge('ava-val').value) { alert('⚠ Veuillez sélectionner un code avarie.'); return; }
   var email = gv('email_usager');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { alert('⚠ E-mail invalide.'); return; }
+  if (!gv('technicien')) { alert('\u26a0 Le nom du demandeur est obligatoire.'); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { alert('\u26a0 E-mail invalide.'); return; }
 
   var btn = ge('btn-envoyer');
   if (!btn || btn.disabled) return;
@@ -1420,6 +1473,7 @@ function nouvelleDemande() {
   ge('chassis').className = '';
   ge('or-num').className  = '';
   setType('K');
+  var nok = ge('kulanz-nok-alert'); if(nok){ nok.classList.remove('show'); nok.innerHTML=''; }
   if (G.role === 'usager') {
     ge('f-site').value = G.site;
     ge('kvps').value = KVPS_MAP[G.site]||'';
@@ -1552,13 +1606,61 @@ function renderHisto() {
 }
 
 function viderHistorique() {
-  if (!confirm("⚠ Supprimer tout l'historique partagé ?")) return;
+  // Ouvrir le modal en 2 étapes
+  var m = ge('vider-modal');
+  if (!m) return;
+  // Reset à l'étape 1
+  var s1 = ge('vm-step1'); if(s1) { s1.classList.add('active'); }
+  var s2 = ge('vm-step2'); if(s2) { s2.classList.remove('active'); }
+  var pe = ge('vider-pwd-err'); if(pe) pe.style.display = 'none';
+  var pi = ge('vider-pwd'); if(pi) pi.value = '';
+  var ob = ge('vider-ok-btn'); if(ob) ob.disabled = false;
+  m.classList.add('open');
+}
+
+function closeViderModal() {
+  var m = ge('vider-modal'); if(m) m.classList.remove('open');
+  var pi = ge('vider-pwd'); if(pi) pi.value = '';
+  var pe = ge('vider-pwd-err'); if(pe) pe.style.display = 'none';
+  var ob = ge('vider-ok-btn'); if(ob) ob.disabled = false;
+}
+
+function viderStep2() {
+  // Passer à l'étape mot de passe
+  var s1 = ge('vm-step1'); if(s1) s1.classList.remove('active');
+  var s2 = ge('vm-step2'); if(s2) s2.classList.add('active');
+  setTimeout(function() { var pi = ge('vider-pwd'); if(pi) pi.focus(); }, 100);
+}
+
+function viderConfirm() {
+  var ob = ge('vider-ok-btn');
+  if (ob && ob.disabled) return;
+  var pi = ge('vider-pwd');
+  if (!pi || pi.value !== MOT_DE_PASSE) {
+    var pe = ge('vider-pwd-err'); if(pe) pe.style.display = 'block';
+    if(pi) pi.focus();
+    return;
+  }
+  if(ob) ob.disabled = true;
+  var pe = ge('vider-pwd-err'); if(pe) pe.style.display = 'none';
   if (demandesRef) {
     demandesRef.remove()
-      .then(function() { G.demandes=[]; renderHisto(); renderDash(); toast('🗑 Historique supprimé.'); })
-      .catch(function() { toast('❌ Erreur suppression.'); });
+      .then(function() {
+        G.demandes = [];
+        closeViderModal();
+        renderHisto();
+        renderDash();
+        toast('🗑 Historique supprimé définitivement.');
+      })
+      .catch(function() {
+        closeViderModal();
+        toast('❌ Erreur lors de la suppression.');
+      });
   } else {
-    G.demandes=[]; renderHisto(); toast('🗑 Historique local supprimé.');
+    G.demandes = [];
+    closeViderModal();
+    renderHisto();
+    toast('🗑 Historique local supprimé.');
   }
 }
 
@@ -1568,6 +1670,7 @@ function viderHistorique() {
 function renderDash() {
   var grid = ge('dash-grid');
   if (!grid || G.role !== 'team') return;
+  if (!G.demandes) G.demandes = [];
   var totalWait = 0;
   var html = '';
   var curFilter = ge('f-site').value || '';
@@ -1661,14 +1764,14 @@ function openSP(id) {
   var okBtn = ge('sp-ok-btn');
   if (okBtn) okBtn.disabled = false;
   onStatutChange();
-  ge('sp-overlay').classList.add('open');
-  ge('side-panel').classList.add('open');
-  setTimeout(function() { if(ge('sp-pwd')) ge('sp-pwd').focus(); }, 350);
+  var spOv = ge('sp-overlay'); if(spOv) spOv.classList.add('open');
+  var spPn = ge('side-panel'); if(spPn) spPn.classList.add('open');
+  setTimeout(function() { var p=ge('sp-pwd'); if(p) p.focus(); }, 350);
 }
 
 function closeSP() {
-  ge('sp-overlay').classList.remove('open');
-  ge('side-panel').classList.remove('open');
+  var spOv2 = ge('sp-overlay'); if(spOv2) spOv2.classList.remove('open');
+  var spPn2 = ge('side-panel'); if(spPn2) spPn2.classList.remove('open');
   G.activeId = null;
   var okBtn = ge('sp-ok-btn'); if (okBtn) okBtn.disabled = false;
 }
@@ -1852,12 +1955,7 @@ function checkKulanzNok() {
   var lienEnt   = gr('lien_entretien');
 
   // Déterminer si NOK
-  var isNok = (tuning === 'OUI') || (dernEnt === 'NON') || (lien_entretien_nok());
-
-  function lien_entretien_nok() {
-    // "lien_entretien OUI" = NOK sauf si entretiens OK
-    return lienEnt === 'OUI';
-  }
+  var isNok = (tuning === 'OUI') || (dernEnt === 'NON') || (lienEnt === 'OUI');
 
   if (!isNok) {
     zone.classList.remove('show');
