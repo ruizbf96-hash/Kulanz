@@ -71,7 +71,7 @@
 
   <div id="view-search">
     <div class="searchbar">
-      <input type="text" id="q" placeholder="Adresse, quartier ou code postal (ex : 69006, Mermoz, Guillotière)">
+      <input type="text" id="q" placeholder="Code postal, quartier ou nom de lieu (ex : Palais Hirsch, Berges du Rhône)">
       <button class="act primary" id="go">Chercher</button>
     </div>
     <div class="chips">
@@ -81,6 +81,7 @@
       <span class="chip" data-q="69006">6e</span>
       <span class="chip" data-q="Villeurbanne">Villeurbanne</span>
       <span class="chip" data-q="Guillotière">Guillotière</span>
+      <span class="chip" data-q="Berges du Rhône">Berges du Rhône</span>
       <span class="chip" data-q="Mermoz">Mermoz 8e</span>
     </div>
     <div class="layout">
@@ -93,6 +94,7 @@
           <span><span class="dot" style="background:var(--blue)"></span>Campus Carnot (UCLy)</span>
           <span><span class="dot" style="background:var(--purple)"></span>Porte des Alpes (Lyon 2)</span>
         </div>
+        <p style="font-size:11.5px;color:var(--txt3);margin:8px 2px 0;line-height:1.5;">La couleur = recommandation pour se loger (croise sécurité, prix, transports), pas le taux brut. Un secteur peut avoir un taux statistique élevé mais rester sûr pour un résident (ex : 2e, vols touristiques) — le détail le précise.</p>
       </div>
       <div class="panel">
         <div id="empty" class="empty">Cherche un lieu ou clique sur une zone de la carte pour voir le niveau de recommandation, le détail sécurité (trafic, vols, nuisances, troubles) et les trajets vers chaque campus.</div>
@@ -111,9 +113,10 @@
   </div>
 
   <p class="foot">
-    Sources : SSMSI / ministère de l'Intérieur (chiffres 2024–2025), ville-data.com, Baromètre des loyers Studapart 2025, guides logement étudiant Lyon 2026.
-    Les niveaux sont indicatifs et varient fortement d'une rue à l'autre (surtout dans le 8e). Visite le quartier précis à différentes heures avant de décider.
-    Fond de carte © OpenStreetMap. Trajets approximatifs en transports.
+    Sources officielles : SSMSI / ministère de l'Intérieur — base communale de la délinquance 2024 (data.gouv.fr, taux pour 1 000 hab.) ; liste des QPV par décret n°2023-1314 (préfecture du Rhône, SIG Ville). Taux de référence Lyon 2024 : 84,2 ‰.
+    Les niveaux « recommandation logement » croisent sécurité, prix et transports ; ils restent indicatifs et varient d'une rue à l'autre (cas du 8e). Visite le quartier précis à différentes heures avant de décider.
+    Le « ressenti terrain » est une synthèse subjective d'impressions qualitatives publiques (descriptions de quartiers, débats locaux) — à confirmer par tes propres visites et par des groupes étudiants/logement actuels.
+    Fond de carte © OpenStreetMap. Recherche de lieux via Nominatim (OpenStreetMap, nécessite une connexion). Trajets approximatifs en transports.
   </p>
 </div>
 
@@ -127,56 +130,69 @@ const CAMPUS = {
 const ZONES = {
   "6":{name:"6e — Brotteaux / Tête d'Or",lvl:"green",rent:"~17 €/m²",carnot:"~15 min",bron:"~35 min",
     lat:45.7700,lng:4.8520,r:600,
-    note:"L'arrondissement le plus sûr de Lyon, le ratio de délits le plus bas.",
-    traffic:"Quasi nul.",vols:"Les plus bas de la ville.",nuis:"Très calme, résidentiel haut de gamme.",troub:"Référence en matière de tranquillité."},
+    taux:"≈86 ‰ — 4 362 faits / 50 718 hab.",rang:"Faible délinquance de personnes ; cambriolages élevés",qpv:"Aucun QPV.",
+    note:"Résidentiel haut de gamme, le plus prisé. Faible délinquance de voie publique, MAIS cambriolages les plus élevés de Lyon (maisons/apparts bourgeois ciblés).",
+    traffic:"Quasi nul (officiel).",vols:"Cambriolages record : ≈12,8 ‰ logements (408 faits 2024). Peu de vols violents.",nuis:"Très calme, peu de nuisances nocturnes.",troub:"Référence en tranquillité de voie publique.",ressenti:"Ressenti très positif et constant : résidentiel, sûr à pied de jour comme de nuit. Le revers : cher et un peu \"trop calme\" pour certains étudiants qui le trouvent peu animé."},
   "4":{name:"4e — Croix-Rousse",lvl:"green",rent:"~18 €/m²",carnot:"~15 min",bron:"~40 min",
     lat:45.7780,lng:4.8290,r:550,
-    note:"Plateau familial, ambiance village, aucun quartier prioritaire.",
-    traffic:"Très faible.",vols:"Faibles.",nuis:"Tranquille le soir, rues résidentielles pentues.",troub:"Parmi les plus sereins de Lyon."},
-  "1":{name:"1er — Terreaux",lvl:"green",rent:"~18 €/m²",carnot:"~10 min",bron:"~35 min",
+    taux:"Bas (un des plus faibles de Lyon)",rang:"Parmi les arrondissements les moins touchés",qpv:"Aucun QPV.",
+    note:"Plateau familial, ambiance village, aucun quartier prioritaire. Un des secteurs les plus sereins de la ville.",
+    traffic:"Très faible.",vols:"Faibles.",nuis:"Tranquille le soir, rues résidentielles pentues.",troub:"Parmi les plus sereins de Lyon.",ressenti:"Très apprécié : ambiance \"village dans la ville\", populaire et artistique, équilibre calme/vie de quartier. Bémol terrain : les pentes raides fatiguent au quotidien."},
+  "1":{name:"1er — Terreaux",lvl:"amber",rent:"~18 €/m²",carnot:"~10 min",bron:"~35 min",
     lat:45.7680,lng:4.8330,r:450,
-    note:"Central et vivant. Sûr globalement, vigilance ordinaire dans les rues festives la nuit.",
-    traffic:"Faible.",vols:"Pickpockets possibles dans les zones très fréquentées, sorties de soirée.",nuis:"Bruit nocturne autour des bars (pentes, rue Ste-Catherine).",troub:"Animation festive plutôt que délinquance structurelle."},
+    taux:"Élevé — 3 402 faits / 29 040 hab. (≈117 ‰)",rang:"Parmi les plus hauts (délinquance d'opportunité)",qpv:"Aucun QPV.",
+    note:"Central et festif. Taux élevé surtout dû aux vols sans violence et violences de nuit liés à l'animation (bars, sorties), pas à de la criminalité organisée. Sûr à pied mais vigilance ordinaire.",
+    traffic:"Faible.",vols:"Vols violents sans arme parmi les plus hauts (≈8,2 ‰) ; pickpockets en zone festive.",nuis:"Bruit nocturne autour des bars (pentes, rue Ste-Catherine).",troub:"Délinquance d'opportunité liée à la forte fréquentation.",ressenti:"Vécu comme central, festif et plaisant, mais bruyant le week-end (sorties de bars). Sûr à pied, vigilance ordinaire de grande ville la nuit."},
   "villeurbanne":{name:"Villeurbanne — La Doua",lvl:"green",rent:"~15–17 €/m²",carnot:"~25 min",bron:"~30 min",
     lat:45.7800,lng:4.8730,r:800,
-    note:"Campus LyonTech, très étudiant et abordable (400–550 €). Évite seulement les abords de Charpennes tard le soir.",
-    traffic:"Faible sur le campus et Gratte-Ciel.",vols:"Vols de vélos et à la tire autour des stations de métro.",nuis:"Quelques nuisances nocturnes vers Charpennes.",troub:"Ambiance campus, plutôt rassurante."},
+    taux:"Variable selon le secteur",rang:"Campus serein ; QPV à l'écart",qpv:"QPV Tonkin, Les Buers Nord/Sud, Monod-Baratin-Cacard (hors campus).",
+    note:"Campus LyonTech, très étudiant et abordable (400–550 €). Le campus et Gratte-Ciel sont sûrs ; les QPV (Buers, Tonkin) sont à l'écart. Évite les abords de Charpennes tard le soir.",
+    traffic:"Faible sur le campus et Gratte-Ciel.",vols:"Vols de vélos et à la tire autour des stations de métro.",nuis:"Quelques nuisances nocturnes vers Charpennes.",troub:"Ambiance campus, plutôt rassurante.",ressenti:"Côté étudiant très positif : vie de campus, prix doux, communauté jeune. Charpennes/Gratte-Ciel animés ; quelques retours de nuisances nocturnes près des stations."},
   "5":{name:"5e — Vieux Lyon / St-Just",lvl:"amber",rent:"~19 €/m²",carnot:"~12 min",bron:"~40 min",
     lat:45.7600,lng:4.8200,r:650,
-    note:"Patrimonial et charmant. St-Just/Fourvière très calme ; attention à l'état des logements anciens.",
-    traffic:"Faible.",vols:"Vols à la tire dans le Vieux Lyon touristique (traboules, quais).",nuis:"St-Just quasi sans nuisances ; quais plus animés.",troub:"Faibles, ambiance villageoise sur la colline."},
-  "2":{name:"2e — Presqu'île · Carnot",lvl:"amber",rent:"~20 €/m²",carnot:"Sur place ✓",bron:"~35 min",
+    taux:"Bas (relativement épargné)",rang:"Parmi les moins touchés en taux global",qpv:"QPV Saint-Jean (poche ancienne, à part).",
+    note:"Patrimonial et charmant, globalement épargné. St-Just/Fourvière très calme. Attention surtout à l'état des logements anciens (parfois vétustes).",
+    traffic:"Faible.",vols:"Vols à la tire dans le Vieux Lyon touristique (traboules, quais).",nuis:"St-Just quasi sans nuisances ; quais plus animés.",troub:"Faibles, ambiance villageoise sur la colline.",ressenti:"Vieux Lyon vécu comme touristique et charmant mais parfois bondé ; St-Just/Fourvière paisible et prisé. Plainte récurrente : logements anciens, humidité, escaliers."},
+  "2":{name:"2e — Presqu'île · Carnot",lvl:"red",rent:"~20 €/m²",carnot:"Sur place ✓",bron:"~35 min",
     lat:45.7530,lng:4.8270,r:600,
-    note:"Très central et sûr la nuit, mais le plus cher de Lyon et exposé aux vols dans les voitures.",
-    traffic:"Faible.",vols:"Taux record de vols DANS les véhicules — ne rien laisser dans la voiture. Vols sans violence fréquents (zone touristique Bellecour).",nuis:"Bruit autour des places animées et de Confluence le week-end.",troub:"Sûr à pied le soir, secteur très fréquenté et éclairé."},
+    taux:"LE PLUS ÉLEVÉ de Lyon — ≈41 ‰ (3× la moyenne)",rang:"1er des arrondissements en taux de délinquance",qpv:"Aucun QPV.",
+    note:"Donnée contre-intuitive : officiellement le taux de délinquance le plus élevé de Lyon, MAIS quasi exclusivement des atteintes aux biens (vols sans violence, vols dans voitures, cambriolages) liées au tourisme/commerce. Sûr à pied le soir, très éclairé. Le plus cher de la ville.",
+    traffic:"Faible.",vols:"Vols sans violence record (≈109 ‰) + taux record de vols DANS les véhicules. Ne rien laisser en voiture.",nuis:"Bruit autour des places animées et de Confluence le week-end.",troub:"Atteintes aux biens, pas violences visant les résidents.",ressenti:"Ressenti sécurité du résident plutôt bon (rues animées, éclairées), malgré le taux statistique élevé. Frustrations : prix, stationnement, vols dans voitures."},
   "3":{name:"3e — Part-Dieu",lvl:"amber",rent:"~17 €/m²",carnot:"~15 min",bron:"~25 min (T2) ✓",
     lat:45.7600,lng:4.8580,r:700,
-    note:"Pratique (gare, tram T2 vers Bron) mais peu de vie de quartier. Montchat, plus à l'est, est calme.",
-    traffic:"126 mis en cause (2024), surtout vers la gare.",vols:"387 vols de véhicules (2024) ; vols sans violence autour de Part-Dieu.",nuis:"Animation et flux autour de la gare / centre commercial.",troub:"Concentrés près du pôle d'échange ; Montchat paisible."},
+    taux:"Élevé — 10 034 faits / 101 523 hab. (≈99 ‰)",rang:"Parmi les plus hauts en volume",qpv:"QPV Moncey-Voltaire (poche ouest, vers Guillotière).",
+    note:"Très pratique (gare, tram T2 direct vers Bron) mais peu de vie de quartier. Délinquance concentrée autour de la gare/centre commercial. Montchat, à l'est, est calme et résidentiel.",
+    traffic:"126 mis en cause (2024), surtout vers la gare.",vols:"387 vols de véhicules (2024) ; vols sans violence autour de Part-Dieu.",nuis:"Animation et flux autour de la gare / centre commercial.",troub:"Concentrés près du pôle d'échange ; Montchat paisible.",ressenti:"Part-Dieu vécu comme pratique mais impersonnel/\"bétonné\". Montchat à l'inverse très apprécié, ambiance résidentielle calme et recherchée."},
   "7":{name:"7e — Jean Macé / Gerland",lvl:"amber",rent:"~16,6 €/m²",carnot:"~12 min",bron:"~25 min (T2) ✓",
     lat:45.7430,lng:4.8420,r:750,
-    note:"Excellent rapport vie étudiante/prix. Jean Macé et Gerland corrects ; le sous-secteur Guillotière concentre les problèmes.",
-    traffic:"Record intra-muros (≈192–204 faits/an), très localisé sur la Guillotière.",vols:"237 vols de véhicules (2025).",nuis:"Fortes à la Guillotière, modérées à Jean Macé/Gerland.",troub:"Hétérogène : Gerland calme, Guillotière tendu."},
+    taux:"≈112 ‰ — 9 780 faits / 87 491 hab.",rang:"3e sur 9 en délinquance par habitant",qpv:"QPV Cités sociales de Gerland (périmètre élargi 2024).",
+    note:"Excellent rapport vie étudiante/prix. Jean Macé et le nord de Gerland sont corrects ; Gerland classé QPV avec poches sensibles la nuit ; le sous-secteur Guillotière concentre l'essentiel des problèmes.",
+    traffic:"Record intra-muros : 192 faits 2024, soit 2,2 ‰ — très localisé sur la Guillotière.",vols:"782 vols violents sans arme en 2025 (vs 445 en 2024) ; 237 vols de véhicules.",nuis:"Fortes à la Guillotière, modérées à Jean Macé/Gerland.",troub:"Hétérogène : Gerland calme le jour, Guillotière tendu.",ressenti:"Jean Macé très coté chez les étudiants (vivant, commerçant, bien desservi). Gerland en transformation, calme mais un peu isolé le soir. Guillotière : voir fiche dédiée."},
   "8":{name:"8e — Monplaisir / Mermoz",lvl:"amber",rent:"~16 €/m²",carnot:"~20 min",bron:"~15 min (T2) ✓",
     lat:45.7370,lng:4.8720,r:850,
-    note:"Monplaisir familial et pratique pour Bron. MAIS Mermoz / États-Unis / Bocage / Laënnec sensibles : choisis bien la rue.",
-    traffic:"Élevé sur Mermoz, États-Unis, Bocage, Moulin à Vent (ZSP, 5 quartiers prioritaires).",vols:"Vols et violences liés aux trafics dans ces sous-secteurs.",nuis:"Marquées autour des grands ensembles ; Monplaisir / Grange Blanche plus calmes.",troub:"Épisodes de violence ponctuels. Vise Monplaisir, pas Mermoz."},
+    taux:"Bas en moyenne — 6 578 faits (6e/9 en taux)",rang:"Relativement épargné EN MOYENNE, mais très inégal",qpv:"5 QPV (le plus de Lyon) : Mermoz, États-Unis–Langlet-Santy, Moulin-à-Vent, Laënnec (créé 2024), + ZSP.",
+    note:"Le cas le plus trompeur : taux moyen BAS, mais c'est une moyenne entre Monplaisir/Grange Blanche (calmes, familiaux, pratiques pour Bron) et les QPV Mermoz/États-Unis/Moulin-à-Vent (trafic, ZSP). Le choix de la rue change tout. Vise Monplaisir, pas Mermoz.",
+    traffic:"Concentré sur Mermoz, États-Unis, Bocage, Moulin-à-Vent (ZSP = niveau d'alerte le plus élevé).",vols:"Vols et violences liés aux trafics dans ces QPV uniquement.",nuis:"Marquées autour des grands ensembles ; Monplaisir/Grange Blanche calmes.",troub:"Épisodes de violence ponctuels dans les QPV. Reste hors de ces 5 secteurs.",ressenti:"Ressenti à deux vitesses : Monplaisir/Grange Blanche vécus comme familiaux et paisibles ; route de Vienne/Grand Trou et Mermoz décrits par les habitants comme touchés par incivilités, rodéos et trafic."},
   "9":{name:"9e — Vaise / Duchère",lvl:"amber",rent:"~15 €/m²",carnot:"~20 min",bron:"~40 min",
     lat:45.7800,lng:4.8050,r:750,
-    note:"Vaise en plein essor et plutôt sûr ; la Duchère (à part) reste un secteur sensible.",
-    traffic:"Faible à Vaise. La Duchère concentre l'essentiel (ZSP).",vols:"172 vols de véhicules (2024), en baisse ; 226 cambriolages.",nuis:"Vaise calme ; éviter les abords des grands ensembles de la Duchère.",troub:"Globalement moins touché que les arrondissements centraux."},
+    taux:"Bas en moyenne (relativement épargné)",rang:"Parmi les moins touchés ; Duchère à part",qpv:"4 QPV (le plus de QPV distincts) : Duchère, Le Vergoin, La Vallonnière (2024), Gorge de Loup–Loucheur.",
+    note:"Vaise et Gorge de Loup en essor et plutôt sereins (mixité préservée). La Duchère, à l'écart sur les hauteurs, concentre l'essentiel des difficultés. Pour se loger, vise Vaise.",
+    traffic:"Faible à Vaise. La Duchère concentre l'essentiel.",vols:"172 vols de véhicules (2024), en baisse ; 226 cambriolages.",nuis:"Vaise calme ; éviter les abords des grands ensembles de la Duchère.",troub:"Globalement moins touché que les arrondissements centraux.",ressenti:"Vaise vécu comme un bon plan montant (calme, en rénovation, abordable) mais un peu excentré. La Duchère, à part, garde une réputation difficile malgré la rénovation."},
   "guillotiere":{name:"Guillotière (7e/3e)",lvl:"red",rent:"~16 €/m²",carnot:"~10 min",bron:"~25 min (T2)",
     lat:45.7555,lng:4.8430,r:400,
-    note:"Très animé et multiculturel mais point de tension récurrent de Lyon. À éviter pour se loger seule.",
-    traffic:"Forte concentration : drogue et cigarettes autour des places Gabriel-Péri et Mazagran (31 caméras).",vols:"Vols fréquents, à la tire et avec violence.",nuis:"Incivilités, attroupements, bruit — nuisances diverses récurrentes.",troub:"Rixes et tensions régulières ; brigades spécialisées déployées."},
+    taux:"≈105–115 ‰ (au-dessus de la moyenne 84 ‰)",rang:"Point de tension n°1 de Lyon intra-muros",qpv:"Recoupe QPV Moncey ; secteur sous brigades spécialisées.",
+    note:"Le point noir confirmé par toutes les sources. Très animé et multiculturel le jour, mais concentration de trafics et de tensions autour des places Gabriel-Péri et Mazagran. À éviter pour se loger seule.",
+    traffic:"Forte concentration : drogue et cigarettes (31 caméras place Gabriel-Péri).",vols:"Vols fréquents, à la tire et avec violence.",nuis:"Incivilités, attroupements, bruit — nuisances récurrentes.",troub:"Rixes et tensions régulières ; brigades spécialisées déployées.",ressenti:"Ressenti contrasté et marqué par l'heure : vivant et multiculturel le jour, vécu comme tendu le soir autour de Gabriel-Péri. Quartier en gentrification mais réputation lourde côté habitants."},
   "bron":{name:"Bron — Porte des Alpes",lvl:"red",rent:"variable",carnot:"~35 min (T2)",bron:"Sur place ✓",
     lat:45.7270,lng:4.9265,r:900,
-    note:"Campus Lyon 2 ici ✓, mais commune classée parmi les plus difficiles de l'agglo. Pour dormir, préfère le 8e Monplaisir (T2, ~15 min).",
-    traffic:"En hausse (+25 % dans les quartiers prioritaires de la banlieue est).",vols:"Vols de véhicules au-dessus de la moyenne.",nuis:"Variables selon le secteur ; abords du campus corrects en journée.",troub:"Certains secteurs sensibles le soir ; vigilance recommandée."},
+    taux:"Supérieur à la moyenne de l'agglo",rang:"Parmi les communes les plus difficiles (banlieue est)",qpv:"QPV Terraillon-Chénier, Parilly. Trafic +25 % dans les QPV de la banlieue est.",
+    note:"Le campus Lyon 2 est ici, mais la commune est classée parmi les plus difficiles de l'agglo. Les abords du campus sont corrects en journée. Pour dormir, préfère le 8e Monplaisir (T2, ~15 min) plutôt que les QPV de Bron.",
+    traffic:"En hausse (+25 % dans les QPV de la banlieue est).",vols:"Vols de véhicules au-dessus de la moyenne.",nuis:"Variables selon le secteur ; abords du campus corrects en journée.",troub:"Certains secteurs sensibles le soir ; vigilance recommandée.",ressenti:"Abords du campus vécus comme corrects en journée ; ressenti plus négatif le soir dans les secteurs QPV. La plupart des étudiants préfèrent dormir côté Lyon 8e et venir en tram."},
   "peripherie":{name:"Périphérie sensible (Vénissieux, Vaulx-en-Velin)",lvl:"red",rent:"bas",carnot:">40 min",bron:"variable",
     lat:45.7000,lng:4.8850,r:1100,
-    note:"Vaulx-en-Velin (Mas du Taureau), Vénissieux (Minguettes), certaines zones de St-Priest : à éviter pour se loger seule malgré des loyers bas.",
-    traffic:"Élevé (+25 % dans les QPV) ; points névralgiques à Vénissieux.",vols:"Vols de véhicules très au-dessus de la moyenne nationale.",nuis:"Fortes autour des grands ensembles.",troub:"Règlements de comptes liés aux trafics (Minguettes, barre Sakharov)."}
+    taux:"Très supérieur à la moyenne",rang:"Communes les plus difficiles du département",qpv:"Minguettes-Clochettes, Monery, Les Maronniers, La Borelle (Vénissieux) ; Mas du Taureau (Vaulx-en-Velin) ; Bellevue-Ermitage (St-Priest).",
+    note:"Vaulx-en-Velin (Mas du Taureau), Vénissieux (Minguettes), certaines zones de St-Priest : QPV avec trafic en hausse de 25 %. À éviter pour se loger seule malgré des loyers bas.",
+    traffic:"Élevé (+25 % dans les QPV) ; points névralgiques à Vénissieux.",vols:"Vols de véhicules très au-dessus de la moyenne nationale.",nuis:"Fortes autour des grands ensembles.",troub:"Règlements de comptes liés aux trafics (Minguettes, barre Sakharov).",ressenti:"Réputation difficile ancrée chez les habitants ; déconseillé par la plupart des étudiants pour s'y loger seule, malgré des loyers très bas."}
 };
 
 const POSTAL = {"69001":"1","69002":"2","69003":"3","69004":"4","69005":"5","69006":"6","69007":"7","69008":"8","69009":"9","69100":"villeurbanne","69500":"bron","69120":"peripherie","69200":"peripherie","69800":"peripherie"};
@@ -195,6 +211,28 @@ const KEYWORDS = [
   [["vaulx","venissieux","vénissieux","minguettes","mas du taureau","saint-priest","saint priest","st-priest","oullins","sakharov"],"peripherie"]
 ];
 function resolve(raw){const s=(raw||"").toLowerCase().trim();if(!s)return null;const pc=s.match(/\b(69\d{3})\b/);if(pc&&POSTAL[pc[1]])return POSTAL[pc[1]];for(const[w,k]of KEYWORDS){for(const x of w){if(s.includes(x))return k;}}return null;}
+
+function nearestZone(lat,lng){
+  let best=null,bestD=Infinity;
+  for(const key in ZONES){
+    const z=ZONES[key];
+    const dx=(z.lat-lat)*111000, dy=(z.lng-lng)*78000;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d<bestD){bestD=d;best=key;}
+  }
+  return {key:best,dist:Math.round(bestD)};
+}
+
+let geoMarker=null;
+async function geocode(raw){
+  const q=(raw||"").trim();
+  if(!q) return null;
+  const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=4.72,45.83,5.00,45.66&bounded=1&q='+encodeURIComponent(q+', Lyon, France');
+  const r=await fetch(url,{headers:{'Accept-Language':'fr'}});
+  const data=await r.json();
+  if(!data || !data.length) return null;
+  return {lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon),label:data[0].display_name.split(',').slice(0,2).join(',')};
+}
 
 const COL = {green:"#7aa73a",amber:"#e09a1f",red:"#d84b46"};
 const LBL = {green:"Recommandé",amber:"Moyen / variable",red:"Vigilance"};
@@ -225,26 +263,48 @@ const ICONS = {
   pill:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#d84b46" stroke-width="2"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>',
   bag:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#e09a1f" stroke-width="2"><path d="M3 7h18v13H3z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg>',
   vol:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#e09a1f" stroke-width="2"><path d="M3 9v6h4l5 5V4L7 9H3Z"/><path d="M16 9a3 3 0 0 1 0 6"/></svg>',
-  warn:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#d84b46" stroke-width="2"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>'
+  warn:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#d84b46" stroke-width="2"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>',
+  chat:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#185fa5" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>'
 };
 
 function secBlock(z){
-  return '<div class="sec"><h4>Sécurité</h4>'+
+  const stats = (z.taux||z.rang||z.qpv) ?
+    '<div style="background:var(--bg);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.6;">'+
+      (z.taux?'<div><b>Taux officiel (SSMSI 2024) :</b> '+z.taux+'</div>':'')+
+      (z.rang?'<div><b>Profil :</b> '+z.rang+'</div>':'')+
+      (z.qpv?'<div><b>Quartiers prioritaires (décret 2023) :</b> '+z.qpv+'</div>':'')+
+    '</div>' : '';
+  const ressenti = z.ressenti ?
+    '<div style="background:#e9f0f7;border-radius:8px;padding:9px 11px;margin-top:10px;font-size:12px;line-height:1.6;">'+
+      '<div style="display:flex;gap:7px;align-items:flex-start;">'+ICONS.chat+
+      '<span><b>Ressenti terrain (subjectif) :</b> '+z.ressenti+'</span></div>'+
+    '</div>' : '';
+  return '<div class="sec"><h4>Sécurité</h4>'+stats+
     '<div class="secrow">'+ICONS.pill+'<span><b>Trafic de stups :</b> '+z.traffic+'</span></div>'+
     '<div class="secrow">'+ICONS.bag+'<span><b>Vols :</b> '+z.vols+'</span></div>'+
     '<div class="secrow">'+ICONS.vol+'<span><b>Nuisances :</b> '+z.nuis+'</span></div>'+
-    '<div class="secrow">'+ICONS.warn+'<span><b>Troubles :</b> '+z.troub+'</span></div></div>';
+    '<div class="secrow">'+ICONS.warn+'<span><b>Troubles :</b> '+z.troub+'</span></div>'+
+    ressenti+'</div>';
 }
 
-function show(key){
+function show(key, geo){
   const z = ZONES[key];
   const empty = document.getElementById('empty');
   const res = document.getElementById('result');
-  if(!z){empty.textContent='Lieu non reconnu. Essaie un code postal (69001–69009), une commune (Bron, Villeurbanne) ou un quartier (Carnot, Mermoz, Guillotière).';empty.classList.remove('hidden');res.classList.add('hidden');return;}
+  if(!z){empty.textContent='Lieu non reconnu. Essaie un code postal (69001–69009), une commune, un quartier (Carnot, Mermoz) ou un nom de lieu précis (ex : Palais Hirsch, Berges du Rhône).';empty.classList.remove('hidden');res.classList.add('hidden');return;}
   for(const k in layers){const lit=(k===key);layers[k].setStyle({fillOpacity:lit?0.55:0.12,weight:lit?3:1});}
-  map.setView([z.lat,z.lng],13);
+
+  if(geoMarker){map.removeLayer(geoMarker);geoMarker=null;}
+  if(geo){
+    geoMarker=L.marker([geo.lat,geo.lng]).addTo(map).bindTooltip(geo.label,{direction:"top"}).openTooltip();
+    map.setView([geo.lat,geo.lng],14);
+  } else {
+    map.setView([z.lat,z.lng],13);
+  }
+
   empty.classList.add('hidden'); res.classList.remove('hidden');
-  res.innerHTML =
+  const geoBanner = geo ? '<div style="font-size:12px;color:var(--txt2);background:var(--bg);border-radius:8px;padding:7px 10px;margin-bottom:10px;">📍 <b>'+geo.label+'</b><br>Rattaché au secteur : <b>'+z.name+'</b></div>' : '';
+  res.innerHTML = geoBanner+
     '<div class="name">'+z.name+'</div>'+
     '<div class="badge" style="background:'+BG[z.lvl]+';color:'+TX[z.lvl]+'">'+LBL[z.lvl]+'</div>'+
     '<p class="note">'+z.note+'</p>'+
@@ -264,9 +324,26 @@ function cmpCard(raw){
     secBlock(z)+'</div>';
 }
 
-document.getElementById('go').onclick=()=>show(resolve(document.getElementById('q').value));
-document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')show(resolve(document.getElementById('q').value));});
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.getElementById('q').value=c.dataset.q;show(resolve(c.dataset.q));});
+async function runSearch(raw){
+  const k = resolve(raw);
+  if(k){ show(k); return; }
+  const empty=document.getElementById('empty');
+  empty.classList.remove('hidden');
+  document.getElementById('result').classList.add('hidden');
+  empty.textContent='Recherche du lieu…';
+  try{
+    const geo = await geocode(raw);
+    if(!geo){show(null);return;}
+    const near = nearestZone(geo.lat,geo.lng);
+    show(near.key, geo);
+  }catch(e){
+    empty.textContent='Recherche impossible (hors ligne ?). Essaie un code postal ou un quartier connu.';
+  }
+}
+
+document.getElementById('go').onclick=()=>runSearch(document.getElementById('q').value);
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch(document.getElementById('q').value);});
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.getElementById('q').value=c.dataset.q;runSearch(c.dataset.q);});
 document.getElementById('cgo').onclick=()=>{document.getElementById('cResult').innerHTML=cmpCard(document.getElementById('cA').value)+cmpCard(document.getElementById('cB').value);};
 
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
