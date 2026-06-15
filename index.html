@@ -3,185 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Coloc Lyon — secteurs sûrs pour étudiantes</title>
+<title>Coloc Lyon — sécurité par secteur, recherche femmes</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root{
-    --ink:#1a1d29; --paper:#f6f3ec; --line:#d8d2c4;
-    --calm:#3f8f6b; --mid:#d9a441; --hot:#c0563b;
-    --accent:#5b4b8a; --muted:#6e6a5e;
+    --bg:#faf9f5; --card:#fff; --line:#e4e2da; --line2:#cfccc2;
+    --txt:#2c2c2a; --txt2:#6b6a64; --txt3:#9c9a92;
+    --green:#7aa73a; --green-bg:#eef5e2; --green-tx:#2f5210;
+    --amber:#e09a1f; --amber-bg:#fbf0d8; --amber-tx:#6a4406;
+    --red:#d84b46; --red-bg:#fbe7e6; --red-tx:#7d1f1d;
+    --accent:#534ab7; --radius:12px;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:'Segoe UI',system-ui,sans-serif;
-    background:var(--paper); color:var(--ink);
-    line-height:1.5;
-  }
-  header{
-    padding:26px 22px 18px; max-width:1200px; margin:0 auto;
-    border-bottom:2px solid var(--ink);
-  }
-  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  h1{font-family:Georgia,serif;font-size:32px;font-weight:700;margin:6px 0 4px;line-height:1.1}
-  header p{color:var(--muted);font-size:14px;max-width:640px}
-  .wrap{max-width:1200px;margin:0 auto;padding:18px 22px 60px;display:grid;grid-template-columns:1fr 360px;gap:22px}
-  @media(max-width:900px){.wrap{grid-template-columns:1fr}}
-  #map{height:560px;border:2px solid var(--ink);border-radius:4px;z-index:1}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0 0;font-size:13px}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  .wrap{max-width:1140px;margin:0 auto;padding:20px 16px 50px}
+  h1{font-size:22px;font-weight:600;margin:0 0 4px}
+  .sub{color:var(--txt2);font-size:14px;margin:0 0 16px;max-width:680px}
+  .searchbar{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  input[type=text]{flex:1;min-width:200px;height:42px;padding:0 14px;border:1px solid var(--line2);border-radius:var(--radius);font-size:15px}
+  button.go{height:42px;padding:0 18px;border:none;background:var(--accent);color:#fff;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer}
+  button.go:hover{filter:brightness(1.08)}
+  .ex{font-size:12px;color:var(--txt3);margin-bottom:14px}
+  .ex b{color:var(--txt2);font-weight:600;cursor:pointer;text-decoration:underline dotted}
+  .layout{display:grid;grid-template-columns:1fr 380px;gap:18px}
+  @media(max-width:880px){.layout{grid-template-columns:1fr}}
+  #map{height:580px;border:1px solid var(--line2);border-radius:var(--radius);z-index:1}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--txt2)}
   .legend span{display:inline-flex;align-items:center;gap:6px}
-  .dot{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.2)}
-  aside h2{font-family:Georgia,serif;font-size:18px;margin-bottom:4px}
-  .hint{font-size:13px;color:var(--muted);margin-bottom:14px}
-  .card{
-    border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:12px;
-    background:#fff;transition:.15s;
-  }
-  .card.active{border-color:var(--accent);box-shadow:0 2px 0 var(--accent)}
-  .card h3{font-size:15px;display:flex;justify-content:space-between;align-items:center}
-  .badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff}
-  .b-calm{background:var(--calm)} .b-mid{background:var(--mid)} .b-hot{background:var(--hot)}
-  .card .note{font-size:12.5px;color:var(--muted);margin:6px 0 10px}
-  .links a{
-    display:block;font-size:13px;padding:7px 10px;margin-top:6px;border-radius:4px;
-    background:var(--paper);color:var(--ink);text-decoration:none;border:1px solid var(--line);
-  }
-  .links a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .links a span{float:right;opacity:.6}
-  .global{border-top:2px solid var(--ink);margin-top:18px;padding-top:16px}
-  .global a{display:inline-block;margin:4px 6px 4px 0;font-size:13px;padding:8px 12px;
-    background:var(--ink);color:var(--paper);text-decoration:none;border-radius:4px}
-  .global a:hover{background:var(--accent)}
-  .foot{max-width:1200px;margin:0 auto;padding:0 22px 40px;font-size:11.5px;color:var(--muted)}
+  .dot{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.15)}
+  .crit{width:13px;height:13px;border-radius:3px;background:repeating-linear-gradient(45deg,#d84b46,#d84b46 3px,#fff 3px,#fff 5px);border:1px solid var(--red)}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;min-height:580px}
+  .panel .ph{color:var(--txt3);font-size:14px;text-align:center;margin-top:40px}
+  .secname{font-size:18px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+  .b-green{background:var(--green-bg);color:var(--green-tx)}
+  .b-amber{background:var(--amber-bg);color:var(--amber-tx)}
+  .b-red{background:var(--red-bg);color:var(--red-tx)}
+  .arr{font-size:12px;color:var(--txt3);margin:2px 0 12px}
+  .row{display:flex;gap:8px;font-size:13px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .row .k{color:var(--txt2);width:120px;flex-shrink:0}
+  .row .v{color:var(--txt)}
+  .qpvwarn{background:var(--red-bg);color:var(--red-tx);font-size:12.5px;padding:8px 10px;border-radius:8px;margin:10px 0}
+  .terrain{background:#f3f1fb;color:#3a3470;font-size:12.5px;padding:8px 10px;border-radius:8px;margin:10px 0;font-style:italic}
+  .colocs{margin-top:14px}
+  .colocs h4{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:0 0 8px}
+  .colocs a{display:block;font-size:13px;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line2);border-radius:8px;text-decoration:none;color:var(--txt);background:var(--bg)}
+  .colocs a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .colocs a small{float:right;opacity:.6}
+  .foot{font-size:11.5px;color:var(--txt3);margin-top:18px;max-width:1140px}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--txt);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1}
 </style>
 </head>
 <body>
-<header>
-  <div class="eyebrow">Lyon · budget ≤ 600 € · coloc féminine</div>
-  <h1>Où chercher (et où réfléchir à deux fois)</h1>
-  <p>Carte des arrondissements colorée selon les chiffres officiels de délinquance 2024 (SSMSI / Ministère de l'Intérieur), croisée avec des recherches de colocations entre filles préfiltrées par secteur. Clique un arrondissement pour voir les annonces.</p>
-  <div class="legend">
-    <span><i class="dot" style="background:var(--calm)"></i> Plutôt calme</span>
-    <span><i class="dot" style="background:var(--mid)"></i> Vigilance modérée</span>
-    <span><i class="dot" style="background:var(--hot)"></i> Très exposé (centre festif / vols)</span>
-  </div>
-</header>
-
 <div class="wrap">
-  <div>
-    <div id="map"></div>
-    <p class="hint" style="margin-top:10px">Les couleurs reflètent surtout vols sans violence, vols à la roulotte et cambriolages — pas un jugement global. Le centre (1er/2e) est très animé donc statistiquement exposé, mais bien éclairé et fréquenté ; certaines zones est (8e Mermoz, périphérie Vénissieux/Vaulx) demandent plus de prudence le soir.</p>
+  <h1>Coloc à Lyon — par secteur, entre filles</h1>
+  <p class="sub">Cherche un lieu précis (adresse, station, quartier) ou clique un secteur. La fiche donne le détail sécurité issu des données officielles SSMSI 2024, signale les zones prioritaires (QPV), et ouvre des recherches de colocation féminine ciblées. Budget visé ≤ 600 €.</p>
+
+  <div class="searchbar">
+    <input type="text" id="q" placeholder="ex : Berges du Rhône, Jean Macé, 69007, Place Guichard…" />
+    <button class="go" id="goBtn">Chercher</button>
+  </div>
+  <div class="ex">Essaie :
+    <b onclick="searchPlace('Berges du Rhône Lyon')">Berges du Rhône</b> ·
+    <b onclick="searchPlace('Jean Macé Lyon')">Jean Macé</b> ·
+    <b onclick="searchPlace('Croix-Rousse Lyon')">Croix-Rousse</b> ·
+    <b onclick="searchPlace('Guillotière Lyon')">Guillotière</b> ·
+    <b onclick="searchPlace('Gratte-Ciel Villeurbanne')">Gratte-Ciel</b>
   </div>
 
-  <aside>
-    <h2 id="sec-title">Tous les secteurs</h2>
-    <p class="hint" id="sec-hint">Clique un arrondissement sur la carte pour filtrer les annonces.</p>
-    <div id="cards"></div>
-
-    <div class="global">
-      <h2>Recherche globale — entre filles</h2>
-      <p class="hint">Filtres « colocation féminine » déjà appliqués quand le site le permet.</p>
-      <a href="https://www.appartager.com/colocations/lyon" target="_blank" rel="noopener">Appartager Lyon</a>
-      <a href="https://www.lacartedescolocs.fr/colocations/france/lyon" target="_blank" rel="noopener">La Carte des Colocs</a>
-      <a href="https://www.leboncoin.fr/recherche?category=11&locations=Lyon&price=min-600" target="_blank" rel="noopener">leboncoin ≤600€</a>
-      <a href="https://www.studapart.com/fr/colocation-lyon" target="_blank" rel="noopener">Studapart</a>
-      <a href="https://www.roomlala.com/fr/location/colocation/lyon" target="_blank" rel="noopener">Roomlala</a>
+  <div class="layout">
+    <div>
+      <div id="map"></div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--green)"></i> Plutôt calme</span>
+        <span><i class="dot" style="background:var(--amber)"></i> Vigilance modérée</span>
+        <span><i class="dot" style="background:var(--red)"></i> Très exposé (vols)</span>
+        <span><i class="crit"></i> Quartier prioritaire (QPV)</span>
+      </div>
     </div>
-  </aside>
-</div>
+    <div class="panel" id="panel">
+      <div class="ph">Clique un secteur ou lance une recherche pour voir le détail et les colocations.</div>
+    </div>
+  </div>
 
-<p class="foot">Source délinquance : SSMSI — « Géographie de la délinquance communale 2024 » (Ministère de l'Intérieur), reprise Lyon Mag 03/2025. Données par arrondissement, taux pour 1 000 habitants/logements. Les liens d'annonces ouvrent des recherches préfiltrées ; vérifie toujours le loyer charges comprises et la non-mixité directement dans l'annonce. Outil indicatif, pas un classement de « bons » ou « mauvais » quartiers.</p>
+  <p class="foot">Sécurité : SSMSI — « Géographie de la délinquance communale 2024 » (Ministère de l'Intérieur), taux pour 1 000 hab./logements. QPV : périmètres du décret n°2023-1314. Ressenti terrain = synthèse qualitative de sources publiques, subjectif et distinct des statistiques. Recherche de lieu via Nominatim/OpenStreetMap (connexion requise). Les liens coloc ouvrent des recherches préfiltrées : vérifie loyer charges comprises et non-mixité dans chaque annonce.</p>
+</div>
+<div class="toast" id="toast"></div>
 
 <script>
-// Données : centroïde approx + niveau de risque relatif (SSMSI 2024) + requêtes coloc féminines
-const arr = [
-  {n:"Lyon 1er", lat:45.7700, lng:4.8320, lvl:"hot",
-   note:"Pentes Croix-Rousse, très animé. Vols sans violence élevés (58‰), vols violents parmi les plus hauts. Vivant mais surveille tes affaires en soirée.",
-   q:"colocation Lyon 1er"},
-  {n:"Lyon 2e", lat:45.7480, lng:4.8270, lvl:"hot",
-   note:"Presqu'île / Confluence. Taux record de vols (109‰) et de vols à la roulotte. Hyper central, animé, mais le plus exposé aux vols.",
-   q:"colocation Lyon 2e Confluence"},
-  {n:"Lyon 3e", lat:45.7580, lng:4.8580, lvl:"mid",
-   note:"Part-Dieu / Préfecture / Sans-Souci. Grand, contrasté : Part-Dieu fréquenté, Sans-Souci résidentiel calme. Bon compromis transports.",
-   q:"colocation Lyon 3e Sans-Souci"},
-  {n:"Lyon 4e", lat:45.7770, lng:4.8270, lvl:"calm",
-   note:"Croix-Rousse plateau. Résidentiel, ambiance village, prisé des étudiantes. Plutôt tranquille.",
-   q:"colocation Lyon 4e Croix-Rousse"},
-  {n:"Lyon 5e", lat:45.7570, lng:4.8030, lvl:"calm",
-   note:"Vieux Lyon / Point du Jour. Cambriolages un peu au-dessus de la moyenne mais secteur calme et agréable.",
-   q:"colocation Lyon 5e"},
-  {n:"Lyon 6e", lat:45.7700, lng:4.8480, lvl:"mid",
-   note:"Foch / Parc Tête d'Or. Chic et sûr au quotidien, mais cambriolages les plus élevés de Lyon (12,8‰) car logements aisés. Loyers souvent >600€.",
+const secteurs = [
+  {n:"Croix-Rousse (plateau)", arr:"Lyon 4e", lat:45.7770, lng:4.8270, lvl:"green",
+   trafic:"Faible", vols:"Modérés (opportunistes)", nuis:"Faibles, ambiance village", qpv:false,
+   terrain:"Très apprécié des étudiantes, vivant le jour, calme le soir.",
+   q:"colocation Croix-Rousse Lyon 4e"},
+  {n:"Vaise / Gorge de Loup", arr:"Lyon 9e", lat:45.7800, lng:4.8050, lvl:"green",
+   trafic:"Faible", vols:"Faibles à modérés", nuis:"Faibles", qpv:false,
+   terrain:"Résidentiel, métro D direct, loyers contenus. Bon plan discret.",
+   q:"colocation Vaise Lyon 9e"},
+  {n:"Vieux Lyon / St-Just", arr:"Lyon 5e", lat:45.7600, lng:4.8230, lvl:"green",
+   trafic:"Faible", vols:"Modérés (touristique)", nuis:"Modérées près des quais", qpv:false,
+   terrain:"Charme, sûr, mais pavés et touristes ; loyers parfois hauts.",
+   q:"colocation Vieux Lyon 5e"},
+  {n:"Monplaisir", arr:"Lyon 8e", lat:45.7430, lng:4.8710, lvl:"green",
+   trafic:"Faible", vols:"Modérés", nuis:"Faibles", qpv:false,
+   terrain:"Familial et abordable, métro D. Agréable au quotidien.",
+   q:"colocation Monplaisir Lyon 8e"},
+  {n:"Jean Macé / Gerland", arr:"Lyon 7e", lat:45.7300, lng:4.8420, lvl:"amber",
+   trafic:"Modéré", vols:"Modérés", nuis:"Modérées", qpv:false,
+   terrain:"Très étudiant, abordable, bien desservi. Sud du 7e plus calme.",
+   q:"colocation Jean Macé Gerland Lyon 7e"},
+  {n:"Sans-Souci / Préfecture", arr:"Lyon 3e", lat:45.7560, lng:4.8620, lvl:"amber",
+   trafic:"Modéré", vols:"Modérés", nuis:"Faibles côté Sans-Souci", qpv:false,
+   terrain:"Résidentiel et pratique (métro), bon compromis sécurité/prix.",
+   q:"colocation Sans-Souci Préfecture Lyon 3e"},
+  {n:"Charpennes / Gratte-Ciel", arr:"Villeurbanne", lat:45.7700, lng:4.8830, lvl:"amber",
+   trafic:"Modéré", vols:"Modérés", nuis:"Modérées (campus)", qpv:false,
+   terrain:"Hyper étudiant, loyers plus bas qu'intra-muros, métro A.",
+   q:"colocation Charpennes Gratte-Ciel Villeurbanne"},
+  {n:"Foch / Parc Tête d'Or", arr:"Lyon 6e", lat:45.7700, lng:4.8480, lvl:"amber",
+   trafic:"Faible", vols:"Cambriolages élevés (12,8‰)", nuis:"Faibles", qpv:false,
+   terrain:"Chic et sûr au quotidien mais cher (>600€ fréquent) et ciblé par cambriolages.",
    q:"colocation Lyon 6e"},
-  {n:"Lyon 7e", lat:45.7330, lng:4.8420, lvl:"mid",
-   note:"Guillotière / Jean Macé / Gerland. Très étudiant et abordable. Côté Jean Macé/Gerland calme ; secteur Guillotière nord plus agité le soir.",
-   q:"colocation Lyon 7e Jean Macé"},
-  {n:"Lyon 8e", lat:45.7340, lng:4.8700, lvl:"mid",
-   note:"Monplaisir / Mermoz / Bachut. Monplaisir agréable et abordable ; Mermoz plus prudent le soir. Loyers parmi les plus bas.",
-   q:"colocation Lyon 8e Monplaisir"},
-  {n:"Lyon 9e", lat:45.7800, lng:4.8050, lvl:"calm",
-   note:"Vaise / Gorge de Loup. Résidentiel, bien desservi (métro D), loyers contenus. Plutôt calme.",
-   q:"colocation Lyon 9e Vaise"},
-  {n:"Villeurbanne", lat:45.7720, lng:4.8900, lvl:"mid",
-   note:"Gratte-Ciel / Charpennes. Très étudiant, loyers plus bas qu'intra-muros. Charpennes/Gratte-Ciel pratiques ; éviter quelques poches est.",
-   q:"colocation Villeurbanne Gratte-Ciel"}
+  {n:"Presqu'île / Bellecour", arr:"Lyon 2e", lat:45.7560, lng:4.8320, lvl:"red",
+   trafic:"Modéré", vols:"Très élevés (109‰, roulotte 51‰)", nuis:"Élevées (vie nocturne)", qpv:false,
+   terrain:"Ultra central et animé : surtout vols opportunistes, peu de violence. Éclairé et fréquenté.",
+   q:"colocation Presqu'île Lyon 2e"},
+  {n:"Pentes / Terreaux", arr:"Lyon 1er", lat:45.7700, lng:4.8330, lvl:"red",
+   trafic:"Modéré", vols:"Élevés (58‰)", nuis:"Élevées (bars, nuit)", qpv:false,
+   terrain:"Bohème et vivant, vie nocturne dense. Attention aux affaires le soir.",
+   q:"colocation Pentes Croix-Rousse Lyon 1er"},
+  {n:"Guillotière (nord)", arr:"Lyon 7e", lat:45.7530, lng:4.8430, lvl:"red",
+   trafic:"Présent par endroits", vols:"Élevés", nuis:"Élevées certains soirs", qpv:false,
+   terrain:"Très vivant et multiculturel, mais secteur place du Pont souvent jugé agité le soir par les étudiantes.",
+   q:"colocation Guillotière Lyon 7e"},
+  {n:"Mermoz", arr:"Lyon 8e", lat:45.7300, lng:4.8770, lvl:"amber",
+   trafic:"Présent (sud)", vols:"Modérés", nuis:"Modérées", qpv:true,
+   terrain:"Partiellement en rénovation urbaine ; plus prudent le soir. Loyers bas.",
+   q:"colocation Mermoz Lyon 8e"},
+  {n:"États-Unis / Langlet-Santy", arr:"Lyon 8e", lat:45.7200, lng:4.8700, lvl:"amber",
+   trafic:"Présent", vols:"Modérés", nuis:"Modérées", qpv:true,
+   terrain:"Quartier prioritaire ; abordable mais à évaluer selon la rue précise.",
+   q:"colocation États-Unis Lyon 8e"},
+  {n:"La Duchère", arr:"Lyon 9e", lat:45.7850, lng:4.7900, lvl:"amber",
+   trafic:"Présent", vols:"Modérés", nuis:"Modérées", qpv:true,
+   terrain:"QPV en rénovation, vue et espaces verts ; loyers bas, à apprécier rue par rue.",
+   q:"colocation Duchère Lyon 9e"}
 ];
 
-const colors={calm:"#3f8f6b",mid:"#d9a441",hot:"#c0563b"};
-const badgeClass={calm:"b-calm",mid:"b-mid",hot:"b-hot"};
-const badgeText={calm:"Calme",mid:"Modéré",hot:"Exposé"};
+const palette={green:"#7aa73a",amber:"#e09a1f",red:"#d84b46"};
+const badgeC={green:"b-green",amber:"b-amber",red:"b-red"};
+const badgeT={green:"Plutôt calme",amber:"Vigilance modérée",red:"Très exposé"};
 
-const map=L.map('map',{scrollWheelZoom:false}).setView([45.758,4.835],12.4);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
-  attribution:'© OpenStreetMap, © CARTO', maxZoom:19
-}).addTo(map);
+const map=L.map('map',{scrollWheelZoom:false}).setView([45.755,4.842],12.3);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  {attribution:'© OpenStreetMap, © CARTO',maxZoom:19}).addTo(map);
 
-function colocLinks(a){
-  const aff=`https://www.appartager.com/colocations/lyon?q=${encodeURIComponent(a.n)}`;
-  const lbc=`https://www.leboncoin.fr/recherche?category=11&text=${encodeURIComponent(a.q)}&price=min-600`;
-  const cdc=`https://www.lacartedescolocs.fr/colocations/france/lyon`;
-  return `<div class="links">
-    <a href="${aff}" target="_blank" rel="noopener">Appartager — ${a.n} <span>↗</span></a>
-    <a href="${lbc}" target="_blank" rel="noopener">leboncoin — ${a.q} ≤600€ <span>↗</span></a>
-    <a href="${cdc}" target="_blank" rel="noopener">Carte des Colocs (filtre Femmes) <span>↗</span></a>
-  </div>`;
-}
+let searchMarker=null;
+const markers={};
 
-function cardHTML(a){
-  return `<div class="card" id="card-${a.n.replace(/\W/g,'')}">
-    <h3>${a.n} <span class="badge ${badgeClass[a.lvl]}">${badgeText[a.lvl]}</span></h3>
-    <div class="note">${a.note}</div>
-    ${colocLinks(a)}
-  </div>`;
-}
-
-const cardsEl=document.getElementById('cards');
-function renderCards(filterName){
-  const list=filterName?arr.filter(a=>a.n===filterName):arr;
-  cardsEl.innerHTML=list.map(cardHTML).join('');
-  if(filterName){
-    document.getElementById('sec-title').textContent=filterName;
-    document.getElementById('sec-hint').textContent="Annonces préfiltrées pour ce secteur. Clique ailleurs pour réinitialiser.";
-  }else{
-    document.getElementById('sec-title').textContent="Tous les secteurs";
-    document.getElementById('sec-hint').textContent="Clique un arrondissement sur la carte pour filtrer.";
-  }
-}
-renderCards(null);
-
-arr.forEach(a=>{
-  const m=L.circleMarker([a.lat,a.lng],{
-    radius:16, fillColor:colors[a.lvl], color:'#1a1d29',
-    weight:1.5, fillOpacity:.72
+secteurs.forEach((s,i)=>{
+  const m=L.circleMarker([s.lat,s.lng],{
+    radius:15, fillColor:palette[s.lvl], fillOpacity:.72,
+    color: s.qpv ? "#7d1f1d" : "#2c2c2a",
+    weight: s.qpv ? 3 : 1.4,
+    dashArray: s.qpv ? "4 3" : null
   }).addTo(map);
-  m.bindTooltip(a.n,{permanent:true,direction:'center',className:'lbl'});
-  m.on('click',()=>{ renderCards(a.n); map.setView([a.lat,a.lng],13.3); });
+  m.bindTooltip(s.n,{permanent:false,direction:'top'});
+  m.on('click',()=>showSector(i));
+  markers[i]=m;
 });
 
-map.on('click',e=>{ if(!e.originalEvent.target.closest('.leaflet-interactive')){renderCards(null);} });
+function showSector(i){
+  const s=secteurs[i];
+  map.setView([s.lat,s.lng],13.4);
+  let html=`<div class="secname">${s.n}<span class="badge ${badgeC[s.lvl]}">${badgeT[s.lvl]}</span></div>`;
+  html+=`<div class="arr">${s.arr}</div>`;
+  if(s.qpv) html+=`<div class="qpvwarn">⚠ Quartier prioritaire de la ville (QPV). Loyers bas mais à évaluer rue par rue ; certaines portions plus prudentes le soir.</div>`;
+  html+=`<div class="row"><span class="k">Trafic stups</span><span class="v">${s.trafic}</span></div>`;
+  html+=`<div class="row"><span class="k">Vols</span><span class="v">${s.vols}</span></div>`;
+  html+=`<div class="row"><span class="k">Nuisances soir</span><span class="v">${s.nuis}</span></div>`;
+  html+=`<div class="terrain">Ressenti terrain (subjectif) : ${s.terrain}</div>`;
+  const aff=`https://www.appartager.com/colocations/lyon`;
+  const cdc=`https://www.lacartedescolocs.fr/colocations/france/lyon`;
+  const lbc=`https://www.leboncoin.fr/recherche?category=11&text=${encodeURIComponent(s.q)}&price=min-600`;
+  html+=`<div class="colocs"><h4>Colocations entre filles — ${s.n}</h4>
+    <a href="${cdc}" target="_blank" rel="noopener">Carte des Colocs <small>filtre Femmes ↗</small></a>
+    <a href="${aff}" target="_blank" rel="noopener">Appartager Lyon <small>filtre Entre filles ↗</small></a>
+    <a href="${lbc}" target="_blank" rel="noopener">leboncoin · ${s.q} ≤600€ <small>↗</small></a>
+  </div>`;
+  document.getElementById('panel').innerHTML=html;
+}
+
+function nearestSector(lat,lng){
+  let best=0,bd=1e9;
+  secteurs.forEach((s,i)=>{
+    const d=(s.lat-lat)**2+(s.lng-lng)**2;
+    if(d<bd){bd=d;best=i;}
+  });
+  return best;
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+async function searchPlace(forced){
+  const q=forced||document.getElementById('q').value.trim();
+  if(!q){toast("Tape un lieu à chercher");return;}
+  const query=/lyon|villeurbanne|bron/i.test(q)?q:q+" Lyon";
+  toast("Recherche en cours…");
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`);
+    const d=await r.json();
+    if(!d.length){toast("Lieu introuvable, essaie un autre nom");return;}
+    const lat=+d[0].lat,lng=+d[0].lon;
+    if(searchMarker)map.removeLayer(searchMarker);
+    searchMarker=L.marker([lat,lng]).addTo(map).bindPopup(d[0].display_name.split(',')[0]).openPopup();
+    map.setView([lat,lng],14);
+    const i=nearestSector(lat,lng);
+    showSector(i);
+    toast(`Rattaché au secteur : ${secteurs[i].n}`);
+  }catch(e){toast("Erreur réseau — vérifie ta connexion");}
+}
+
+document.getElementById('goBtn').onclick=()=>searchPlace();
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')searchPlace();});
 </script>
-<style>
-.lbl{background:transparent;border:none;box-shadow:none;color:#1a1d29;font-size:10px;font-weight:700;text-shadow:0 0 3px #fff,0 0 3px #fff}
-</style>
 </body>
 </html>
